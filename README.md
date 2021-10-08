@@ -1,6 +1,6 @@
-# .emacs.d
+# .spaceemacs.d
 
-昔の環境は大きくなりすぎたので、再構築。
+昔の環境は大きくなりすぎたので、再構築。ナウいSpacemacsをカスタマイズする。
 
 *Keep it Simple, Stupid* だよ
 
