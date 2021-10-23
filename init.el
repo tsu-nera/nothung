@@ -550,7 +550,11 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
-  (setq x-select-enable-clipboard t))
+  (setq x-select-enable-clipboard t)
+  (set-fontset-font
+   nil 'japanese-jisx0208
+   (font-spec :family "Ricty Diminished"))
+  )
 
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -568,12 +572,10 @@ This function is called at the very end of Spacemacs initialization."
  '(ansi-color-names-vector
    ["#080808" "#d70000" "#67b11d" "#875f00" "#268bd2" "#af00df" "#00ffff" "#b2b2b2"])
  '(custom-safe-themes
-   (quote
-    ("bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" default)))
+   '("bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" default))
  '(evil-want-Y-yank-to-eol nil)
  '(hl-todo-keyword-faces
-   (quote
-    (("TODO" . "#dc752f")
+   '(("TODO" . "#dc752f")
      ("NEXT" . "#dc752f")
      ("THEM" . "#2aa198")
      ("PROG" . "#268bd2")
@@ -587,13 +589,12 @@ This function is called at the very end of Spacemacs initialization."
      ("TEMP" . "#875f00")
      ("FIXME" . "#dc752f")
      ("XXX+" . "#dc752f")
-     ("\\?\\?\\?+" . "#dc752f"))))
+     ("\\?\\?\\?+" . "#dc752f")))
  '(org-fontify-done-headline nil)
  '(org-fontify-todo-headline nil)
  '(package-selected-packages
-   (quote
-(vmd-mode valign mmm-mode markdown-toc gh-md emoji-cheat-sheet-plus company-emoji insert-shebang flycheck-bashate fish-mode company-shell yapfify stickyfunc-enhance sphinx-doc pytest pyenv-mode pydoc py-isort poetry transient pippel pipenv pyvenv pip-requirements nose lsp-python-ms lsp-pyright live-py-mode importmagic epc ctable concurrent deferred helm-pydoc helm-gtags helm-cscope xcscope ggtags dap-mode lsp-treemacs bui lsp-mode markdown-mode cython-mode counsel-gtags counsel swiper ivy company-anaconda company blacken anaconda-mode pythonic ws-butler writeroom-mode winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package undo-tree treemacs-projectile treemacs-persp treemacs-icons-dired toc-org symon symbol-overlay string-inflection string-edit spaceline-all-the-icons restart-emacs request rainbow-delimiters quickrun popwin pcre2el password-generator paradox overseer org-superstar open-junk-file nameless multi-line macrostep lorem-ipsum link-hint inspector info+ indent-guide hybrid-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-purpose helm-projectile helm-org helm-mode-manager helm-make helm-ls-git helm-flx helm-descbinds helm-cider helm-ag google-translate golden-ratio font-lock+ flycheck-package flycheck-elsa flx-ido fill-column-indicator fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-collection evil-cleverparens evil-args evil-anzu emr elisp-slime-nav editorconfig dumb-jump drag-stuff dotenv-mode dired-quick-sort diminish define-word column-enforce-mode clean-aindent-mode cider-eval-sexp-fu centered-cursor-mode auto-highlight-symbol auto-compile aggressive-indent ace-link ace-jump-helm-line)))
- '(pdf-view-midnight-colors (quote ("#b2b2b2" . "#262626"))))
+   '(treemacs-magit smeargle helm-gitignore helm-git-grep gitignore-templates git-timemachine git-messenger git-link forge yaml magit ghub closql emacsql-sqlite emacsql treepy magit-section git-commit with-editor vmd-mode valign mmm-mode markdown-toc gh-md emoji-cheat-sheet-plus company-emoji insert-shebang flycheck-bashate fish-mode company-shell yapfify stickyfunc-enhance sphinx-doc pytest pyenv-mode pydoc py-isort poetry transient pippel pipenv pyvenv pip-requirements nose lsp-python-ms lsp-pyright live-py-mode importmagic epc ctable concurrent deferred helm-pydoc helm-gtags helm-cscope xcscope ggtags dap-mode lsp-treemacs bui lsp-mode markdown-mode cython-mode counsel-gtags counsel swiper ivy company-anaconda company blacken anaconda-mode pythonic ws-butler writeroom-mode winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package undo-tree treemacs-projectile treemacs-persp treemacs-icons-dired toc-org symon symbol-overlay string-inflection string-edit spaceline-all-the-icons restart-emacs request rainbow-delimiters quickrun popwin pcre2el password-generator paradox overseer org-superstar open-junk-file nameless multi-line macrostep lorem-ipsum link-hint inspector info+ indent-guide hybrid-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-purpose helm-projectile helm-org helm-mode-manager helm-make helm-ls-git helm-flx helm-descbinds helm-cider helm-ag google-translate golden-ratio font-lock+ flycheck-package flycheck-elsa flx-ido fill-column-indicator fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-collection evil-cleverparens evil-args evil-anzu emr elisp-slime-nav editorconfig dumb-jump drag-stuff dotenv-mode dired-quick-sort diminish define-word column-enforce-mode clean-aindent-mode cider-eval-sexp-fu centered-cursor-mode auto-highlight-symbol auto-compile aggressive-indent ace-link ace-jump-helm-line))
+ '(pdf-view-midnight-colors '("#b2b2b2" . "#262626")))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -601,3 +602,17 @@ This function is called at the very end of Spacemacs initialization."
  ;; If there is more than one, they won't work right.
  )
 )
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(evil-want-Y-yank-to-eol nil)
+ '(package-selected-packages
+   '(yapfify yaml-mode ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package undo-tree toc-org spaceline powerline smeargle restart-emacs rainbow-delimiters pyvenv pytest pyenv-mode py-isort popwin pip-requirements persp-mode pcre2el paradox orgit org-plus-contrib org-bullets open-junk-file neotree move-text mmm-mode markdown-toc markdown-mode magit-gitflow magit-popup magit magit-section macrostep lorem-ipsum live-py-mode linum-relative link-hint insert-shebang indent-guide hy-mode hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-pydoc helm-projectile projectile helm-mode-manager helm-make helm-gitignore request helm-flx helm-descbinds helm-ag google-translate golden-ratio git-timemachine git-messenger git-link git-commit with-editor transient gh-md flx-ido flx fish-mode fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist highlight evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg elisp-slime-nav dumb-jump diminish define-word cython-mode column-enforce-mode clj-refactor hydra inflections multiple-cursors paredit yasnippet lv clean-aindent-mode cider-eval-sexp-fu eval-sexp-fu cider sesman seq spinner queue pkg-info parseedn clojure-mode parseclj epl bind-map bind-key auto-highlight-symbol ht auto-compile packed anaconda-mode pythonic f dash s aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async monokai-theme)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
