@@ -36,7 +36,13 @@ This function should only modify configuration layer settings."
      shell-scripts
      shell-scripts
      yaml
-     python
+     (python :variables
+             python-backend 'lsp
+             python-formatter 'yapf
+             python-format-on-save t
+             python-sort-imports-on-save t
+             ;; python-pipenv-activate t
+             python-test-runner 'pytest)
 
      ;; https://develop.spacemacs.org/layers/+lang/clojure/README.html
      (clojure :variables
@@ -73,7 +79,7 @@ This function should only modify configuration layer settings."
    ;; `dotspacemacs/user-config'. To use a local version of a package, use the
    ;; `:location' property: '(your-package :location "~/path/to/your-package/")
    ;; Also include the dependencies as they will not be resolved automatically.
-   dotspacemacs-additional-packages '()
+   dotspacemacs-additional-packages '(jedi)
 
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -554,6 +560,12 @@ before packages are loaded."
   (set-fontset-font
    nil 'japanese-jisx0208
    (font-spec :family "Ricty Diminished"))
+
+  ;; python-modeで `jediによる自動補完`と `flake8`によるチェックを行う
+  (add-hook 'python-mode-hook
+            (lambda ()
+              #'(flycheck-add-next-checker 'python-flake8)
+              'jedi:setup))
   )
 
 
@@ -572,10 +584,12 @@ This function is called at the very end of Spacemacs initialization."
  '(ansi-color-names-vector
    ["#080808" "#d70000" "#67b11d" "#875f00" "#268bd2" "#af00df" "#00ffff" "#b2b2b2"])
  '(custom-safe-themes
-   '("bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" default))
+   (quote
+    ("bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" default)))
  '(evil-want-Y-yank-to-eol nil)
  '(hl-todo-keyword-faces
-   '(("TODO" . "#dc752f")
+   (quote
+    (("TODO" . "#dc752f")
      ("NEXT" . "#dc752f")
      ("THEM" . "#2aa198")
      ("PROG" . "#268bd2")
@@ -589,12 +603,13 @@ This function is called at the very end of Spacemacs initialization."
      ("TEMP" . "#875f00")
      ("FIXME" . "#dc752f")
      ("XXX+" . "#dc752f")
-     ("\\?\\?\\?+" . "#dc752f")))
+     ("\\?\\?\\?+" . "#dc752f"))))
  '(org-fontify-done-headline nil)
  '(org-fontify-todo-headline nil)
  '(package-selected-packages
-   '(treemacs-magit smeargle helm-gitignore helm-git-grep gitignore-templates git-timemachine git-messenger git-link forge yaml magit ghub closql emacsql-sqlite emacsql treepy magit-section git-commit with-editor vmd-mode valign mmm-mode markdown-toc gh-md emoji-cheat-sheet-plus company-emoji insert-shebang flycheck-bashate fish-mode company-shell yapfify stickyfunc-enhance sphinx-doc pytest pyenv-mode pydoc py-isort poetry transient pippel pipenv pyvenv pip-requirements nose lsp-python-ms lsp-pyright live-py-mode importmagic epc ctable concurrent deferred helm-pydoc helm-gtags helm-cscope xcscope ggtags dap-mode lsp-treemacs bui lsp-mode markdown-mode cython-mode counsel-gtags counsel swiper ivy company-anaconda company blacken anaconda-mode pythonic ws-butler writeroom-mode winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package undo-tree treemacs-projectile treemacs-persp treemacs-icons-dired toc-org symon symbol-overlay string-inflection string-edit spaceline-all-the-icons restart-emacs request rainbow-delimiters quickrun popwin pcre2el password-generator paradox overseer org-superstar open-junk-file nameless multi-line macrostep lorem-ipsum link-hint inspector info+ indent-guide hybrid-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-purpose helm-projectile helm-org helm-mode-manager helm-make helm-ls-git helm-flx helm-descbinds helm-cider helm-ag google-translate golden-ratio font-lock+ flycheck-package flycheck-elsa flx-ido fill-column-indicator fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-collection evil-cleverparens evil-args evil-anzu emr elisp-slime-nav editorconfig dumb-jump drag-stuff dotenv-mode dired-quick-sort diminish define-word column-enforce-mode clean-aindent-mode cider-eval-sexp-fu centered-cursor-mode auto-highlight-symbol auto-compile aggressive-indent ace-link ace-jump-helm-line))
- '(pdf-view-midnight-colors '("#b2b2b2" . "#262626")))
+   (quote
+    (yasnippet-snippets lsp-ui lsp-python-ms lsp-pyright lsp-origami origami jedi jedi-core python-environment helm-lsp helm-company helm-c-yasnippet fuzzy flycheck-pos-tip pos-tip dap-mode lsp-treemacs bui lsp-mode company-shell company-anaconda company clojure-snippets auto-yasnippet ac-ispell auto-complete yapfify yaml-mode ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package undo-tree toc-org spaceline powerline smeargle restart-emacs rainbow-delimiters pyvenv pytest pyenv-mode py-isort popwin pip-requirements persp-mode pcre2el paradox orgit org-plus-contrib org-bullets open-junk-file neotree move-text mmm-mode markdown-toc markdown-mode magit-gitflow magit-popup magit magit-section macrostep lorem-ipsum live-py-mode linum-relative link-hint insert-shebang indent-guide hy-mode hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-pydoc helm-projectile projectile helm-mode-manager helm-make helm-gitignore request helm-flx helm-descbinds helm-ag google-translate golden-ratio git-timemachine git-messenger git-link git-commit with-editor transient gh-md flx-ido flx fish-mode fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist highlight evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg elisp-slime-nav dumb-jump diminish define-word cython-mode column-enforce-mode clj-refactor hydra inflections multiple-cursors paredit yasnippet lv clean-aindent-mode cider-eval-sexp-fu eval-sexp-fu cider sesman seq spinner queue pkg-info parseedn clojure-mode parseclj epl bind-map bind-key auto-highlight-symbol ht auto-compile packed anaconda-mode pythonic f dash s aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async monokai-theme)))
+ '(pdf-view-midnight-colors (quote ("#b2b2b2" . "#262626"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
