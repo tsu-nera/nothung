@@ -64,12 +64,13 @@ This function should only modify configuration layer settings."
      ;; markdown
      multiple-cursors
      ;; org
-     (shell :variables shell-default-shell 'vterm)
-     ;; (shell :variables
-     ;;        shell-default-height 30
-     ;;        shell-default-position 'bottom)
+     (shell :variables
+            shell-default-height 25
+            shell-default-full-span nil
+            shell-default-shell 'vterm)
      ;; spell-checking
      ;; syntax-checking
+
      ;; version-control
      treemacs)
 
@@ -568,8 +569,7 @@ before packages are loaded."
   (add-hook 'python-mode-hook
             (lambda ()
               #'(flycheck-add-next-checker 'python-flake8)
-              'jedi:setup))
-  )
+              'jedi:setup)))
 
 
 ;; Do not write anything past this comment. This is where Emacs will
