@@ -73,6 +73,7 @@ This function should only modify configuration layer settings."
      (colors :variables colors-enable-nyan-cat-progress-bar t)
 
      ;; version-control
+     pdf
      eww
      treemacs)
 
@@ -561,11 +562,38 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
+
   (setq x-select-enable-clipboard t)
+
+  ;; 日本語設定
+  (setenv "LANG" "ja_JP.UTF-8")
+  (prefer-coding-system 'utf-8-unix)
   (set-fontset-font
    nil 'japanese-jisx0208
    (font-spec :family "Ricty Diminished"))
 
+  ;; ここからの設定は旧設定ファイルからそのまま持ってきた. Spacemacsでも必要なのかな？
+  (fset 'yes-or-no-p 'y-or-n-p) ;; 問い合わせを簡略化 yes/no を y/n
+  (setq vc-follow-symlinks t) ;; symlink は必ず追いかける
+  (setq-default bidi-display-reordering nil) ;; 右から左に読む言語に対応させないことで描画高速化
+  (setq history-delete-duplicates t)  ;; 同じ内容を履歴に記録しないようにする
+  (setq-default indent-tabs-mode t) ;; インデントに TAB を使うようにする
+  (setq gc-cons-threshold (* 10 gc-cons-threshold)) ;; GC を減らして軽くする
+  (setq message-log-max 10000) ;; ログの記録行数を増やす
+  (setq history-length 1000) ;; 履歴をたくさん保存する
+
+  ;; 今なんじ？
+  (defun my:time-now ()
+    (interactive)
+    (let ((temp-buffer-show-function 'switch-to-buffer))
+      (with-output-to-temp-buffer
+          "*time-now*"
+        (princ (format-time-string "%H:%M")))
+      (setq buffer-face-mode-face '(:height 3000))
+      (buffer-face-mode)))
+  (global-set-key (kbd "S-<f9>") 'my:time-now)
+
+  ;; migemo関連
   (require 'migemo)
   (setq migemo-command "cmigemo")
   (setq migemo-options '("-q" "--emacs" "-i" "\a"))
