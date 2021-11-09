@@ -1,8 +1,8 @@
 # hekireki
 
-My configration file of .spaceemacs.d.
+My configration file of .doom.d.
 
-昔の設定は大きくなりすぎたのでSpacemacsをベースに再構築. *Keep it Simple, Stupid* だよ.
+昔の設定は大きくなりすぎたのでDoom Emacsをベースに再構築. *Keep it Simple, Stupid* だよ.
 
 https://github.com/tsu-nera/dotfiles/tree/master/.emacs.d
 
