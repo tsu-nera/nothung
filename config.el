@@ -53,3 +53,10 @@
 ;;
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
+(use-package! fcitx
+  :init
+  (fcitx-aggressive-setup)
+  (setq fcitx-use-dbus t))
+
+(add-hook! org-mode 'org-indent-mode)
+(setq org-startup-indented t)
