@@ -21,7 +21,7 @@
 (setq org-return-follows-link t)
 (setq org-use-speed-commands t)
 (setq org-hide-emphasis-markers t)
-(setq org-insert-heading-respect-content nil)
+(setq org-insert-heading-respect-content t)
 
 (setq org-startup-indented t)
 (setq org-indent-mode-turns-on-hiding-stars nil)
