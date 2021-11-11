@@ -8,8 +8,9 @@
 
 ;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
 ;(package! some-package)
-(package! writeroom-mode)
-(package! fcitx)
+;; (package! writeroom-mode)
+;; (package! fcitx) ;; fcitx5未対応のためコメントアウト
+(package! fish-mode)
 
 ;; To install a package directly from a remote git repo, you must specify a
 ;; `:recipe'. You'll find documentation on what `:recipe' accepts here:
