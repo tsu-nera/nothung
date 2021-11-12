@@ -5,8 +5,7 @@
 ;; (setq user-full-name "John Doe"
 ;;       user-mail-address "john@doe.com")
 (setq doom-font (font-spec :family "Source Han Code JP" :size 12))
-(setq doom-theme 'doom-monokai-pro)
-(setq doom-monokai-pro-brighter-comments t)
+(setq doom-theme 'doom-one)
 (doom-themes-org-config)
 
 ;; general config
@@ -14,6 +13,20 @@
 (prefer-coding-system 'utf-8)
 (set-default 'buffer-filec-oding-system 'utf-8)
 (setq display-line-numbers-type t)
+
+;; lessでのファイル閲覧に操作性を似せるmode.
+;; view-modeはemacs内蔵. C-x C-rでview-modeでファイルオープン
+;; doom emacsだと　C-c t r で　read-only-modeが起動する.
+(use-package! view
+  :config
+  (define-key ctl-x-map "\C-q" 'view-mode) ;; assinged C-x C-q.
+  (setq view-read-only t)
+
+  ;; less っぼく.
+  (define-key view-mode-map (kbd "p") 'View-scroll-line-backward)
+  (define-key view-mode-map (kbd "n") 'View-scroll-line-forward)
+  ;; defaultのeでもいいけど，mule時代にvにbindされてたので, emacsでもvにbindしておく.
+  (define-key view-mode-map (kbd "v") 'read-only-mode))
 
 ;; migemo
 (require 'migemo)
@@ -35,6 +48,10 @@
 (setq org-use-speed-commands t)  ;; bulletにカーソルがあると高速移動
 (setq org-hide-emphasis-markers t)
 
+;; M-RETの挙動の調整
+;; tだとsubtreeの最終行にheadingを挿入
+;; nilだとcurrent pointに挿入
+;; なお，C-RETだとsubtreeの最終行に挿入される模様.
 (setq org-insert-heading-respect-content nil)
 
 (setq org-startup-indented t)
@@ -77,7 +94,6 @@
 ;; 評価でいちいち質問されないように.
 (setq org-confirm-babel-evaluate nil)
 
-
 ;; org-roam
 (setq org-roam-directory (file-truename "~/repo/gtd/notes"))
 (org-roam-db-autosync-mode)
@@ -88,3 +104,8 @@
   (fcitx-aggressive-setup)
   ;; Linuxなら t が推奨されるものの、fcitx5には未対応なためここはnil
   (setq fcitx-use-dbus nil))
+
+;; twittering-mode
+;; この設定がないと認証が失敗した.
+;; twittering-oauth-get-access-token: Failed to retrieve a request token
+(setq twittering-allow-insecure-server-cert t)
