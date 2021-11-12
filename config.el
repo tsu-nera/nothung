@@ -67,7 +67,7 @@
 ;; org-capture
 (setq org-capture-templates
       '(("i" "Inbox" entry (file+datetree "~/repo/gtd/inbox.org") "** TODO %?\n")
-        ("n" "Note" entry (file+headline "~/repo/gtd/notes.org" "Notes")
+        ("r" "Random" entry (file+headline "~/repo/gtd/random.org" "Random")
          "* %?\nEntered on %U\n %i\n %a")
         ("d" "Daily Log" entry (function org-journal-find-location)
                                "* %(format-time-string org-journal-time-format)%i%?")
@@ -76,3 +76,15 @@
 ;; org-babel
 ;; 評価でいちいち質問されないように.
 (setq org-confirm-babel-evaluate nil)
+
+
+;; org-roam
+(setq org-roam-directory (file-truename "~/repo/gtd/notes"))
+(org-roam-db-autosync-mode)
+
+(use-package! fcitx
+  :config
+  (setq fcitx-remote-command "fcitx5-remote")
+  (fcitx-aggressive-setup)
+  ;; Linuxなら t が推奨されるものの、fcitx5には未対応なためここはnil
+  (setq fcitx-use-dbus nil))
