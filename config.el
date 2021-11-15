@@ -92,23 +92,27 @@
 
 
 ;; org-journal
-;;   (org-journal-dir “~/Dropbox/Org/journal”)
-;;
-(setq org-journal-date-format "%x")
+(setq org-journal-dir "~/gtd/journals/2021")
+(setq org-journal-file-type 'weekly)
+(setq org-journal-file-format "weekly_journal_%Yw%U.org")
+(setq org-journal-date-format "%Y-%m-%d, %A")
 (setq org-journal-time-format "<%Y-%m-%d %R> ")
-(setq org-journal-file-format "%Y-%m-%d.org")
-(setq org-journal-dir "~/gtd/reports/daily")
-(defun org-journal-find-location ()
-  (org-journal-new-entry t)
-  (goto-char (point-min)))
+(setq org-journal-find-file 'find-file)
+
+(defun org-journal-file-header-func ()
+  "Custom function to create journal header."
+  (concat
+   (pcase org-journal-file-type
+     (`daily "#+STARTUP: showall indent inlineimages"))))
+(setq org-journal-file-header 'org-journal-file-header-func)
 
 ;; org-capture
 (setq org-capture-templates
-      '(("i" "Inbox" entry (file+datetree "~/gtd/inbox.org") "** TODO %?\n")
-        ("j" "Journal" entry (file+headline "~/gtd/journal.org" "Random")
+      '(("i" "Inbox" entry (file+datetree "~/gtd/inbox.org") "* %?\n")
+        ("m" "Memo" entry (file+headline "~/gtd/memo.org" "Memo")
          "* %?\nEntered on %U\n %i\n %a")
-        ("d" "Daily Log" entry (function org-journal-find-location)
-                               "* %(format-time-string org-journal-time-format)%i%?")
+;;        ("d" "Daily Log" entry (function org-journal-find-location)
+;;                               "* %(format-time-string org-journal-time-format)%i%?")
         ))
 
 ;; org-babel
@@ -141,3 +145,9 @@
     ("=" (:background "red" :foreground "white")) ;; 書き手の主張
     ("~" (:background "blue" :foreground "white"))　;; 根拠
     ("+" (:background "green" :foreground "black")))) ;; 自分の考え
+
+;; 後で改善
+(require 'org-toggl)
+(setq toggl-auth-token "4b707d3e5bc71cc5f0010ac7ea76185d")
+(setq org-toggl-inherit-toggl-properties nil)
+(org-toggl-integration-mode)

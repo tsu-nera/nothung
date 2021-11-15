@@ -14,6 +14,8 @@
 (package! fcitx)
 (package! org-bars
   :recipe (:host github :repo "tonyaldon/org-bars"))
+(package! monkeytype)
+(package! org-toggl :recipe (:host github :repo "mbork/org-toggl"))
 
 ;; To install a package directly from a remote git repo, you must specify a
 ;; `:recipe'. You'll find documentation on what `:recipe' accepts here:
