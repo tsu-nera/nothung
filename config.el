@@ -5,6 +5,8 @@
 ;; (setq user-full-name "John Doe"
 ;;       user-mail-address "john@doe.com")
 (setq doom-font (font-spec :family "Source Han Code JP" :size 12))
+
+
 (setq doom-theme 'doom-one)
 (doom-themes-org-config)
 
@@ -60,6 +62,9 @@
 ;; org-mode
 ;; https://github.com/hlissner/doom-emacs/blob/develop/modules/lang/org/README.org
 ;; https://github.com/tsu-nera/dotfiles/blob/master/.emacs.d/inits/50_org-mode.org
+(use-package! org
+  :init
+  (set-face-attribute 'org-table nil :family "Ricty Diminished" :height 100))
 
 ;; スマホとの共有のため, githubをcloneしたものをDropboxに置いて$HOMEにsymlinkしている.
 (setq org-directory "~/gtd")
@@ -151,3 +156,10 @@
 (setq toggl-auth-token "4b707d3e5bc71cc5f0010ac7ea76185d")
 (setq org-toggl-inherit-toggl-properties nil)
 (org-toggl-integration-mode)
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((lisp . t)))
+
+(use-package! ox-hugo
+  :after 'ox)
