@@ -4,8 +4,10 @@
 ;; あとでプライベートな宣言方法うしらべる.
 ;; (setq user-full-name "John Doe"
 ;;       user-mail-address "john@doe.com")
-(setq doom-font (font-spec :family "Source Han Code JP" :size 12))
-
+;;
+;; どうもフォントが奇数だとorg-tableの表示が崩れる.
+;; Source Han Code JPだとそもそもorg-tableの表示が崩れる.
+(setq doom-font (font-spec :family "Ricty Diminished" :size 14))
 
 (setq doom-theme 'doom-one)
 (doom-themes-org-config)
@@ -14,6 +16,7 @@
 (set-language-environment "Japanese")
 (prefer-coding-system 'utf-8)
 (set-default 'buffer-filecoding-system 'utf-8)
+
 
 ;; 行番号表示
 (setq display-line-numbers-type t)
@@ -62,9 +65,6 @@
 ;; org-mode
 ;; https://github.com/hlissner/doom-emacs/blob/develop/modules/lang/org/README.org
 ;; https://github.com/tsu-nera/dotfiles/blob/master/.emacs.d/inits/50_org-mode.org
-(use-package! org
-  :init
-  (set-face-attribute 'org-table nil :family "Ricty Diminished" :height 100))
 
 ;; スマホとの共有のため, githubをcloneしたものをDropboxに置いて$HOMEにsymlinkしている.
 (setq org-directory "~/gtd")
