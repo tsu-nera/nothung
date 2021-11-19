@@ -7,7 +7,7 @@
 ;;
 ;; どうもフォントが奇数だとorg-tableの表示が崩れる.
 ;; Source Han Code JPだとそもそもorg-tableの表示が崩れる.
-(setq doom-font (font-spec :family "Ricty Diminished" :size 14))
+(setq doom-font (font-spec :family "Source Han Code JP" :size 13 ))
 
 (setq doom-theme 'doom-one)
 (doom-themes-org-config)
@@ -93,29 +93,58 @@
 ;; org-agenda
 (setq org-agenda-files '("~/gtd"))
 (setq org-refile-targets '((org-agenda-files :maxlevel . 3)))
-(setq org-log-done 'time) ;; 変更時の終了時刻記録.
+(setq org-agenda-time-leading-zero t) ;; 時間表示が 1 桁の時, 0 をつける
+(setq calendar-holidays nil) ;; 祝日を利用しない.
+(setq org-log-done 'time);; 変更時の終了時刻記録.
+
+;; スケジュールやデッドラインアイテムは DONE になっていれば表示する
+(setq org-agenda-skip-deadline-if-done nil)
+(setq org-agenda-skip-scheduled-if-done nil)
+
+(setq org-agenda-include-inactive-timestamps t) ;; default で logbook を表示
+(setq org-agenda-start-with-log-mode t) ;; ;; default で 時間を表示
+
+;; org-agenda speedup tips
+;; https://orgmode.org/worg/agenda-optimization.html
+
+;; 何でもかんでもagendaすると思いので厳選.
+;; とりあえずnotes以下は最適化のために保留.
+;; 時間が絡むものはorg-roamで扱わないほうがいいのかな? もしくは，notes/dialy限定
+(setq org-agenda-files '("~/gtd/main.org"
+                         "~/gtd/futurismo.org"
+                         "~/gtd/journal.org"
+                         "~/gtd/inbox.org"))
+;; 期間を限定
+(setq org-agenda-span 30)
+; Inhibit the dimming of blocked tasks:
+(setq org-agenda-dim-blocked-tasks nil)
+;; Inhibit agenda files startup options:
+(setq org-agenda-inhibit-startup nil)
+;; Disable tag inheritance in agenda:
+(setq org-agenda-use-tag-inheritance nil)
 
 
-;; org-journal
-(setq org-journal-dir "~/gtd/journals/2021")
-(setq org-journal-file-type 'weekly)
-(setq org-journal-file-format "weekly_journal_%Yw%U.org")
-(setq org-journal-date-format "%Y-%m-%d, %A")
-(setq org-journal-time-format "<%Y-%m-%d %R> ")
-(setq org-journal-find-file 'find-file)
+;; org-journalはorg-roamに置き換えるので一旦隠す.
+;; (setq org-journal-dir "~/gtd/journals/2021")
+;; (setq org-journal-file-type 'weekly)
+;; (setq org-journal-file-format "weekly_journal_%Yw%U.org")
+;; (setq org-journal-date-format "%Y-%m-%d, %A")
+;; (setq org-journal-time-format "<%Y-%m-%d %R> ")
+;; (setq org-journal-find-file 'find-file)
 
-(defun org-journal-file-header-func ()
-  "Custom function to create journal header."
-  (concat
-   (pcase org-journal-file-type
-     (`daily "#+STARTUP: showall indent inlineimages"))))
-(setq org-journal-file-header 'org-journal-file-header-func)
+;; (defun org-journal-file-header-func ()
+;;  "Custom function to create journal header."
+;;  (concat
+;;   (pcase org-journal-file-type
+;;     (`daily "#+STARTUP: showall indent inlineimages"))))
+;; (setq org-journal-file-header 'org-journal-file-header-func)
 
 ;; org-capture
+;; 使いこなせてないな...
 (setq org-capture-templates
       '(("i" "Inbox" entry (file+datetree "~/gtd/inbox.org") "* %?\n")
-        ("m" "Memo" entry (file+headline "~/gtd/memo.org" "Memo")
-         "* %?\nEntered on %U\n %i\n %a")
+;;        ("j" "Journal" entry (file+headline "~/gtd/journal.org" "Journal")
+;         "* %?\nEntered on %U\n %i\n %a")
 ;;        ("d" "Daily Log" entry (function org-journal-find-location)
 ;;                               "* %(format-time-string org-journal-time-format)%i%?")
         ))
@@ -123,6 +152,11 @@
 ;; org-babel
 ;; 評価でいちいち質問されないように.
 (setq org-confirm-babel-evaluate nil)
+;; org-babel で 実行した言語を書く. デフォルトでは emacs-lisp だけ.
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((lisp . t)
+   (shell . t)))
 
 ;; org-roam
 ;; そもそもgtdとroamを同じリポジトリで管理するかどうかは疑問なのであとで見極める.
@@ -151,15 +185,11 @@
     ("~" (:background "blue" :foreground "white"))　;; 根拠
     ("+" (:background "green" :foreground "black")))) ;; 自分の考え
 
-;; 後で改善
+;; org-clock関連
 (require 'org-toggl)
 (setq toggl-auth-token "4b707d3e5bc71cc5f0010ac7ea76185d")
 (setq org-toggl-inherit-toggl-properties nil)
 (org-toggl-integration-mode)
-
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((lisp . t)))
 
 (use-package! ox-hugo
   :after 'ox)

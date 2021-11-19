@@ -59,3 +59,6 @@
 ;(unpin! pinned-package another-pinned-package)
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;(unpin! t)
+;
+;; workaround this, https://github.com/hlissner/doom-emacs/issues/5721
+(unpin! org-mode)
