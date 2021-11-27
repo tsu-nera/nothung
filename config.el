@@ -161,8 +161,24 @@
 ;; org-roam
 ;; そもそもgtdとroamを同じリポジトリで管理するかどうかは疑問なのであとで見極める.
 (setq org-roam-directory (file-truename "~/gtd/notes"))
+(setq org-roam-dailies-directory "~/gtd/reports/daily")
 (org-roam-db-autosync-mode)
 
+(use-package! websocket
+    :after org-roam)
+(use-package! org-roam-ui
+    :after org-roam ;; or :after org
+;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+;;         a hookable mode anymore, you're advised to pick something yourself
+;;         if you don't care about startup time, use
+;;  :hook (after-init . org-roam-ui-mode)
+    :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))
+
+;; 今どきのアウトライナー的な線を出す.
 (require 'org-bars)
 (add-hook! 'org-mode-hook #'org-bars-mode)
 
@@ -193,3 +209,22 @@
 
 (use-package! ox-hugo
   :after 'ox)
+
+;; 空白が保存時に削除されるとbullet表示がおかしくなる.
+;; なおwl-bulterはdoom emacsのデフォルトで組み込まれている.
+(add-hook! 'org-mode-hook (ws-butler-mode -1))
+(add-hook! 'org-mode-hook (company-mode -1))
+
+
+
+(use-package! conda
+  :config
+  ;; if you want interactive shell support, include:
+  ;; (conda-env-initialize-interactive-shells)
+  ;; if you want eshell support, include:
+  ;; (conda-env-initialize-eshell)
+  ;; if you want auto-activation (see below for details), include:
+  (conda-env-autoactivate-mode t)
+  ;; if you want to automatically activate a conda environment on the opening of a file:
+  (add-to-hook 'find-file-hook (lambda () (when (bound-and-true-p conda-project-env-path)
+                                          (conda-env-activate-for-buffer))))
