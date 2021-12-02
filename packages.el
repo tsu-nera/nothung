@@ -18,7 +18,6 @@
 (package! org-toggl :recipe (:host github :repo "mbork/org-toggl"))
 ;; (package! zh-align :recipe (:host github :repo "chen-chao/zh-align.el"))
 (package! anki-editor)
-(package! ox-hugo)
 (package! csv-mode)
 (package! org-roam-ui)
 

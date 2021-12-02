@@ -113,6 +113,7 @@
 (setq org-agenda-files '("~/gtd/main.org"
                          "~/gtd/futurismo.org"
                          "~/gtd/journal.org"
+                         "~/gtd/notes/journal/"
                          "~/gtd/inbox.org"))
 ;; 期間を限定
 (setq org-agenda-span 30)
@@ -159,10 +160,29 @@
    (shell . t)))
 
 ;; org-roam
-;; そもそもgtdとroamを同じリポジトリで管理するかどうかは疑問なのであとで見極める.
-(setq org-roam-directory (file-truename "~/gtd/notes"))
-(setq org-roam-dailies-directory "~/gtd/reports/daily")
-(org-roam-db-autosync-mode)
+(use-package! org-roam
+  :init
+  (setq org-roam-v2-ack t)
+  :custom
+  (org-roam-directory "~/gtd/notes")
+  (org-roam-dailies-directory "journal/")
+  (org-roam-completion-everywhere t)
+  (org-roam-dailies-capture-templates
+    '(("d" "default" entry "* <%<%Y-%m-%d %R>> %?"
+       :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n"))))
+  :bind (("C-c r l" . org-roam-buffer-toggle)
+         ("C-c r f" . org-roam-node-find)
+         ("C-c r i" . org-roam-node-insert)
+         :map org-mode-map
+         ("C-M-i"    . completion-at-point)
+         :map org-roam-dailies-map
+         ("Y" . org-roam-dailies-capture-yesterday)
+         ("T" . org-roam-dailies-capture-tomorrow))
+  :bind-keymap
+  ("C-c r d" . org-roam-dailies-map)
+  :config
+  (require 'org-roam-dailies) ;; Ensure the keymap is available
+  (org-roam-db-autosync-mode))
 
 (use-package! websocket
     :after org-roam)
@@ -215,16 +235,16 @@
 (add-hook! 'org-mode-hook (ws-butler-mode -1))
 (add-hook! 'org-mode-hook (company-mode -1))
 
-
-
-(use-package! conda
-  :config
+;; temporary hide because of warning.
+;;(use-package! conda
+;;  :config
   ;; if you want interactive shell support, include:
   ;; (conda-env-initialize-interactive-shells)
   ;; if you want eshell support, include:
   ;; (conda-env-initialize-eshell)
   ;; if you want auto-activation (see below for details), include:
-  (conda-env-autoactivate-mode t)
+;;  (conda-env-autoactivate-mode t)
   ;; if you want to automatically activate a conda environment on the opening of a file:
-  (add-to-hook 'find-file-hook (lambda () (when (bound-and-true-p conda-project-env-path)
-                                          (conda-env-activate-for-buffer))))
+;;  (add-to-hook 'find-file-hook (lambda () (when (bound-and-true-p conda-project-env-path)
+;;                                          (conda-env-activate-for-buffer)))))
+
