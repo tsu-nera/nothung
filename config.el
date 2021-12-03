@@ -124,22 +124,6 @@
 ;; Disable tag inheritance in agenda:
 (setq org-agenda-use-tag-inheritance nil)
 
-
-;; org-journalはorg-roamに置き換えるので一旦隠す.
-;; (setq org-journal-dir "~/gtd/journals/2021")
-;; (setq org-journal-file-type 'weekly)
-;; (setq org-journal-file-format "weekly_journal_%Yw%U.org")
-;; (setq org-journal-date-format "%Y-%m-%d, %A")
-;; (setq org-journal-time-format "<%Y-%m-%d %R> ")
-;; (setq org-journal-find-file 'find-file)
-
-;; (defun org-journal-file-header-func ()
-;;  "Custom function to create journal header."
-;;  (concat
-;;   (pcase org-journal-file-type
-;;     (`daily "#+STARTUP: showall indent inlineimages"))))
-;; (setq org-journal-file-header 'org-journal-file-header-func)
-
 ;; org-capture
 ;; 使いこなせてないな...
 (setq org-capture-templates
@@ -168,7 +152,7 @@
   (org-roam-dailies-directory "journal/")
   (org-roam-completion-everywhere t)
   (org-roam-dailies-capture-templates
-    '(("d" "default" entry "* <%<%Y-%m-%d %R>> %?"
+    '(("d" "default" entry "** <%<%Y-%m-%d %a %R>> %?"
        :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n"))))
   :bind (("C-c r l" . org-roam-buffer-toggle)
          ("C-c r f" . org-roam-node-find)
