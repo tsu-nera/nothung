@@ -157,7 +157,6 @@
   :after org
   :init
   (setq org-roam-v2-ack t)
-  :custom
   (map!
         :leader
         :prefix ("r" . "org-roam")
@@ -166,6 +165,7 @@
         "l" #'org-roam-buffer-toggle
         "t" #'org-roam-tag-add
         "T" #'org-roam-tag-remove)
+  :custom
   (org-roam-dailies-directory "journal/")
   (org-roam-dailies-capture-templates
      '(("d" "default" entry "* %T %?\n"
@@ -242,17 +242,3 @@
 ;; companyはなにげに使いそうだからな，TABでのみ補完発動させるか.
 (setq company-idle-delay nil)
 (global-set-key (kbd "TAB") #'company-indent-or-complete-common)
-
-;; temporary hide because of warning.
-;;(use-package! conda
-;;  :config
-  ;; if you want interactive shell support, include:
-  ;; (conda-env-initialize-interactive-shells)
-  ;; if you want eshell support, include:
-  ;; (conda-env-initialize-eshell)
-  ;; if you want auto-activation (see below for details), include:
-;;  (conda-env-autoactivate-mode t)
-  ;; if you want to automatically activate a conda environment on the opening of a file:
-;;  (add-to-hook 'find-file-hook (lambda () (when (bound-and-true-p conda-project-env-path)
-;;                                          (conda-env-activate-for-buffer)))))
-
