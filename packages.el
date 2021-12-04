@@ -62,4 +62,5 @@
 ;(unpin! t)
 ;
 ;; workaround this, https://github.com/hlissner/doom-emacs/issues/5721
-(unpin! org-mode org-roam)
+(unpin! org-mode)
+(unpin! org-roam)

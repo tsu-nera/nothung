@@ -149,10 +149,18 @@
    'org-babel-load-languages
    '((lisp . t)
      (shell . t)))
-)
+  )
+
+;; org-modeでtimestampのみを挿入するカスタム関数(hh:mm)
+(after! org
+  (defun my/insert-timestamp ()
+    "Insert time stamp."
+    (interactive)
+    (insert (format-time-string "%H:%M")))
+ (map! :map org-mode-map "C-c C-." #'my/insert-timestamp))
 
 ;; org-roam
-(setq org-roam-directory "~/gtd/notes")
+(setq org-roam-directory (file-truename "~/gtd/notes"))
 (use-package! org-roam
   :after org
   :init
@@ -180,9 +188,8 @@
   ;;        ("Y" . org-roam-dailies-capture-yesterday)
   ;;        ("T" . org-roam-dailies-capture-tomorrow))
   :bind-keymap
-  ("C-c r d" . org-roam-dailies-map)
+  ("C-c r j" . org-roam-dailies-map)
   :config
-  (setq org-roam-completion-everywhere nil)
   (require 'org-roam-dailies) ; Ensure the keymap is available
   (org-roam-db-autosync-mode))
 
@@ -242,3 +249,13 @@
 ;; companyはなにげに使いそうだからな，TABでのみ補完発動させるか.
 (setq company-idle-delay nil)
 (global-set-key (kbd "TAB") #'company-indent-or-complete-common)
+
+(use-package deft
+  :after org
+  :bind
+  ("C-c r d" . deft)
+  :custom
+  (deft-recursive t)
+  (deft-use-filter-string-for-filename t)
+  (deft-default-extension "org")
+  (deft-directory "~/gtd/notes"))
