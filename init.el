@@ -189,6 +189,7 @@
        ;;everywhere        ; *leave* Emacs!? You must be joking
        ;;irc               ; how neckbeards socialize
        ;;(rss +org)        ; emacs as an RSS reader
+       rss
        twitter           ; twitter client https://twitter.com/vnought
 
        :config

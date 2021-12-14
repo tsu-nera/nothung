@@ -172,41 +172,50 @@
         "i" #'org-roam-node-insert
         "l" #'org-roam-buffer-toggle
         "t" #'org-roam-tag-add
-        "T" #'org-roam-tag-remove)
+        "T" #'org-roam-tag-remove
+        "a" #'org-roam-alias-add
+        "A" #'org-roam-alias-remove
+        "r" #'org-roam-ref-add
+        "R" #'org-roam-ref-remove
+        "s" #'org-roam-db-sync
+        )
   :custom
   (org-roam-dailies-directory "journal/")
   (org-roam-dailies-capture-templates
-     '(("d" "default" entry "* %T %?\n"
-        :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n")
-        :unnarrowed t)))
-  ;; :bind (("C-c r l" . org-roam-buffer-toggle)
-  ;;        ("C-c r f" . org-roam-node-find)
-  ;;        ("C-c r i" . org-roam-node-insert)
+   '(("d" "default" item "%?"
+      :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n")
+      :unnarrowed t)))
   ;;        :map org-mode-map
   ;;        ("C-M-i"    . completion-at-point)
   ;;        :map org-roam-dailies-map
   ;;        ("Y" . org-roam-dailies-capture-yesterday)
   ;;        ("T" . org-roam-dailies-capture-tomorrow))
   :bind-keymap
-  ("C-c r j" . org-roam-dailies-map)
+  ("C-c r d" . org-roam-dailies-map)
   :config
   (require 'org-roam-dailies) ; Ensure the keymap is available
   (org-roam-db-autosync-mode))
 
 
-;; (use-package! websocket
-;;     :after org-roam)
-;; (use-package! org-roam-ui
-;;     :after org-roam ;; or :after org
-;; ;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
-;; ;;         a hookable mode anymore, you're advised to pick something yourself
-;; ;;         if you don't care about startup time, use
-;; ;;  :hook (after-init . org-roam-ui-mode)
-;;     :config
-;;     (setq org-roam-ui-sync-theme t
-;;           org-roam-ui-follow t
-;;           org-roam-ui-update-on-save t
-;;           org-roam-ui-open-on-start t))
+(use-package! websocket
+    :after org-roam)
+(use-package! org-roam-ui
+    :after org-roam ;; or :after org
+;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+;;         a hookable mode anymore, you're advised to pick something yourself
+;;         if you don't care about startup time, use
+    ;; :hook (after-init . org-roam-ui-mode)
+    :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))
+
+;; バグってる..
+;; (use-package! org-roam-timestamps
+;;   :after org-roam
+;;   :config
+;;   (org-roam-timestamps-mode))
 
 ;; 今どきのアウトライナー的な線を出す.
 (require 'org-bars)
@@ -223,13 +232,13 @@
 
 ;; 読書のためのマーカー（仮）
 ;; あとでちゃんと検討と朝鮮しよう.
-(setq org-emphasis-alist
-  '(("*" bold)
-    ("/" italic)
-    ("_" underline)
-    ("=" (:background "red" :foreground "white")) ;; 書き手の主張
-    ("~" (:background "blue" :foreground "white"))　;; 根拠
-    ("+" (:background "green" :foreground "black")))) ;; 自分の考え
+;; (setq org-emphasis-alist
+;;   '(("*" bold)
+;;     ("/" italic)
+;;     ("_" underline)
+;;     ("=" (:background "red" :foreground "white")) ;; 書き手の主張
+;;     ("~" (:background "blue" :foreground "white"))　;; 根拠
+;;     ("+" (:background "green" :foreground "black")))) ;; 自分の考え
 
 ;; org-clock関連
 (require 'org-toggl)
@@ -250,12 +259,20 @@
 (setq company-idle-delay nil)
 (global-set-key (kbd "TAB") #'company-indent-or-complete-common)
 
-(use-package deft
+(use-package! deft
   :after org
   :bind
-  ("C-c r d" . deft)
+  ("C-c r j" . deft)
   :custom
   (deft-recursive t)
   (deft-use-filter-string-for-filename t)
   (deft-default-extension "org")
   (deft-directory "~/gtd/notes"))
+
+;; elfeed
+(global-set-key (kbd "C-x w") 'elfeed)
+
+(use-package! elfeed
+  :config
+  (setq elfeed-feeds
+        '("https://futurismo.biz")))
