@@ -119,9 +119,8 @@
   ;; 時間が絡むものはorg-roamで扱わないほうがいいのかな? もしくは，notes/dialy限定
   (setq org-agenda-files '("~/gtd/main.org"
                            "~/gtd/futurismo.org"
-                           "~/gtd/journal.org"
-                           "~/gtd/notes/journal/"
-                           "~/gtd/inbox.org"))
+                           "~/gtd/z/journal/"
+                           "~/gtd/i/inbox.org"))
   ;; 期間を限定
   (setq org-agenda-span 30)
                                         ; Inhibit the dimming of blocked tasks:
@@ -160,11 +159,12 @@
  (map! :map org-mode-map "C-c C-." #'my/insert-timestamp))
 
 ;; org-roam
-(setq org-roam-directory (file-truename "~/gtd/notes"))
+(setq org-roam-directory (file-truename "~/gtd/z"))
 (use-package! org-roam
   :after org
   :init
   (setq org-roam-v2-ack t)
+  (setq org-roam-open-buffer-on-find-file nil)
   (map!
         :leader
         :prefix ("r" . "org-roam")
@@ -267,7 +267,7 @@
   (deft-recursive t)
   (deft-use-filter-string-for-filename t)
   (deft-default-extension "org")
-  (deft-directory "~/gtd/notes"))
+  (deft-directory "~/gtd/z"))
 
 ;; elfeed
 (global-set-key (kbd "C-x w") 'elfeed)
