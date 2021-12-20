@@ -69,7 +69,7 @@
 
 ;; スマホとの共有のため, githubをcloneしたものをDropboxに置いて$HOMEにsymlinkしている.
 (after! org
-  (setq org-directory "~/gtd")
+  (setq org-directory "~/keido")
   (setq org-default-notes-file "main.org")
 
   (setq org-return-follows-link t) ;; Enterでリンク先へジャンプ
@@ -98,7 +98,6 @@
   (add-hook! org-mode (electric-indent-local-mode -1))
 
   ;; org-agenda
-  (setq org-agenda-files '("~/gtd"))
   (setq org-refile-targets '((org-agenda-files :maxlevel . 3)))
   (setq org-agenda-time-leading-zero t) ;; 時間表示が 1 桁の時, 0 をつける
   (setq calendar-holidays nil) ;; 祝日を利用しない.
@@ -117,10 +116,10 @@
   ;; 何でもかんでもagendaすると思いので厳選.
   ;; とりあえずnotes以下は最適化のために保留.
   ;; 時間が絡むものはorg-roamで扱わないほうがいいのかな? もしくは，notes/dialy限定
-  (setq org-agenda-files '("~/gtd/main.org"
-                           "~/gtd/futurismo.org"
-                           "~/gtd/z/journal/"
-                           "~/gtd/i/inbox.org"))
+  (setq org-agenda-files '("~/keido/main.org"
+                           "~/keido/futurismo.org"
+                           "~/keido/roam/journal/"))
+
   ;; 期間を限定
   (setq org-agenda-span 30)
                                         ; Inhibit the dimming of blocked tasks:
@@ -133,7 +132,7 @@
   ;; org-capture
   ;; 使いこなせてないな...
   (setq org-capture-templates
-        '(("i" "Inbox" entry (file "~/gtd/inbox.org") "* %T %?\n")
+        '(("i" "Inbox" entry (file "~/keido/inbox/inbox.org") "* %T %?\n")
           ;;        ("j" "Journal" entry (file+headline "~/gtd/journal.org" "Journal")
                                         ;         "* %?\nEntered on %U\n %i\n %a")
           ;;        ("d" "Daily Log" entry (function org-journal-find-location)
@@ -159,12 +158,11 @@
  (map! :map org-mode-map "C-c C-." #'my/insert-timestamp))
 
 ;; org-roam
-(setq org-roam-directory (file-truename "~/gtd/z"))
+(setq org-roam-directory (file-truename "~/keido/roam"))
 (use-package! org-roam
   :after org
   :init
   (setq org-roam-v2-ack t)
-  (setq org-roam-open-buffer-on-find-file nil)
   (map!
         :leader
         :prefix ("r" . "org-roam")
@@ -193,6 +191,7 @@
   :bind-keymap
   ("C-c r d" . org-roam-dailies-map)
   :config
+  (setq +org-roam-open-buffer-on-find-file nil)
   (require 'org-roam-dailies) ; Ensure the keymap is available
   (org-roam-db-autosync-mode))
 
@@ -267,7 +266,7 @@
   (deft-recursive t)
   (deft-use-filter-string-for-filename t)
   (deft-default-extension "org")
-  (deft-directory "~/gtd/z"))
+  (deft-directory "~/keido/roam"))
 
 ;; elfeed
 (global-set-key (kbd "C-x w") 'elfeed)
