@@ -7,9 +7,10 @@
 ;;
 ;; どうもフォントが奇数だとorg-tableの表示が崩れる.
 ;; Source Han Code JPだとそもそもorg-tableの表示が崩れる.
-(setq doom-font (font-spec :family "Source Han Code JP" :size 13 ))
+;; terminalだと大丈夫な模様.そもそもTerminalはこの設定ではなくてTerminal Emulatorの設定がきく.
+(setq doom-font (font-spec :family "Source Han Code JP" :size 12 ))
 
-(setq doom-theme 'doom-one)
+(setq doom-theme 'doom-molokai)
 (doom-themes-org-config)
 
 ;; general config
@@ -58,8 +59,8 @@
   (define-key ctl-x-map "\C-q" 'view-mode) ;; assinged C-x C-q.
 
   ;; less っぼく.
-  (define-key view-mode-map (kbd "p") 'View-scroll-line-backward)
-  (define-key view-mode-map (kbd "n") 'View-scroll-line-forward)
+  (define-key view-mode-map (kbd "p") 'view-scroll-line-backward)
+  (define-key view-mode-map (kbd "n") 'view-scroll-line-forward)
   ;; defaultのeでもいいけど，mule時代にvにbindされてたので, emacsでもvにbindしておく.
   (define-key view-mode-map (kbd "v") 'read-only-mode))
 
@@ -70,11 +71,11 @@
 ;; スマホとの共有のため, githubをcloneしたものをDropboxに置いて$HOMEにsymlinkしている.
 (after! org
   (setq org-directory "~/keido")
-  (setq org-default-notes-file "main.org")
+  (setq org-default-notes-file "gtd/gtd_projects.org")
 
   (setq org-return-follows-link t) ;; Enterでリンク先へジャンプ
   (setq org-use-speed-commands t)  ;; bulletにカーソルがあると高速移動
-  (setq org-hide-emphasis-markers t)
+  (setq org-hide-emphasis-markers t) ;; * を消して表示.
 
   ;; M-RETの挙動の調整
   ;; tだとsubtreeの最終行にheadingを挿入, nilだとcurrent pointに挿入
@@ -114,11 +115,8 @@
   ;; https://orgmode.org/worg/agenda-optimization.html
 
   ;; 何でもかんでもagendaすると思いので厳選.
-  ;; とりあえずnotes以下は最適化のために保留.
-  ;; 時間が絡むものはorg-roamで扱わないほうがいいのかな? もしくは，notes/dialy限定
-  (setq org-agenda-files '("~/keido/main.org"
-                           "~/keido/futurismo.org"
-                           "~/keido/roam/journal/"))
+  (setq org-agenda-files '("~/keido/zk/gtd/gtd_projects.org"
+                           "~/keido/zk/logs/daily"))
 
   ;; 期間を限定
   (setq org-agenda-span 30)
@@ -157,8 +155,47 @@
     (insert (format-time-string "%H:%M")))
  (map! :map org-mode-map "C-c C-." #'my/insert-timestamp))
 
+;; +pretty(org-superstar-mode)関連
+;;; Titles and Sections
+;; hide #+TITLE:
+;; (setq org-hidden-keywords '(title))
+;; set basic title font
+;; (set-face-attribute 'org-level-8 nil :weight 'bold :inherit 'default)
+;; Low levels are unimportant => no scaling
+;; (set-face-attribute 'org-level-7 nil :inherit 'org-level-8)
+;; (set-face-attribute 'org-level-6 nil :inherit 'org-level-8)
+;; (set-face-attribute 'org-level-5 nil :inherit 'org-level-8)
+;; (set-face-attribute 'org-level-4 nil :inherit 'org-level-8)
+;; Top ones get scaled the same as in LaTeX (\large, \Large, \LARGE)
+;; (set-face-attribute 'org-level-3 nil :inherit 'org-level-8 :height 1.2) ;\large
+;; (set-face-attribute 'org-level-2 nil :inherit 'org-level-8 :height 1.44) ;\Large
+;; (set-face-attribute 'org-level-1 nil :inherit 'org-level-8 :height 1.728) ;\LARGE
+;; Only use the first 4 styles and do not cycle.
+(setq org-cycle-level-faces nil)
+(setq org-n-level-faces 4)
+;; Document Title, (\huge)
+;; (set-face-attribute 'org-document-title nil
+;;                    :height 2.074
+;;                    :foreground 'unspecified
+;;                    :inherit 'org-level-8)
+
+;; (with-eval-after-load 'org-superstar
+;;  (set-face-attribute 'org-superstar-item nil :height 1.2)
+;;  (set-face-attribute 'org-superstar-header-bullet nil :height 1.2)
+;;  (set-face-attribute 'org-superstar-leading nil :height 1.3))
+;; Set different bullets, with one getting a terminal fallback.
+(setq org-superstar-headline-bullets-list
+      '("◉" ("🞛" ?◈) "○" "▷"))
+;; (setq org-superstar-special-todo-items t)
+
+;; Stop cycling bullets to emphasize hierarchy of headlines.
+(setq org-superstar-cycle-headline-bullets nil)
+;; Hide away leading stars on terminal.
+;; (setq org-superstar-leading-fallback ?\s)
+(setq inhibit-compacting-font-caches t)
+
 ;; org-roam
-(setq org-roam-directory (file-truename "~/keido/roam"))
+(setq org-roam-directory (file-truename "~/keido/zk"))
 (use-package! org-roam
   :after org
   :init
@@ -175,10 +212,19 @@
         "A" #'org-roam-alias-remove
         "r" #'org-roam-ref-add
         "R" #'org-roam-ref-remove
+        "o" #'org-id-get-create
         "s" #'org-roam-db-sync
+        "u" #'org-roam-update-org-id-locations
         )
   :custom
-  (org-roam-dailies-directory "journal/")
+  ;; ファイル名をIDにする.
+  (org-roam-capture-templates
+   '(("d" "default" plain "%?"
+      :target (file+head "%<%Y%m%d%H%M%S>.org"
+                         "#+title: ${title}\n")
+      :unnarrowed t)))
+  (org-roam-extract-new-file-path "%<%Y%m%d%H%M%S>.org")
+  (org-roam-dailies-directory "logs/daily/")
   (org-roam-dailies-capture-templates
    '(("d" "default" item "%?"
       :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n")
@@ -210,15 +256,15 @@
           org-roam-ui-update-on-save t
           org-roam-ui-open-on-start t))
 
-;; バグってる..
-;; (use-package! org-roam-timestamps
-;;   :after org-roam
-;;   :config
-;;   (org-roam-timestamps-mode))
+(use-package! org-roam-timestamps
+   :after org-roam
+   :config
+   (org-roam-timestamps-mode))
 
 ;; 今どきのアウトライナー的な線を出す.
-(require 'org-bars)
-(add-hook! 'org-mode-hook #'org-bars-mode)
+;; Terminal Modeではつかえないので一旦無効化する.
+;; (require 'org-bars)
+;; (add-hook! 'org-mode-hook #'org-bars-mode)
 
 ;; twittering-mode
 ;; この設定がないと認証が失敗した.
@@ -262,11 +308,29 @@
   :after org
   :bind
   ("C-c r j" . deft)
-  :custom
-  (deft-recursive t)
-  (deft-use-filter-string-for-filename t)
-  (deft-default-extension "org")
-  (deft-directory "~/keido/roam"))
+  :config
+  (setq deft-default-extension "org")
+  (setq deft-directory org-directory)
+  (setq deft-recursive t)
+  (setq deft-strip-summary-regexp ":PROPERTIES:\n\\(.+\n\\)+:END:\n")
+  (setq deft-use-filename-as-title nil)
+  ;; (setq deft-use-filter-string-for-filename t)
+  ;; (setq deft-org-mode-title-prefix t)
+  ;;
+  ;; deftでorg-roamのtitleをparseするためのworkaround
+  ;; see: https://github.com/jrblevin/deft/issues/75
+  (advice-add 'deft-parse-title :override
+    (lambda (file contents)
+      (if deft-use-filename-as-title
+          (deft-base-filename file)
+        (let* ((case-fold-search 't)
+               (begin (string-match "title: " contents))
+               (end-of-begin (match-end 0))
+               (end (string-match "\n" contents begin)))
+          (if begin
+              (substring contents end-of-begin end)
+            (format "%s" file))))))
+  )
 
 ;; elfeed
 (global-set-key (kbd "C-x w") 'elfeed)

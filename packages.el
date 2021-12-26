@@ -20,7 +20,7 @@
 (package! anki-editor)
 (package! csv-mode)
 (package! org-roam-ui)
-;; (package! org-roam-timestamps) バグってる.
+(package! org-roam-timestamps)
 
 ;; To install a package directly from a remote git repo, you must specify a
 ;; `:recipe'. You'll find documentation on what `:recipe' accepts here:
@@ -62,6 +62,5 @@
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;(unpin! t)
 ;
-;; workaround this, https://github.com/hlissner/doom-emacs/issues/5721
-(unpin! org-mode)
-(unpin! org-roam)
+;; workaround this, https://github.com/hlissner/doom-emacs/issues/5913
+(unpin! dired-git-info)
