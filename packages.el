@@ -11,16 +11,18 @@
 ;
 ;; どうもjapanese moduleのmigemoは動作しないので個別にいれる.
 (package! migemo)
+(package! avy-migemo)
 (package! fcitx)
-(package! org-bars
-  :recipe (:host github :repo "tonyaldon/org-bars"))
-(package! monkeytype)
-(package! org-toggl :recipe (:host github :repo "mbork/org-toggl"))
+;; (package! org-bars
+;;   :recipe (:host github :repo "tonyaldon/org-bars"))
+;; (package! monkeytype)
+;; (package! org-toggl :recipe (:host github :repo "mbork/org-toggl"))
 ;; (package! zh-align :recipe (:host github :repo "chen-chao/zh-align.el"))
 (package! anki-editor)
 (package! csv-mode)
 (package! org-roam-ui)
 (package! org-roam-timestamps)
+(package! ox-rst)
 
 ;; To install a package directly from a remote git repo, you must specify a
 ;; `:recipe'. You'll find documentation on what `:recipe' accepts here:
@@ -64,3 +66,5 @@
 ;
 ;; workaround this, https://github.com/hlissner/doom-emacs/issues/5913
 (unpin! dired-git-info)
+
+(unpin! ivy)

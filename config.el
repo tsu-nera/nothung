@@ -51,9 +51,37 @@
   (setq migemo-coding-system 'utf-8-unix)
   (migemo-init))
 
+(use-package! avy
+  :bind
+  ("M-g c" . avy-goto-char) ;; doomのkeybind上書き.
+  ("M-g g" . avy-goto-line) ;; doomのkeybind上書き.
+  ("M-g s". avy-goto-word-1))
+
+;; うまく動かないので封印 doomとの相性が悪いのかも.
+;; ひとまずmigemoしたいときはisearchで対応.
+;; (use-package! avy-migemo
+;;  :after migemo
+;;  :bind
+;;  ("M-g m m" . avy-migemo-mode)
+;;  ("M-g c" . avy-migemo-goto-char-timer) ;; doomのkeybind上書き.
+;;  :config
+;;  (avy-migemo-mode 1)
+;;  (setq avy-timeout-seconds nil))
+
+(use-package! swiper
+  :bind
+  ;; ("C-s" . swiper) migemoとうまく連携しないのでisearch置き換えを保留. C-c s s でswiper起動.
+  :config
+  (ivy-mode 1))
+
+;; avy-migemo-e.g.swiperだけバクる
+;; https://github.com/abo-abo/swiper/issues/2249
+;;(after! avy-migemo
+;;  (require 'avy-migemo-e.g.swiper))
+
 ;; lessでのファイル閲覧に操作性を似せるmode.
 ;; view-modeはemacs内蔵. C-x C-rでread-only-modeでファイルオープン
-;; doom emacsだと　C-c t r で　read-only-modeが起動する.
+;; doom emacsだとC-c t r でread-only-modeが起動する.
 (add-hook! view-mode
   (setq view-read-only t)
   (define-key ctl-x-map "\C-q" 'view-mode) ;; assinged C-x C-q.
@@ -115,8 +143,8 @@
   ;; https://orgmode.org/worg/agenda-optimization.html
 
   ;; 何でもかんでもagendaすると思いので厳選.
-  (setq org-agenda-files '("~/keido/zk/gtd/gtd_projects.org"
-                           "~/keido/zk/logs/daily"))
+  (setq org-agenda-files '("~/keido/notes/gtd/gtd_projects.org"
+                           "~/keido/notes/journals/daily"))
 
   ;; 期間を限定
   (setq org-agenda-span 30)
@@ -195,7 +223,8 @@
 (setq inhibit-compacting-font-caches t)
 
 ;; org-roam
-(setq org-roam-directory (file-truename "~/keido/zk"))
+(setq org-roam-directory (file-truename "~/keido/notes"))
+(setq org-roam-db-location (file-truename "~/keido/db/org-roam.db"))
 (use-package! org-roam
   :after org
   :init
@@ -224,7 +253,7 @@
                          "#+title: ${title}\n")
       :unnarrowed t)))
   (org-roam-extract-new-file-path "%<%Y%m%d%H%M%S>.org")
-  (org-roam-dailies-directory "logs/daily/")
+  (org-roam-dailies-directory "journals/daily/")
   (org-roam-dailies-capture-templates
    '(("d" "default" item "%?"
       :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n")
@@ -259,7 +288,9 @@
 (use-package! org-roam-timestamps
    :after org-roam
    :config
-   (org-roam-timestamps-mode))
+   (org-roam-timestamps-mode)
+   (setq org-roam-timestamps-remember-timestamps nil)
+   (setq org-roam-timestamps-remember-timestamps nil))
 
 ;; 今どきのアウトライナー的な線を出す.
 ;; Terminal Modeではつかえないので一旦無効化する.
@@ -272,27 +303,31 @@
 (add-hook! 'twittering-mode-hook
   (setq twittering-allow-insecure-server-cert t))
 
-(add-hook! writeroom-mode
-  (setq +zen-text-scale 1))
+;; 使ってないので一旦マスク，そのうち削除かも.
+;; (add-hook! writeroom-mode
+  ;; (setq +zen-text-scale 1))
 
 ;; 読書のためのマーカー（仮）
 ;; あとでちゃんと検討と朝鮮しよう.
 ;; (setq org-emphasis-alist
 ;;   '(("*" bold)
 ;;     ("/" italic)
-;;     ("_" underline)
+;;     ("_" underline))
 ;;     ("=" (:background "red" :foreground "white")) ;; 書き手の主張
-;;     ("~" (:background "blue" :foreground "white"))　;; 根拠
+;;     ("~" (:background "blue" :foreground "white")) cddddd;; 根拠
 ;;     ("+" (:background "green" :foreground "black")))) ;; 自分の考え
 
-;; org-clock関連
-(require 'org-toggl)
-(setq toggl-auth-token "4b707d3e5bc71cc5f0010ac7ea76185d")
-(setq org-toggl-inherit-toggl-properties nil)
-(org-toggl-integration-mode)
+;; org-clock関連 使わないのでいったんマスクだが使いこなしたいので消さない.
+;; (require 'org-toggl)
+;; (setq toggl-auth-token "4b707d3e5bc71cc5f0010ac7ea76185d")
+;;(setq org-toggl-inherit-toggl-properties nil)
+;; (org-toggl-integration-mode)
 
 (use-package! ox-hugo
   :after 'ox)
+
+(use-package! ox-rst
+  :after 'org)
 
 ;; 空白が保存時に削除されるとbullet表示がおかしくなる.
 ;; なおwl-bulterはdoom emacsのデフォルトで組み込まれている.
