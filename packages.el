@@ -20,9 +20,12 @@
 ;; (package! zh-align :recipe (:host github :repo "chen-chao/zh-align.el"))
 (package! anki-editor)
 (package! csv-mode)
+(package! ox-rst)
+
 (package! org-roam-ui)
 (package! org-roam-timestamps)
-(package! ox-rst)
+(package! org-roam-bibtex
+  :recipe (:host github :repo "org-roam/org-roam-bibtex"))
 
 ;; To install a package directly from a remote git repo, you must specify a
 ;; `:recipe'. You'll find documentation on what `:recipe' accepts here:
@@ -67,4 +70,6 @@
 ;; workaround this, https://github.com/hlissner/doom-emacs/issues/5913
 (unpin! dired-git-info)
 
-(unpin! ivy)
+;; for org-roam-bibtex
+(unpin! org-roam)
+(unpin! bibtex-completion ivy-bibtex)

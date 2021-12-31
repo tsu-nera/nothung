@@ -156,14 +156,37 @@
   (setq org-agenda-use-tag-inheritance nil)
 
   ;; org-capture
-  ;; 使いこなせてないな...
+  ;; https://orgmode.org/manual/Capture-templates.html
+  (defun my/create-timestamped-org-file (path)
+    (expand-file-name (format "%s.org" (format-time-string "%Y%m%d%H%M%S")) path))
+
   (setq org-capture-templates
-        '(("i" "Inbox" entry (file "~/keido/inbox/inbox.org") "* %T %?\n")
+        '(("i" "📥Inbox" entry (file "~/keido/inbox/inbox.org") "* %T %?\n")
           ;;        ("j" "Journal" entry (file+headline "~/gtd/journal.org" "Journal")
                                         ;         "* %?\nEntered on %U\n %i\n %a")
           ;;        ("d" "Daily Log" entry (function org-journal-find-location)
           ;;                               "* %(format-time-string org-journal-time-format)%i%?")
+          ;; ("z" "💡Zettelkasten" entry (file (lambda () (my/create-timestamped-org-file "~/keido/notes/zk"))) "* TITLE%?\n")
+          ;; ("z" "💡Zettelkasten" entry (file "~/keido/notes/zk/20210101.org") "* TITLE%?\n")
+          ("z" "💡Zettelkasten" plain (file+headline (lambda () (my/create-timestamped-org-file "~/keido/notes/zk")) "") "#+TITLE:%?\n")
+          ("w" "📝Wiki" plain (file+headline (lambda () (my/create-timestamped-org-file "~/keido/notes/wiki")) "") "#+TITLE:%?\n")
+          ;; ("z" "💡Zettelkasten" plain (file+headline "~/keido/notes/zk/%<%Y%m%d%H%M%S>.org" "") "#+TITLE: %?\n")
+          ;; ("w" "wiki" plain "%?"
+          ;;  :target (file+head "wiki/%<%Y%m%d%H%M%S>.org"
+          ;;                     "#+title: ${title}\n")
+          ;;  :unnarrowed t)))
+          ("P" "Protocol" entry ; key, name, type
+           (file+headline +org-capture-notes-file "Inbox") ; target
+           "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?"
+           :prepend t ; properties
+           :kill-buffer t)
+          ("L" "Protocol Link" entry
+           (file+headline +org-capture-notes-file "Inbox")
+           "* %? [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n"
+           :prepend t
+           :kill-buffer t)
           ))
+
 
   ;; org-babel
   ;; 評価でいちいち質問されないように.
@@ -225,6 +248,7 @@
 ;; org-roam
 (setq org-roam-directory (file-truename "~/keido/notes"))
 (setq org-roam-db-location (file-truename "~/keido/db/org-roam.db"))
+
 (use-package! org-roam
   :after org
   :init
@@ -250,6 +274,14 @@
   (org-roam-capture-templates
    '(("d" "default" plain "%?"
       :target (file+head "%<%Y%m%d%H%M%S>.org"
+                         "#+title: ${title}\n")
+      :unnarrowed t)
+     ("z" "zettelkasten" plain "%?"
+      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                         "#+title: ${title}\n")
+      :unnarrowed t)
+     ("w" "wiki" plain "%?"
+      :target (file+head "wiki/%<%Y%m%d%H%M%S>.org"
                          "#+title: ${title}\n")
       :unnarrowed t)))
   (org-roam-extract-new-file-path "%<%Y%m%d%H%M%S>.org")
@@ -291,6 +323,7 @@
    (org-roam-timestamps-mode)
    (setq org-roam-timestamps-remember-timestamps nil)
    (setq org-roam-timestamps-remember-timestamps nil))
+
 
 ;; 今どきのアウトライナー的な線を出す.
 ;; Terminal Modeではつかえないので一旦無効化する.
@@ -339,16 +372,19 @@
 (setq company-idle-delay nil)
 (global-set-key (kbd "TAB") #'company-indent-or-complete-common)
 
+;; deftはOrg-roamシステムの検索で活躍する
 (use-package! deft
-  :after org
+  :after org-roam
   :bind
-  ("C-c r j" . deft)
+  ("C-c r j" . deft) ;; Doom だと C-c n dにもbindされている.
   :config
   (setq deft-default-extension "org")
-  (setq deft-directory org-directory)
+  (setq deft-directory org-roam-directory)
   (setq deft-recursive t)
   (setq deft-strip-summary-regexp ":PROPERTIES:\n\\(.+\n\\)+:END:\n")
   (setq deft-use-filename-as-title nil)
+  (setq deft-auto-save-interval -1.0) ;; disable auto-save
+  (add-to-list 'deft-extensions "tex")
   ;; (setq deft-use-filter-string-for-filename t)
   ;; (setq deft-org-mode-title-prefix t)
   ;;
@@ -364,8 +400,7 @@
                (end (string-match "\n" contents begin)))
           (if begin
               (substring contents end-of-begin end)
-            (format "%s" file))))))
-  )
+            (format "%s" file)))))))
 
 ;; elfeed
 (global-set-key (kbd "C-x w") 'elfeed)
@@ -374,3 +409,80 @@
   :config
   (setq elfeed-feeds
         '("https://futurismo.biz")))
+
+(use-package! org-ref
+    :config
+    (setq
+         org-ref-completion-library 'org-ref-ivy-cite
+         org-ref-get-pdf-filename-function 'org-ref-get-pdf-filename-ivy-bibtex
+         org-ref-default-bibliography (list (file-truename "~/keido/references/zotLib.bib"))
+         org-ref-bibliography-notes (file-truename "~/keido/notes/bibnotes.org")
+         org-ref-note-title-format "* TODO %y - %t\n :PROPERTIES:\n  :Custom_ID: %k\n  :NOTER_DOCUMENT: %F\n :ROAM_KEY: cite:%k\n  :AUTHOR: %9a\n  :JOURNAL: %j\n  :YEAR: %y\n  :VOLUME: %v\n  :PAGES: %p\n  :DOI: %D\n  :URL: %U\n :END:\n\n"
+         org-ref-notes-directory (file-truename "~/keido/notes/")
+         org-ref-notes-function 'orb-edit-notes
+    ))
+
+(use-package! ivy-bibtex
+  :after org-ref
+  :config
+  (setq ivy-re-builders-alist
+        '((ivy-bibtex . ivy--regex-ignore-order)
+          (t . ivy--regex-plus)))
+  (setq
+   bibtex-completion-notes-path (file-truename "~/keido/notes/")
+   bibtex-completion-bibliography (file-truename "~/keido/references/zotLib.bib")
+   bibtex-completion-pdf-field "file"
+   bibtex-completion-notes-template-multiple-files
+   (concat
+    "#+TITLE: ${title}\n"
+    "#+ROAM_KEY: cite:${=key=}\n"
+    "* TODO Notes\n"
+    ":PROPERTIES:\n"
+    ":Custom_ID: ${=key=}\n"
+    ":NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")\n"
+    ":AUTHOR: ${author-abbrev}\n"
+    ":JOURNAL: ${journaltitle}\n"
+    ":DATE: ${date}\n"
+    ":YEAR: ${year}\n"
+    ":DOI: ${doi}\n"
+    ":URL: ${url}\n"
+    ":END:\n\n"
+    )
+   )
+  )
+
+(use-package! org-roam-protocol
+  :after org-protocol)
+
+(use-package! org-roam-bibtex
+  :after org-roam
+  :hook (org-roam-mode . org-roam-bibtex-mode)
+  :config
+  (setq org-roam-bibtex-preformat-keywords
+   '("=key=" "title" "url" "file" "author-or-editor" "keywords"))
+  (setq orb-templates
+        '(("r" "ref" plain (function org-roam-capture--get-point)
+           ""
+           :file-name "${slug}"
+           :head "#+TITLE: ${=key=}: ${title}\n#+ROAM_KEY: ${ref}
+
+- tags ::
+- keywords :: ${keywords}
+
+\n* ${title}\n  :PROPERTIES:\n  :Custom_ID: ${=key=}\n  :URL: ${url}\n  :AUTHOR: ${author-or-editor}\n  :NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")\n  :NOTER_PAGE: \n  :END:\n\n"
+
+           :unnarrowed t))))
+
+(use-package! org-noter
+  :after (:any org pdf-view)
+  :config
+  (setq
+   ;; The WM can handle splits
+   org-noter-notes-window-location 'other-frame
+   ;; Please stop opening frames
+   org-noter-always-create-frame nil
+   ;; I want to see the whole file
+   org-noter-hide-other nil
+   ;; Everything is relative to the main notes file
+   org-noter-notes-search-path (list (file-truename "~/keido/notes/"))
+   ))
