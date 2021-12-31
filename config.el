@@ -9,7 +9,7 @@
   :config
   (setq fcitx-remote-command "fcitx5-remote")
   (fcitx-aggressive-setup)
-  ;; Linuxなら t が推奨されるものの、fcitx5には未対応なためここはnil
+  ;; Linux なら t が推奨されるものの、fcitx5 には未対応なためここは nil
   (setq fcitx-use-dbus nil))
 
 ;; migemo
@@ -23,21 +23,22 @@
   (setq migemo-coding-system 'utf-8-unix)
   (migemo-init))
 
+
 ;; Completion
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package! avy
   :bind
-  ("M-g c" . avy-goto-char) ;; doomのkeybind上書き.
-  ("M-g g" . avy-goto-line) ;; doomのkeybind上書き.
+  ("M-g c" . avy-goto-char) ;; doom の keybind 上書き.
+  ("M-g g" . avy-goto-line) ;; doom の keybind 上書き.
   ("M-g s". avy-goto-word-1))
 
-;; うまく動かないので封印 doomとの相性が悪いのかも.
-;; ひとまずmigemoしたいときはisearchで対応.
+;; うまく動かないので封印 doom との相性が悪いのかも.
+;; ひとまず migemo したいときは isearch で対応.
 ;; (use-package! avy-migemo
 ;;  :after migemo
 ;;  :bind
 ;;  ("M-g m m" . avy-migemo-mode)
-;;  ("M-g c" . avy-migemo-goto-char-timer) ;; doomのkeybind上書き.
+;;  ("M-g c" . avy-migemo-goto-char-timer) ;; doom の keybind 上書き.
 ;;  :config
 ;;  (avy-migemo-mode 1)
 ;;  (setq avy-timeout-seconds nil))
@@ -73,18 +74,18 @@
 
 (use-package! swiper
   :bind
-  ;; ("C-s" . swiper) migemoとうまく連携しないのでisearch置き換えを保留. C-c s s でswiper起動.
+  ;; ("C-s" . swiper) migemo とうまく連携しないので isearch 置き換えを保留. C-c s s で swiper 起動.
   :config
   (ivy-mode 1))
 
-;; avy-migemo-e.g.swiperだけバクる
+;; avy-migemo-e.g.swiper だけバクる
 ;; https://github.com/abo-abo/swiper/issues/2249
 ;;(after! avy-migemo
 ;;  (require 'avy-migemo-e.g.swiper))
 
-;; org-roamのcompletion-at-pointが動作しないのはこいつかな...
+;; org-roam の completion-at-point が動作しないのはこいつかな...
 ;; (add-hook! 'org-mode-hook (company-mode -1))
-;; companyはなにげに使いそうだからな，TABでのみ補完発動させるか.
+;; company はなにげに使いそうだからな，TAB でのみ補完発動させるか.
 (setq company-idle-delay nil)
 (global-set-key (kbd "TAB") #'company-indent-or-complete-common)
 
@@ -93,15 +94,15 @@
 (setq doom-font (font-spec :family "Source Han Code JP" :size 12 ))
 (setq doom-theme 'doom-molokai)
 (doom-themes-org-config)
-;; どうもフォントが奇数だとorg-tableの表示が崩れる.
-;; Source Han Code JPだとそもそもorg-tableの表示が崩れる.
-;; terminalだと大丈夫な模様.そもそもTerminalはこの設定ではなくてTerminal Emulatorの設定がきく.
+;; どうもフォントが奇数だと org-table の表示が崩れる.
+;; Source Han Code JP だとそもそも org-table の表示が崩れる.
+;; terminal だと大丈夫な模様.そもそも Terminal はこの設定ではなくて Terminal Emulator の設定がきく.
 
 (setq display-line-numbers-type t) ; 行番号表示
 
-;; lessでのファイル閲覧に操作性を似せるmode.
-;; view-modeはemacs内蔵. C-x C-rでread-only-modeでファイルオープン
-;; doom emacsだとC-c t r でread-only-modeが起動する.
+;; less でのファイル閲覧に操作性を似せる mode.
+;; view-mode は emacs 内蔵. C-x C-r で read-only-mode でファイルオープン
+;; doom emacs だと C-c t r で read-only-mode が起動する.
 (add-hook! view-mode
   (setq view-read-only t)
   (define-key ctl-x-map "\C-q" 'view-mode) ;; assinged C-x C-q.
@@ -109,14 +110,14 @@
   ;; less っぼく.
   (define-key view-mode-map (kbd "p") 'view-scroll-line-backward)
   (define-key view-mode-map (kbd "n") 'view-scroll-line-forward)
-  ;; defaultのeでもいいけど，mule時代にvにbindされてたので, emacsでもvにbindしておく.
+  ;; default の e でもいいけど，mule 時代に v に bind されてたので, emacs でも v に bind しておく.
   (define-key view-mode-map (kbd "v") 'read-only-mode))
 
-;; deftはOrg-roamシステムの検索で活躍する
+;; deft は Org-roam システムの検索で活躍する
 (use-package! deft
   :after org-roam
   :bind
-  ("C-c r j" . deft) ;; Doom だと C-c n dにもbindされている.
+  ("C-c r j" . deft) ;; Doom だと C-c n d にも bind されている.
   :config
   (setq deft-default-extension "org")
   (setq deft-directory org-roam-directory)
@@ -128,7 +129,7 @@
   ;; (setq deft-use-filter-string-for-filename t)
   ;; (setq deft-org-mode-title-prefix t)
   ;;
-  ;; deftでorg-roamのtitleをparseするためのworkaround
+  ;; deft で org-roam の title を parse するための workaround
   ;; see: https://github.com/jrblevin/deft/issues/75
   (advice-add 'deft-parse-title :override
     (lambda (file contents)
@@ -144,6 +145,13 @@
 
 ;; Editor
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; 英数字と日本語の間にスペースをいれる.
+(use-package! pangu-spacing
+  :config
+  (global-pangu-spacing-mode 1))
+
+;; 記号の前後にスペースを入れる.
+(use-package! electric-operator)
 
 ;; Emacs
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -166,18 +174,18 @@
 ;; https://github.com/hlissner/doom-emacs/blob/develop/modules/lang/org/README.org
 ;; https://github.com/tsu-nera/dotfiles/blob/master/.emacs.d/inits/50_org-mode.org
 
-;; スマホとの共有のため, githubをcloneしたものをDropboxに置いて$HOMEにsymlinkしている.
+;; スマホとの共有のため, github を clone したものを Dropbox に置いて$HOME に symlink している.
 (after! org
   (setq org-directory "~/keido")
   (setq org-default-notes-file "gtd/gtd_projects.org")
 
-  (setq org-return-follows-link t) ;; Enterでリンク先へジャンプ
-  (setq org-use-speed-commands t)  ;; bulletにカーソルがあると高速移動
+  (setq org-return-follows-link t) ;; Enter でリンク先へジャンプ
+  (setq org-use-speed-commands t)  ;; bullet にカーソルがあると高速移動
   (setq org-hide-emphasis-markers t) ;; * を消して表示.
 
-  ;; M-RETの挙動の調整
-  ;; tだとsubtreeの最終行にheadingを挿入, nilだとcurrent pointに挿入
-  ;; なお，C-RETだとsubtreeの最終行に挿入され, C-S-RETだと手前に挿入される.
+  ;; M-RET の挙動の調整
+  ;; t だと subtree の最終行に heading を挿入, nil だと current point に挿入
+  ;; なお，C-RET だと subtree の最終行に挿入され, C-S-RET だと手前に挿入される.
   (setq org-insert-heading-respect-content nil)
 
   (setq org-startup-indented t)
@@ -186,13 +194,13 @@
   (setq org-startup-folded 'show2levels);; 見出しの階層指定
   (setq org-startup-truncated nil) ;; 長い文は折り返す.
 
-  ;; org-babelのソースをキレイに表示.
+  ;; org-babel のソースをキレイに表示.
   (setq org-src-fontify-natively t)
   (setq org-fontify-whole-heading-line t)
 
-  ;; electric-indentはorg-modeで誤作動の可能性があることのこと
-  ;; たまにいきなりorg-modeのtree構造が壊れるから，とりあえず設定しておく.
-  ;; この設定の効果が以下の記事でgifである.
+  ;; electric-indent は org-mode で誤作動の可能性があることのこと
+  ;; たまにいきなり org-mode の tree 構造が壊れるから，とりあえず設定しておく.
+  ;; この設定の効果が以下の記事で gif である.
   ;; https://www.philnewton.net/blog/electric-indent-with-org-mode/
   (add-hook! org-mode (electric-indent-local-mode -1))
 
@@ -212,7 +220,7 @@
   ;; org-agenda speedup tips
   ;; https://orgmode.org/worg/agenda-optimization.html
 
-  ;; 何でもかんでもagendaすると思いので厳選.
+  ;; 何でもかんでも agenda すると思いので厳選.
   (setq org-agenda-files '("~/keido/notes/gtd/gtd_projects.org"
                            "~/keido/notes/journals/daily"))
 
@@ -270,7 +278,7 @@
      (shell . t)))
   )
 
-;; org-modeでtimestampのみを挿入するカスタム関数(hh:mm)
+;; org-mode で timestamp のみを挿入するカスタム関数(hh:mm)
 (after! org
   (defun my/insert-timestamp ()
     "Insert time stamp."
@@ -342,7 +350,7 @@
         "u" #'org-roam-update-org-id-locations
         )
   :custom
-  ;; ファイル名をIDにする.
+  ;; ファイル名を ID にする.
   (org-roam-capture-templates
    '(("d" "default" plain "%?"
       :target (file+head "%<%Y%m%d%H%M%S>.org"
@@ -398,7 +406,7 @@
 
 
 ;; 今どきのアウトライナー的な線を出す.
-;; Terminal Modeではつかえないので一旦無効化する.
+;; Terminal Mode ではつかえないので一旦無効化する.
 ;; (require 'org-bars)
 ;; (add-hook! 'org-mode-hook #'org-bars-mode)
 
@@ -415,8 +423,8 @@
   (add-to-list 'org-export-filter-link-functions
                'my/rst-to-sphinx-link-format))
 
-;; 空白が保存時に削除されるとbullet表示がおかしくなる.
-;; なおwl-bulterはdoom emacsのデフォルトで組み込まれている.
+;; 空白が保存時に削除されると bullet 表示がおかしくなる.
+;; なお wl-bulter は doom emacs のデフォルトで組み込まれている.
 (add-hook! 'org-mode-hook (ws-butler-mode -1))
 
 (use-package! org-ref
@@ -441,7 +449,7 @@
 ;;     ("~" (:background "blue" :foreground "white")) cddddd;; 根拠
 ;;     ("+" (:background "green" :foreground "black")))) ;; 自分の考え
 
-;; org-clock関連 使わないのでいったんマスクだが使いこなしたいので消さない.
+;; org-clock 関連 使わないのでいったんマスクだが使いこなしたいので消さない.
 ;; (require 'org-toggl)
 ;; (setq toggl-auth-token "4b707d3e5bc71cc5f0010ac7ea76185d")
 ;;(setq org-toggl-inherit-toggl-properties nil)
@@ -507,10 +515,10 @@
 ;; Config
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; memo:
-;; use-package! は:defer, :hook, :commands, or :afterが省略されると起動時にloadされる.
-;; after! はpackageがloadされたときに評価される.
-;; add-hook! はmode有効化のとき. setq-hook!はequivalent.
-;; どれを使うかの正解はないがすべてuse-package!だと起動が遅くなるので
+;; use-package! は:defer, :hook, :commands, or :after が省略されると起動時に load される.
+;; after! は package が load されたときに評価される.
+;; add-hook! は mode 有効化のとき. setq-hook!は equivalent.
+;; どれを使うかの正解はないがすべて use-package!だと起動が遅くなるので
 ;; 場合によってカスタマイズせよ，とのこと.
 ;; https://github.com/hlissner/doom-emacs/blob/develop/docs/getting_started.org#configuring-packages
 ;;
@@ -519,6 +527,6 @@
 ;;      user-mail-address "john@doe.com")
 (setq confirm-kill-emacs nil) ; 終了時の確認はしない.
 
-;; フルスクリーンでEmacs起動
+;; フルスクリーンで Emacs 起動
 ;; ブラウザと並べて表示することが多くなったのでいったんマスク
 ;; (add-to-list 'initial-frame-alist '(fullscreen . maximized))

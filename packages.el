@@ -9,7 +9,7 @@
 ;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
 ;(package! some-package)
 ;
-;; どうもjapanese moduleのmigemoは動作しないので個別にいれる.
+;; どうも japanese module の migemo は動作しないので個別にいれる.
 (package! migemo)
 (package! avy-migemo)
 
@@ -30,6 +30,7 @@
 (package! org-roam-bibtex
   :recipe (:host github :repo "org-roam/org-roam-bibtex"))
 
+(package! electric-operator)
 
 ;; To install a package directly from a remote git repo, you must specify a
 ;; `:recipe'. You'll find documentation on what `:recipe' accepts here:
