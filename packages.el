@@ -15,6 +15,8 @@
 
 (package! fcitx)
 (package! pangu-spacing)
+(package! electric-operator)
+
 (package! anki-editor)
 (package! csv-mode)
 
@@ -29,8 +31,6 @@
 (package! org-roam-timestamps)
 (package! org-roam-bibtex
   :recipe (:host github :repo "org-roam/org-roam-bibtex"))
-
-(package! electric-operator)
 
 ;; To install a package directly from a remote git repo, you must specify a
 ;; `:recipe'. You'll find documentation on what `:recipe' accepts here:

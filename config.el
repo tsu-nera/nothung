@@ -148,7 +148,9 @@
 ;; 英数字と日本語の間にスペースをいれる.
 (use-package! pangu-spacing
   :config
-  (global-pangu-spacing-mode 1))
+  (global-pangu-spacing-mode 1)
+  ;; 保存時に自動的にスペースを入れるのを抑止.あくまで入力時にしておく.
+  (setq pangu-spacing-real-insert-separtor nil))
 
 ;; 記号の前後にスペースを入れる.
 (use-package! electric-operator)
@@ -237,24 +239,30 @@
   ;; https://orgmode.org/manual/Capture-templates.html
   (defun my/create-timestamped-org-file (path)
     (expand-file-name (format "%s.org" (format-time-string "%Y%m%d%H%M%S")) path))
+  (defun my/create-date-org-file (path)
+    (expand-file-name (format "%s.org" (format-time-string "%Y-%m-%d")) path))
 
   (setq org-capture-templates
         '(("i" "📥Inbox" entry (file "~/keido/inbox/inbox.org") "* %T %?\n")
-          ;;        ("j" "Journal" entry (file+headline "~/gtd/journal.org" "Journal")
+          ("j" "🤔Journal" plain
+           (file+headline (lambda () (my/create-date-org-file "~/keido/notes/journals/daily"))
+                          "Journal")
+           "%?"
+           :empty-lines 1
+           :kill-buffer t)
                                         ;         "* %?\nEntered on %U\n %i\n %a")
           ;;        ("d" "Daily Log" entry (function org-journal-find-location)
           ;;                               "* %(format-time-string org-journal-time-format)%i%?")
           ;; ("z" "💡Zettelkasten" entry (file (lambda () (my/create-timestamped-org-file "~/keido/notes/zk"))) "* TITLE%?\n")
           ;; ("z" "💡Zettelkasten" entry (file "~/keido/notes/zk/20210101.org") "* TITLE%?\n")
-          ("z" "💡Zettelkasten" plain (file+headline (lambda () (my/create-timestamped-org-file "~/keido/notes/zk")) "") "#+TITLE:💡%?\n")
-          ("w" "📝Wiki" plain (file+headline (lambda () (my/create-timestamped-org-file "~/keido/notes/wiki")) "") "#+EXPORT_FILE_NAME: ~/repo/futurismo4/wiki/xxx.rst
+          ("z" "💡Zettelkasten" plain
+           (file+headline (lambda () (my/create-timestamped-org-file "~/keido/notes/zk"))
+                          "") "#+TITLE:💡%?\n")
+          ("w" "📝Wiki" plain
+           (file+headline (lambda () (my/create-timestamped-org-file "~/keido/notes/wiki")) "")
+           "#+EXPORT_FILE_NAME: ~/repo/futurismo4/wiki/xxx.rst
 #+OPTIONS: toc:t num:nil todo:nil pri:nil ^:nil author:nil *:t prop:nil
 #+TITLE:📝%?\n")
-          ;; ("z" "💡Zettelkasten" plain (file+headline "~/keido/notes/zk/%<%Y%m%d%H%M%S>.org" "") "#+TITLE: %?\n")
-          ;; ("w" "wiki" plain "%?"
-          ;;  :target (file+head "wiki/%<%Y%m%d%H%M%S>.org"
-          ;;                     "#+title: ${title}\n")
-          ;;  :unnarrowed t)))
           ("P" "Protocol" entry ; key, name, type
            (file+headline +org-capture-notes-file "Inbox") ; target
            "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?"
@@ -266,7 +274,6 @@
            :prepend t
            :kill-buffer t)
           ))
-
 
   ;; org-babel
   ;; 評価でいちいち質問されないように.
@@ -366,10 +373,6 @@
       :unnarrowed t)))
   (org-roam-extract-new-file-path "%<%Y%m%d%H%M%S>.org")
   (org-roam-dailies-directory "journals/daily/")
-  (org-roam-dailies-capture-templates
-   '(("d" "default" item "%?"
-      :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n")
-      :unnarrowed t)))
   ;;        :map org-mode-map
   ;;        ("C-M-i"    . completion-at-point)
   ;;        :map org-roam-dailies-map
@@ -378,6 +381,11 @@
   :bind-keymap
   ("C-c r d" . org-roam-dailies-map)
   :config
+  (setq org-roam-dailies-capture-templates
+        '(("d" "default" item "%?"
+           :if-new (file+head+olp "%<%Y-%m-%d>.org" "#+Title: %<%Y-%m-%d>" ("Journal"))
+           :unnarrowed t)))
+
   (setq +org-roam-open-buffer-on-find-file nil)
   (require 'org-roam-dailies) ; Ensure the keymap is available
   (org-roam-db-autosync-mode))
