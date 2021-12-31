@@ -243,22 +243,33 @@
     (expand-file-name (format "%s.org" (format-time-string "%Y-%m-%d")) path))
 
   (setq org-capture-templates
-        '(("i" "📥Inbox" entry (file "~/keido/inbox/inbox.org") "* %T %?\n")
-          ("j" "🤔Journal" plain
+        '(("i" "📥 Inbox" entry (file "~/keido/inbox/inbox.org") "* %T %?\n")
+          ("t" "🤔 Thought" plain
            (file+headline (lambda () (my/create-date-org-file "~/keido/notes/journals/daily"))
-                          "Journal")
+                          "Thoughts")
            "%?"
            :empty-lines 1
            :kill-buffer t)
-                                        ;         "* %?\nEntered on %U\n %i\n %a")
-          ;;        ("d" "Daily Log" entry (function org-journal-find-location)
-          ;;                               "* %(format-time-string org-journal-time-format)%i%?")
-          ;; ("z" "💡Zettelkasten" entry (file (lambda () (my/create-timestamped-org-file "~/keido/notes/zk"))) "* TITLE%?\n")
-          ;; ("z" "💡Zettelkasten" entry (file "~/keido/notes/zk/20210101.org") "* TITLE%?\n")
-          ("z" "💡Zettelkasten" plain
+          ("T" "🤔 Thought+Ref" plain
+           (file+headline (lambda () (my/create-date-org-file "~/keido/notes/journals/daily"))
+                          "Thoughts")
+           "%?\n%a"
+           :empty-lines 1
+           :kill-buffer t)
+          ("j" "🖊 Journal" plain
+           (file (lambda () (my/create-date-org-file "~/keido/notes/journals/daily")))
+           "%?"
+           :empty-lines 1
+           :kill-buffer t)
+          ("J" "🖊 Journal+Ref" plain
+           (file (lambda () (my/create-date-org-file "~/keido/notes/journals/daily")))
+           "%?\n%a"
+           :empty-lines 1
+           :kill-buffer t)
+          ("z" "💡 Zettelkasten" plain
            (file+headline (lambda () (my/create-timestamped-org-file "~/keido/notes/zk"))
                           "") "#+TITLE:💡%?\n")
-          ("w" "📝Wiki" plain
+          ("w" "📝 Wiki" plain
            (file+headline (lambda () (my/create-timestamped-org-file "~/keido/notes/wiki")) "")
            "#+EXPORT_FILE_NAME: ~/repo/futurismo4/wiki/xxx.rst
 #+OPTIONS: toc:t num:nil todo:nil pri:nil ^:nil author:nil *:t prop:nil
