@@ -1,38 +1,10 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
-;; doom specific config
-;; あとでプライベートな宣言方法うしらべる.
-;; (setq user-full-name "John Doe"
-;;       user-mail-address "john@doe.com")
-;;
-;; どうもフォントが奇数だとorg-tableの表示が崩れる.
-;; Source Han Code JPだとそもそもorg-tableの表示が崩れる.
-;; terminalだと大丈夫な模様.そもそもTerminalはこの設定ではなくてTerminal Emulatorの設定がきく.
-(setq doom-font (font-spec :family "Source Han Code JP" :size 12 ))
-
-(setq doom-theme 'doom-molokai)
-(doom-themes-org-config)
-
-;; general config
+;; Input
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (set-language-environment "Japanese")
 (prefer-coding-system 'utf-8)
 (set-default 'buffer-filecoding-system 'utf-8)
-
-(setq display-line-numbers-type t) ; 行番号表示
-(setq confirm-kill-emacs nil) ; 終了時の確認はしない.
-
-;; フルスクリーンでEmacs起動
-;; ブラウザと並べて表示することが多くなったのでいったんマスク
-;; (add-to-list 'initial-frame-alist '(fullscreen . maximized))
-
-;; memo:
-;; use-package! は:defer, :hook, :commands, or :afterが省略されると起動時にloadされる.
-;; after! はpackageがloadされたときに評価される.
-;; add-hook! はmode有効化のとき. setq-hook!はequivalent.
-;; どれを使うかの正解はないがすべてuse-package!だと起動が遅くなるので
-;; 場合によってカスタマイズせよ，とのこと.
-;; https://github.com/hlissner/doom-emacs/blob/develop/docs/getting_started.org#configuring-packages
-
 (use-package! fcitx
   :config
   (setq fcitx-remote-command "fcitx5-remote")
@@ -51,6 +23,8 @@
   (setq migemo-coding-system 'utf-8-unix)
   (migemo-init))
 
+;; Completion
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package! avy
   :bind
   ("M-g c" . avy-goto-char) ;; doomのkeybind上書き.
@@ -68,6 +42,35 @@
 ;;  (avy-migemo-mode 1)
 ;;  (setq avy-timeout-seconds nil))
 
+(use-package! ivy-bibtex
+  :after org-ref
+  :config
+  (setq ivy-re-builders-alist
+        '((ivy-bibtex . ivy--regex-ignore-order)
+          (t . ivy--regex-plus)))
+  (setq
+   bibtex-completion-notes-path (file-truename "~/keido/notes/")
+   bibtex-completion-bibliography (file-truename "~/keido/references/zotLib.bib")
+   bibtex-completion-pdf-field "file"
+   bibtex-completion-notes-template-multiple-files
+   (concat
+    "#+TITLE: ${title}\n"
+    "#+ROAM_KEY: cite:${=key=}\n"
+    "* TODO Notes\n"
+    ":PROPERTIES:\n"
+    ":Custom_ID: ${=key=}\n"
+    ":NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")\n"
+    ":AUTHOR: ${author-abbrev}\n"
+    ":JOURNAL: ${journaltitle}\n"
+    ":DATE: ${date}\n"
+    ":YEAR: ${year}\n"
+    ":DOI: ${doi}\n"
+    ":URL: ${url}\n"
+    ":END:\n\n"
+    )
+   )
+  )
+
 (use-package! swiper
   :bind
   ;; ("C-s" . swiper) migemoとうまく連携しないのでisearch置き換えを保留. C-c s s でswiper起動.
@@ -78,6 +81,23 @@
 ;; https://github.com/abo-abo/swiper/issues/2249
 ;;(after! avy-migemo
 ;;  (require 'avy-migemo-e.g.swiper))
+
+;; org-roamのcompletion-at-pointが動作しないのはこいつかな...
+;; (add-hook! 'org-mode-hook (company-mode -1))
+;; companyはなにげに使いそうだからな，TABでのみ補完発動させるか.
+(setq company-idle-delay nil)
+(global-set-key (kbd "TAB") #'company-indent-or-complete-common)
+
+;; UI
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(setq doom-font (font-spec :family "Source Han Code JP" :size 12 ))
+(setq doom-theme 'doom-molokai)
+(doom-themes-org-config)
+;; どうもフォントが奇数だとorg-tableの表示が崩れる.
+;; Source Han Code JPだとそもそもorg-tableの表示が崩れる.
+;; terminalだと大丈夫な模様.そもそもTerminalはこの設定ではなくてTerminal Emulatorの設定がきく.
+
+(setq display-line-numbers-type t) ; 行番号表示
 
 ;; lessでのファイル閲覧に操作性を似せるmode.
 ;; view-modeはemacs内蔵. C-x C-rでread-only-modeでファイルオープン
@@ -92,7 +112,57 @@
   ;; defaultのeでもいいけど，mule時代にvにbindされてたので, emacsでもvにbindしておく.
   (define-key view-mode-map (kbd "v") 'read-only-mode))
 
-;; org-mode
+;; deftはOrg-roamシステムの検索で活躍する
+(use-package! deft
+  :after org-roam
+  :bind
+  ("C-c r j" . deft) ;; Doom だと C-c n dにもbindされている.
+  :config
+  (setq deft-default-extension "org")
+  (setq deft-directory org-roam-directory)
+  (setq deft-recursive t)
+  (setq deft-strip-summary-regexp ":PROPERTIES:\n\\(.+\n\\)+:END:\n")
+  (setq deft-use-filename-as-title nil)
+  (setq deft-auto-save-interval -1.0) ;; disable auto-save
+  (add-to-list 'deft-extensions "tex")
+  ;; (setq deft-use-filter-string-for-filename t)
+  ;; (setq deft-org-mode-title-prefix t)
+  ;;
+  ;; deftでorg-roamのtitleをparseするためのworkaround
+  ;; see: https://github.com/jrblevin/deft/issues/75
+  (advice-add 'deft-parse-title :override
+    (lambda (file contents)
+      (if deft-use-filename-as-title
+          (deft-base-filename file)
+        (let* ((case-fold-search 't)
+               (begin (string-match "title: " contents))
+               (end-of-begin (match-end 0))
+               (end (string-match "\n" contents begin)))
+          (if begin
+              (substring contents end-of-begin end)
+            (format "%s" file)))))))
+
+;; Editor
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Emacs
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Term
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;; Checker
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Tools
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; OS
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Org mode
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; https://github.com/hlissner/doom-emacs/blob/develop/modules/lang/org/README.org
 ;; https://github.com/tsu-nera/dotfiles/blob/master/.emacs.d/inits/50_org-mode.org
 
@@ -168,7 +238,7 @@
           ;;                               "* %(format-time-string org-journal-time-format)%i%?")
           ;; ("z" "💡Zettelkasten" entry (file (lambda () (my/create-timestamped-org-file "~/keido/notes/zk"))) "* TITLE%?\n")
           ;; ("z" "💡Zettelkasten" entry (file "~/keido/notes/zk/20210101.org") "* TITLE%?\n")
-          ("z" "💡Zettelkasten" plain (file+headline (lambda () (my/create-timestamped-org-file "~/keido/notes/zk")) "") "#+TITLE:%?\n")
+          ("z" "💡Zettelkasten" plain (file+headline (lambda () (my/create-timestamped-org-file "~/keido/notes/zk")) "") "#+TITLE:💡%?\n")
           ("w" "📝Wiki" plain (file+headline (lambda () (my/create-timestamped-org-file "~/keido/notes/wiki")) "") "#+EXPORT_FILE_NAME: ~/repo/futurismo4/wiki/xxx.rst
 #+OPTIONS: toc:t num:nil todo:nil pri:nil ^:nil author:nil *:t prop:nil
 #+TITLE:📝%?\n")
@@ -332,15 +402,34 @@
 ;; (require 'org-bars)
 ;; (add-hook! 'org-mode-hook #'org-bars-mode)
 
-;; twittering-mode
-;; この設定がないと認証が失敗した.
-;; twittering-oauth-get-access-token: Failed to retrieve a request token
-(add-hook! 'twittering-mode-hook
-  (setq twittering-allow-insecure-server-cert t))
+(use-package! ox-hugo
+  :after 'ox)
 
-;; 使ってないので一旦マスク，そのうち削除かも.
-;; (add-hook! writeroom-mode
-  ;; (setq +zen-text-scale 1))
+(use-package! ox-rst
+  :after 'org)
+
+(after! org
+  (defun my/rst-to-sphinx-link-format (text backend info)
+    (when (and (org-export-derived-backend-p backend 'rst) (not (search "<http" text)))
+      (replace-regexp-in-string "\\(\\.org>`_\\)" ">`" (concat ":doc:" text) nil nil 1)))
+  (add-to-list 'org-export-filter-link-functions
+               'my/rst-to-sphinx-link-format))
+
+;; 空白が保存時に削除されるとbullet表示がおかしくなる.
+;; なおwl-bulterはdoom emacsのデフォルトで組み込まれている.
+(add-hook! 'org-mode-hook (ws-butler-mode -1))
+
+(use-package! org-ref
+    :config
+    (setq
+         org-ref-completion-library 'org-ref-ivy-cite
+         org-ref-get-pdf-filename-function 'org-ref-get-pdf-filename-ivy-bibtex
+         org-ref-default-bibliography (list (file-truename "~/keido/references/zotLib.bib"))
+         org-ref-bibliography-notes (file-truename "~/keido/notes/bibnotes.org")
+         org-ref-note-title-format "* TODO %y - %t\n :PROPERTIES:\n  :Custom_ID: %k\n  :NOTER_DOCUMENT: %F\n :ROAM_KEY: cite:%k\n  :AUTHOR: %9a\n  :JOURNAL: %j\n  :YEAR: %y\n  :VOLUME: %v\n  :PAGES: %p\n  :DOI: %D\n  :URL: %U\n :END:\n\n"
+         org-ref-notes-directory (file-truename "~/keido/notes/")
+         org-ref-notes-function 'orb-edit-notes
+    ))
 
 ;; 読書のためのマーカー（仮）
 ;; あとでちゃんと検討と朝鮮しよう.
@@ -357,107 +446,6 @@
 ;; (setq toggl-auth-token "4b707d3e5bc71cc5f0010ac7ea76185d")
 ;;(setq org-toggl-inherit-toggl-properties nil)
 ;; (org-toggl-integration-mode)
-
-(use-package! ox-hugo
-  :after 'ox)
-
-(use-package! ox-rst
-  :after 'org
-  :init
-  (defun my/rst-to-sphinx-link-format (text backend info)
-    (when (and (org-export-derived-backend-p backend 'rst) (not (search "<http" text)))
-      (replace-regexp-in-string "\\(\\.org>`_\\)" ">`" (concat ":doc:" text) nil nil 1)))
-  (add-to-list 'org-export-filter-link-functions
-               'my/rst-to-sphinx-link-format))
-
-;; 空白が保存時に削除されるとbullet表示がおかしくなる.
-;; なおwl-bulterはdoom emacsのデフォルトで組み込まれている.
-(add-hook! 'org-mode-hook (ws-butler-mode -1))
-
-;; org-roamのcompletion-at-pointが動作しないのはこいつかな...
-;; (add-hook! 'org-mode-hook (company-mode -1))
-;; companyはなにげに使いそうだからな，TABでのみ補完発動させるか.
-(setq company-idle-delay nil)
-(global-set-key (kbd "TAB") #'company-indent-or-complete-common)
-
-;; deftはOrg-roamシステムの検索で活躍する
-(use-package! deft
-  :after org-roam
-  :bind
-  ("C-c r j" . deft) ;; Doom だと C-c n dにもbindされている.
-  :config
-  (setq deft-default-extension "org")
-  (setq deft-directory org-roam-directory)
-  (setq deft-recursive t)
-  (setq deft-strip-summary-regexp ":PROPERTIES:\n\\(.+\n\\)+:END:\n")
-  (setq deft-use-filename-as-title nil)
-  (setq deft-auto-save-interval -1.0) ;; disable auto-save
-  (add-to-list 'deft-extensions "tex")
-  ;; (setq deft-use-filter-string-for-filename t)
-  ;; (setq deft-org-mode-title-prefix t)
-  ;;
-  ;; deftでorg-roamのtitleをparseするためのworkaround
-  ;; see: https://github.com/jrblevin/deft/issues/75
-  (advice-add 'deft-parse-title :override
-    (lambda (file contents)
-      (if deft-use-filename-as-title
-          (deft-base-filename file)
-        (let* ((case-fold-search 't)
-               (begin (string-match "title: " contents))
-               (end-of-begin (match-end 0))
-               (end (string-match "\n" contents begin)))
-          (if begin
-              (substring contents end-of-begin end)
-            (format "%s" file)))))))
-
-;; elfeed
-(global-set-key (kbd "C-x w") 'elfeed)
-
-(use-package! elfeed
-  :config
-  (setq elfeed-feeds
-        '("https://futurismo.biz")))
-
-(use-package! org-ref
-    :config
-    (setq
-         org-ref-completion-library 'org-ref-ivy-cite
-         org-ref-get-pdf-filename-function 'org-ref-get-pdf-filename-ivy-bibtex
-         org-ref-default-bibliography (list (file-truename "~/keido/references/zotLib.bib"))
-         org-ref-bibliography-notes (file-truename "~/keido/notes/bibnotes.org")
-         org-ref-note-title-format "* TODO %y - %t\n :PROPERTIES:\n  :Custom_ID: %k\n  :NOTER_DOCUMENT: %F\n :ROAM_KEY: cite:%k\n  :AUTHOR: %9a\n  :JOURNAL: %j\n  :YEAR: %y\n  :VOLUME: %v\n  :PAGES: %p\n  :DOI: %D\n  :URL: %U\n :END:\n\n"
-         org-ref-notes-directory (file-truename "~/keido/notes/")
-         org-ref-notes-function 'orb-edit-notes
-    ))
-
-(use-package! ivy-bibtex
-  :after org-ref
-  :config
-  (setq ivy-re-builders-alist
-        '((ivy-bibtex . ivy--regex-ignore-order)
-          (t . ivy--regex-plus)))
-  (setq
-   bibtex-completion-notes-path (file-truename "~/keido/notes/")
-   bibtex-completion-bibliography (file-truename "~/keido/references/zotLib.bib")
-   bibtex-completion-pdf-field "file"
-   bibtex-completion-notes-template-multiple-files
-   (concat
-    "#+TITLE: ${title}\n"
-    "#+ROAM_KEY: cite:${=key=}\n"
-    "* TODO Notes\n"
-    ":PROPERTIES:\n"
-    ":Custom_ID: ${=key=}\n"
-    ":NOTER_DOCUMENT: %(orb-process-file-field \"${=key=}\")\n"
-    ":AUTHOR: ${author-abbrev}\n"
-    ":JOURNAL: ${journaltitle}\n"
-    ":DATE: ${date}\n"
-    ":YEAR: ${year}\n"
-    ":DOI: ${doi}\n"
-    ":URL: ${url}\n"
-    ":END:\n\n"
-    )
-   )
-  )
 
 (use-package! org-roam-protocol
   :after org-protocol)
@@ -494,3 +482,43 @@
    ;; Everything is relative to the main notes file
    org-noter-notes-search-path (list (file-truename "~/keido/notes/"))
    ))
+
+;; Email
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; App
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; twittering-mode
+;; この設定がないと認証が失敗した.
+;; twittering-oauth-get-access-token: Failed to retrieve a request token
+(add-hook! 'twittering-mode-hook
+  (setq twittering-allow-insecure-server-cert t))
+
+
+;; elfeed
+(global-set-key (kbd "C-x w") 'elfeed)
+
+(use-package! elfeed
+  :config
+  (setq elfeed-feeds
+        '("https://futurismo.biz")))
+
+;; Config
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; memo:
+;; use-package! は:defer, :hook, :commands, or :afterが省略されると起動時にloadされる.
+;; after! はpackageがloadされたときに評価される.
+;; add-hook! はmode有効化のとき. setq-hook!はequivalent.
+;; どれを使うかの正解はないがすべてuse-package!だと起動が遅くなるので
+;; 場合によってカスタマイズせよ，とのこと.
+;; https://github.com/hlissner/doom-emacs/blob/develop/docs/getting_started.org#configuring-packages
+;;
+;; doom specific config
+;; (setq user-full-name "John Doe"
+;;      user-mail-address "john@doe.com")
+(setq confirm-kill-emacs nil) ; 終了時の確認はしない.
+
+;; フルスクリーンでEmacs起動
+;; ブラウザと並べて表示することが多くなったのでいったんマスク
+;; (add-to-list 'initial-frame-alist '(fullscreen . maximized))
