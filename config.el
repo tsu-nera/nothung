@@ -169,7 +169,9 @@
           ;; ("z" "💡Zettelkasten" entry (file (lambda () (my/create-timestamped-org-file "~/keido/notes/zk"))) "* TITLE%?\n")
           ;; ("z" "💡Zettelkasten" entry (file "~/keido/notes/zk/20210101.org") "* TITLE%?\n")
           ("z" "💡Zettelkasten" plain (file+headline (lambda () (my/create-timestamped-org-file "~/keido/notes/zk")) "") "#+TITLE:%?\n")
-          ("w" "📝Wiki" plain (file+headline (lambda () (my/create-timestamped-org-file "~/keido/notes/wiki")) "") "#+TITLE:%?\n")
+          ("w" "📝Wiki" plain (file+headline (lambda () (my/create-timestamped-org-file "~/keido/notes/wiki")) "") "#+EXPORT_FILE_NAME: ~/repo/futurismo4/wiki/xxx.rst
+#+OPTIONS: toc:t num:nil todo:nil pri:nil ^:nil author:nil *:t prop:nil
+#+TITLE:📝%?\n")
           ;; ("z" "💡Zettelkasten" plain (file+headline "~/keido/notes/zk/%<%Y%m%d%H%M%S>.org" "") "#+TITLE: %?\n")
           ;; ("w" "wiki" plain "%?"
           ;;  :target (file+head "wiki/%<%Y%m%d%H%M%S>.org"
@@ -360,7 +362,13 @@
   :after 'ox)
 
 (use-package! ox-rst
-  :after 'org)
+  :after 'org
+  :init
+  (defun my/rst-to-sphinx-link-format (text backend info)
+    (when (and (org-export-derived-backend-p backend 'rst) (not (search "<http" text)))
+      (replace-regexp-in-string "\\(\\.org>`_\\)" ">`" (concat ":doc:" text) nil nil 1)))
+  (add-to-list 'org-export-filter-link-functions
+               'my/rst-to-sphinx-link-format))
 
 ;; 空白が保存時に削除されるとbullet表示がおかしくなる.
 ;; なおwl-bulterはdoom emacsのデフォルトで組み込まれている.
