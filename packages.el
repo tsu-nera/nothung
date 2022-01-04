@@ -32,6 +32,16 @@
 (package! org-roam-bibtex
   :recipe (:host github :repo "org-roam/org-roam-bibtex"))
 
+(package! org-pdftools)
+(package! org-noter-pdftools)
+
+(package! ace-link)
+(package! perfect-margin)
+
+(package! elfeed)
+(package! pocket-reader)
+(package! org-web-tools)
+
 ;; To install a package directly from a remote git repo, you must specify a
 ;; `:recipe'. You'll find documentation on what `:recipe' accepts here:
 ;; https://github.com/raxod502/straight.el#the-recipe-format
@@ -78,3 +88,4 @@
 ;; for org-roam-bibtex
 (unpin! org-roam)
 (unpin! bibtex-completion ivy-bibtex)
+
