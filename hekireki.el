@@ -44,6 +44,7 @@
           ("https://yuchrszk.blogspot.com/feeds/posts/default" blog) ; パレオな男
           ("https://www.youtube.com/feeds/videos.xml?channel_id=UCFo4kqllbcQ4nV83WCyraiw" youtube) ; 中田敦彦
           ("https://www.youtube.com/feeds/videos.xml?channel_id=UCFdBehO71GQaIom4WfVeGSw" youtube) ;メンタリストDaiGo
+          ("https://www.youtube.com/feeds/videos.xml?playlist_id=PL3N_SB4Wr_S2cGYuI02bdb4UN9XTZRNDu" youtube) ; 与沢の流儀
           ))
   (setq-default elfeed-search-filter "@1-week-ago +unread ")
   (defun elfeed-search-format-date (date)
@@ -177,6 +178,9 @@
   (setq org-use-speed-commands t)  ;; bullet にカーソルがあると高速移動
   (setq org-hide-emphasis-markers t) ;; * を消して表示.
 
+  (setq org-footnote-section "Notes") ;; defaultではFootnotesなので変える.
+  (setq org-footnote-auto-adjust t)
+
   ;; M-RET の挙動の調整
   ;; t だと subtree の最終行に heading を挿入, nil だと current point に挿入
   ;; なお，C-RET だと subtree の最終行に挿入され, C-S-RET だと手前に挿入される.
@@ -248,27 +252,37 @@
            (file "~/keido/inbox/inbox.org")
            "* %?\nSource: [[%:link][%:description]]\nCaptured On: %U\n%i\n"
            :klll-buffer t)
+          ("c" "☑ Planning" plain
+           (file+headline (lambda () (my/create-date-org-file "~/keido/notes/journals/daily"))
+                          "Planning")
+           "%?"
+           :unnarrowed t
+           :kill-buffer t)
           ("t" "🤔 Thought" plain
            (file+headline (lambda () (my/create-date-org-file "~/keido/notes/journals/daily"))
                           "Thoughts")
            "%?"
            :empty-lines 1
+           :unnarrowed t
            :kill-buffer t)
           ("T" "🤔 Thought+Ref" plain
            (file+headline (lambda () (my/create-date-org-file "~/keido/notes/journals/daily"))
                           "Thoughts")
            "%?\n%a"
            :empty-lines 1
+           :unnarrowed t
            :kill-buffer t)
           ("j" "🖊 Journal" plain
            (file (lambda () (my/create-date-org-file "~/keido/notes/journals/daily")))
            "%?"
            :empty-lines 1
+           :unnarrowed t
            :kill-buffer t)
           ("J" "🖊 Journal+Ref" plain
            (file (lambda () (my/create-date-org-file "~/keido/notes/journals/daily")))
            "%?\n%a"
            :empty-lines 1
+           :unnarrowed t
            :kill-buffer t)
           ("z" "💡 Zettelkasten" plain
            (file (lambda () (my/create-timestamped-org-file "~/keido/notes/zk")))
@@ -356,7 +370,7 @@
   :after 'ox)
 
 (use-package! ox-rst
-  :after 'org)
+  :after 'ox)
 
 (after! ox
   (defun my/rst-to-sphinx-link-format (text backend info)
@@ -396,9 +410,13 @@
       :target (file+head "%<%Y%m%d%H%M%S>.org"
                          "#+title: ${title}\n")
       :unnarrowed t)
-     ("z" "💡 Zettelkasten" plain "%?"
+     ("z" "🎓 Zettelkasten" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:💡${title}\n")
+                         "#+title:🎓${title}\n")
+      :unnarrowed t)
+     ("f" "🦊 Darkfox" plain "%?"
+      :target (file+head "darkfox/%<%Y%m%d%H%M%S>.org"
+                         "#+title:🦊${title}\n")
       :unnarrowed t)
      ("w" "📝 Wiki" plain "%?"
       :target (file+head "wiki/%<%Y%m%d%H%M%S>.org"
@@ -413,7 +431,7 @@
 - publisher: %^{publisher}
 - url: http://www.amazon.co.jp/dp/%^{isbn}
 "
-      :target (file+head "src/book/%<%Y%m%d%H%M%S>.org"
+      :target (file+head "wiki/%<%Y%m%d%H%M%S>.org"
                          "#+title:📚${title} - ${author}(${date})\n")
       :unnarrowed t)
      ("t" "🎤 Talk" plain
@@ -424,7 +442,7 @@
 - date: %^{date}
 - url: %^{url}
 "
-      :target (file+head "src/talk/%<%Y%m%d%H%M%S>.org"
+      :target (file+head "wiki/%<%Y%m%d%H%M%S>.org"
                          "#+title:🎤${title} - ${editor}(${date})\n")
       :unnarrowed t)
      ("o" "💻 Online" plain
@@ -434,7 +452,7 @@
 - authors: %^{author}
 - url: %^{url}
 "
-      :target (file+head "src/online/%<%Y%m%d%H%M%S>.org"
+      :target (file+head "wiki/%<%Y%m%d%H%M%S>.org"
                          "#+title:💻${title}\n")
       :unnarrowed t)))
   (org-roam-extract-new-file-path "%<%Y%m%d%H%M%S>.org")
@@ -488,6 +506,14 @@
 ;; なお wl-bulter は doom emacs のデフォルトで組み込まれている.
 (add-hook! 'org-mode-hook (ws-butler-mode -1))
 
+(setq org-publish-project-alist
+      (list
+       (list "fshort"
+             :recursive t
+             :base-directory "~/keido/notes/wiki"
+             :publishing-directory "~/repo/futurismo4/fshort/content/notes"
+             :publishing-function 'org-hugo-export-to-md)))
+
 (use-package! org-ref
   :config
   (setq bibtex-completion-bibliography (list (file-truename "~/keido/references/zotLib.bib")))
@@ -538,7 +564,6 @@
    'ivy-bibtex
    '(("p" ivy-bibtex-open-any "Open PDF, URL, or DOI" ivy-bibtex-open-any)
      ("e" ivy-bibtex-edit-notes "Edit notes" ivy-bibtex-edit-notes)))
-  (ivy-read 'ivy-bibtex  '(mapcar #'buffer-name (buffer-list)))
   )
 
 (use-package! org-roam-protocol
@@ -608,14 +633,24 @@ With a prefix ARG, remove start location."
 
 ;; UI
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; どうもフォントが奇数だと org-table の表示が崩れる.
+;; Source Han Code JP だとそもそも org-table の表示が崩れる.
+;; terminal だと大丈夫な模様.そもそも Terminal はこの設定ではなくて Terminal Emulator の設定がきく.
+
 ;; (setq doom-font (font-spec :family "Source Han Code JP" :size 12 ))
 (setq doom-font (font-spec :family "Ricty Diminished" :size 15))
 ;; doom-molokaiやdoom-monokai-classicだとewwの表示がいまいち.
 (setq doom-theme 'doom-monokai-pro)
 (doom-themes-org-config)
-;; どうもフォントが奇数だと org-table の表示が崩れる.
-;; Source Han Code JP だとそもそも org-table の表示が崩れる.
-;; terminal だと大丈夫な模様.そもそも Terminal はこの設定ではなくて Terminal Emulator の設定がきく.
+
+;; counselとdoom-modelineが相性悪いようなのでworkspace name表示のためには追加で設定.
+;; https://github.com/hlissner/doom-emacs/issues/314
+(after! doom-modeline
+  (setq doom-modeline-persp-name t))
+
+(use-package! perfect-margin
+  :config
+  (perfect-margin-mode 1))
 
 (setq display-line-numbers-type t) ; 行番号表示
 
@@ -661,7 +696,3 @@ With a prefix ARG, remove start location."
           (if begin
               (substring contents end-of-begin end)
             (format "%s" file)))))))
-
-(use-package! perfect-margin
-  :config
-  (perfect-margin-mode 1))
