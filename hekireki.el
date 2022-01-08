@@ -219,8 +219,8 @@
   ;; https://orgmode.org/worg/agenda-optimization.html
 
   ;; 何でもかんでも agenda すると思いので厳選.
-  (setq org-agenda-files '("~/keido/notes/gtd/gtd_projects.org"
-                           "~/keido/notes/journals/daily"))
+  (setq org-agenda-files '("~/keido/notes/gtd/gtd_projects.org"))
+  ;;                          "~/keido/notes/journals/daily"))
 
   ;; 期間を限定
   (setq org-agenda-span 30)
@@ -248,7 +248,7 @@
            (file "~/keido/inbox/inbox.org")
            "* %?\nSource: [[%:link][%:description]]\nCaptured On: %U\n"
            :klll-buffer t)
-          ("p" "📥+🌐 Inbox+Browser(quote)" entry
+          ("q" "📥+🌐 Inbox+Browser(quote)" entry
            (file "~/keido/inbox/inbox.org")
            "* %?\nSource: [[%:link][%:description]]\nCaptured On: %U\n%i\n"
            :klll-buffer t)
@@ -261,21 +261,28 @@
           ("t" "🤔 Thought" entry
            (file+headline (lambda () (my/create-date-org-file "~/keido/notes/journals/daily"))
                           "Thoughts")
-           "%?"
+           "* 🤔 %?\n%T"
            :empty-lines 1
            :unnarrowed t
            :kill-buffer t)
           ("T" "🤔+📃 Thought+Ref" entry
            (file+headline (lambda () (my/create-date-org-file "~/keido/notes/journals/daily"))
                           "Thoughts")
-           "%?\n%a"
+           "* 🤔 %?\n%T from %a\n"
            :empty-lines 1
            :unnarrowed t
            :kill-buffer t)
           ("l" "🤔+🌐 Thought+Browser" entry
            (file+headline (lambda () (my/create-date-org-file "~/keido/notes/journals/daily"))
                           "Thoughts")
-             "%?\nSource: [[%:link][%:description]]\nCaptured On: %U\n"
+             "* 🤔 %?\n%T from [[%:link][%:description]]\n"
+           :empty-lines 1
+           :unnarrowed t
+           :kill-buffer t)
+          ("p" "🍅 Pomodoro" entry
+           (file+headline (lambda () (my/create-date-org-file "~/keido/notes/journals/daily"))
+                          "Pomodoros")
+           "* 🍅 %?\n%T"
            :empty-lines 1
            :unnarrowed t
            :kill-buffer t)
@@ -392,6 +399,38 @@
   (add-to-list 'org-export-filter-link-functions
                'my/rst-to-sphinx-link-format))
 
+(use-package! org-journal
+  :after org
+  :bind
+  ("C-c r d n" . org-journal-new-entry)
+  ("C-c r d d" . org-journal-open-current-journal-file)
+  :custom
+  (org-journal-date-prefix "#+TITLE: ✍")
+  (org-journal-file-format "%Y-%m-%d.org")
+  (org-journal-dir (file-truename "~/keido/notes/journals/daily"))
+  (org-journal-date-format "%Y-%m-%d")
+  
+  ; :config
+  :config
+  (setq org-journal-enable-agenda-integration t)
+  (defun org-journal-file-header-func (time)
+     "Custom function to create journal header."
+     (concat
+      (pcase org-journal-file-type
+        (`daily "#+STARTUP: showeverything"))))
+  ;;     ;; (`weekly "#+TITLE: Weekly Journal\n#+STARTUP: folded")
+  ;;     ;;(`monthly "#+TITLE: Monthly Journal\n#+STARTUP: folded")
+  ;;     ;; (`yearly "#+TITLE: Yearly Journal\n#+STARTUP: folded"))))
+  (setq org-journal-file-header 'org-journal-file-header-func)
+
+  ;; org-roamに対応させるためにorg-idを生成
+  (defun org-create-new-id-journal ()
+    (goto-char (point-min))
+    (org-id-get-create)
+    (goto-char (point-max)))
+  (add-hook 'org-journal-after-header-create-hook 'org-create-new-id-journal)
+)
+
 ;; org-roam
 (setq org-roam-directory (file-truename "~/keido/notes"))
 (setq org-roam-db-location (file-truename "~/keido/db/org-roam.db"))
@@ -469,22 +508,16 @@
                          "#+title:💻${title}\n")
       :unnarrowed t)))
   (org-roam-extract-new-file-path "%<%Y%m%d%H%M%S>.org")
-  (org-roam-dailies-directory "journals/daily/")
   ;;        :map org-mode-map
   ;;        ("C-M-i"    . completion-at-point)
-  ;;        :map org-roam-dailies-map
-  ;;        ("Y" . org-roam-dailies-capture-yesterday)
-  ;;        ("T" . org-roam-dailies-capture-tomorrow))
-  :bind-keymap
-  ("C-c r d" . org-roam-dailies-map)
   :config
-  (setq org-roam-dailies-capture-templates
-        '(("d" "default" item "%?"
-           :if-new (file+head "%<%Y-%m-%d>.org" "#+Title: %<%Y-%m-%d>")
-           :unnarrowed t)))
+  ;; (setq org-roam-dailies-capture-templates
+  ;;      '(("d" "default" item "%?"
+  ;;         :if-new (file+head "%<%Y-%m-%d>.org" "#+Title: %<%Y-%m-%d>")
+  ;;         :unnarrowed t)))
 
   (setq +org-roam-open-buffer-on-find-file nil)
-  (require 'org-roam-dailies) ; Ensure the keymap is available
+  ;; (require 'org-roam-dailies) ; Ensure the keymap is available
   (org-roam-db-autosync-mode))
 
 
