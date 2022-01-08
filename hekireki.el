@@ -244,11 +244,11 @@
         '(("i" "📥 Inbox" entry
            (file "~/keido/inbox/inbox.org") "* %?\nCaptured On: %U\n"
            :klll-buffer t)
-          ("L" "📥 browser" entry
+          ("I" "📥+🌐 Inbox+Browser" entry
            (file "~/keido/inbox/inbox.org")
            "* %?\nSource: [[%:link][%:description]]\nCaptured On: %U\n"
            :klll-buffer t)
-          ("p" "📥 browser(quote)" entry
+          ("p" "📥+🌐 Inbox+Browser(quote)" entry
            (file "~/keido/inbox/inbox.org")
            "* %?\nSource: [[%:link][%:description]]\nCaptured On: %U\n%i\n"
            :klll-buffer t)
@@ -258,17 +258,24 @@
            "%?"
            :unnarrowed t
            :kill-buffer t)
-          ("t" "🤔 Thought" plain
+          ("t" "🤔 Thought" entry
            (file+headline (lambda () (my/create-date-org-file "~/keido/notes/journals/daily"))
                           "Thoughts")
            "%?"
            :empty-lines 1
            :unnarrowed t
            :kill-buffer t)
-          ("T" "🤔 Thought+Ref" plain
+          ("T" "🤔+📃 Thought+Ref" entry
            (file+headline (lambda () (my/create-date-org-file "~/keido/notes/journals/daily"))
                           "Thoughts")
            "%?\n%a"
+           :empty-lines 1
+           :unnarrowed t
+           :kill-buffer t)
+          ("l" "🤔+🌐 Thought+Browser" entry
+           (file+headline (lambda () (my/create-date-org-file "~/keido/notes/journals/daily"))
+                          "Thoughts")
+             "%?\nSource: [[%:link][%:description]]\nCaptured On: %U\n"
            :empty-lines 1
            :unnarrowed t
            :kill-buffer t)
@@ -278,15 +285,21 @@
            :empty-lines 1
            :unnarrowed t
            :kill-buffer t)
-          ("J" "🖊 Journal+Ref" plain
+          ("J" "🖊+📃 Journal+Ref" plain
            (file (lambda () (my/create-date-org-file "~/keido/notes/journals/daily")))
            "%?\n%a"
            :empty-lines 1
            :unnarrowed t
            :kill-buffer t)
-          ("z" "💡 Zettelkasten" plain
+          ("L" "🖊+🌐 Journal+Browser" plain
+           (file (lambda () (my/create-date-org-file "~/keido/notes/journals/daily")))
+             "%?\nSource: [[%:link][%:description]]\nCaptured On: %U\n"
+           :empty-lines 1
+           :unnarrowed t
+           :kill-buffer t)
+          ("z" "🎓 Zettelkasten" plain
            (file (lambda () (my/create-timestamped-org-file "~/keido/notes/zk")))
-           "#+TITLE:💡%?\n")
+           "#+TITLE:🎓%?\n")
           ("w" "📝 Wiki" plain
            (file (lambda () (my/create-timestamped-org-file "~/keido/notes/wiki")))
            "#+EXPORT_FILE_NAME: ~/repo/futurismo4/wiki/xxx.rst
@@ -400,7 +413,7 @@
         "r" #'org-roam-ref-add
         "R" #'org-roam-ref-remove
         "o" #'org-id-get-create
-        "s" #'org-roam-db-sync
+        "w" #'org-roam-db-sync
         "u" #'org-roam-update-org-id-locations
         )
   :custom
@@ -414,13 +427,13 @@
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:🎓${title}\n")
       :unnarrowed t)
-     ("f" "🦊 Darkfox" plain "%?"
-      :target (file+head "darkfox/%<%Y%m%d%H%M%S>.org"
-                         "#+title:🦊${title}\n")
-      :unnarrowed t)
      ("w" "📝 Wiki" plain "%?"
       :target (file+head "wiki/%<%Y%m%d%H%M%S>.org"
                          "#+title:📝${title}\n")
+      :unnarrowed t)
+     ("f" "🦊 Darkfox" plain "%?"
+      :target (file+head "darkfox/%<%Y%m%d%H%M%S>.org"
+                         "#+title:🦊${title}\n")
       :unnarrowed t)
      ("b" "📚 Book" plain
       "%?
@@ -506,13 +519,19 @@
 ;; なお wl-bulter は doom emacs のデフォルトで組み込まれている.
 (add-hook! 'org-mode-hook (ws-butler-mode -1))
 
+(defun my/org-roam-rg-search ()
+  "Search org-roam directory using consult-ripgrep. With live-preview."
+  (interactive)
+  (counsel-rg nil org-roam-directory))
+(global-set-key (kbd "C-c r s") 'my/org-roam-rg-search)
+
 (setq org-publish-project-alist
       (list
-       (list "fshort"
+       (list "keido"
              :recursive t
-             :base-directory "~/keido/notes/wiki"
-             :publishing-directory "~/repo/futurismo4/fshort/content/notes"
-             :publishing-function 'org-hugo-export-to-md)))
+             :base-directory (file-truename "~/keido/notes/wiki")
+             :publishing-directory "~/repo/keido-hugo/content/notes"
+             :publishing-function 'org-hugo-export-wim-to-md)))
 
 (use-package! org-ref
   :config
@@ -586,44 +605,8 @@
    ;; I want to see the whole file
    org-noter-hide-other nil
    ;; Everything is relative to the main notes file
-   org-noter-notes-search-path (list (file-truename "~/keido/notes/wiki/src"))
+   org-noter-notes-search-path (list (file-truename "~/keido/notes/wiki"))
    ))
-
-(use-package! org-pdftools
-  :hook (org-mode . org-pdftools-setup-link))
-
-(use-package! org-noter-pdftools
-  :after org-noter
-  :config
-  ;; Add a function to ensure precise note is inserted
-  (defun org-noter-pdftools-insert-precise-note (&optional toggle-no-questions)
-    (interactive "P")
-    (org-noter--with-valid-session
-     (let ((org-noter-insert-note-no-questions (if toggle-no-questions
-                                                   (not org-noter-insert-note-no-questions)
-                                                 org-noter-insert-note-no-questions))
-           (org-pdftools-use-isearch-link t)
-           (org-pdftools-use-freestyle-annot t))
-       (org-noter-insert-note (org-noter--get-precise-info)))))
-
-  ;; fix https://github.com/weirdNox/org-noter/pull/93/commits/f8349ae7575e599f375de1be6be2d0d5de4e6cbf
-  (defun org-noter-set-start-location (&optional arg)
-    "When opening a session with this document, go to the current location.
-With a prefix ARG, remove start location."
-    (interactive "P")
-    (org-noter--with-valid-session
-     (let ((inhibit-read-only t)
-           (ast (org-noter--parse-root))
-           (location (org-noter--doc-approx-location (when (called-interactively-p 'any) 'interactive))))
-       (with-current-buffer (org-noter--session-notes-buffer session)
-         (org-with-wide-buffer
-          (goto-char (org-element-property :begin ast))
-          (if arg
-              (org-entry-delete nil org-noter-property-note-location)
-            (org-entry-put nil org-noter-property-note-location
-                           (org-noter--pretty-print-location location))))))))
-  (with-eval-after-load 'pdf-annot
-    (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
 
 ;; Term
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -666,33 +649,3 @@ With a prefix ARG, remove start location."
   (define-key view-mode-map (kbd "n") 'view-scroll-line-forward)
   ;; default の e でもいいけど，mule 時代に v に bind されてたので, emacs でも v に bind しておく.
   (define-key view-mode-map (kbd "v") 'read-only-mode))
-
-;; deft は Org-roam システムの検索で活躍する
-(use-package! deft
-  :after org-roam
-  :bind
-  ("C-c r j" . deft) ;; Doom だと C-c n d にも bind されている.
-  :config
-  (setq deft-default-extension "org")
-  (setq deft-directory org-roam-directory)
-  (setq deft-recursive t)
-  (setq deft-strip-summary-regexp ":PROPERTIES:\n\\(.+\n\\)+:END:\n")
-  (setq deft-use-filename-as-title nil)
-  (setq deft-auto-save-interval -1.0) ;; disable auto-save
-  (add-to-list 'deft-extensions "tex")
-  ;; (setq deft-use-filter-string-for-filename t)
-  ;; (setq deft-org-mode-title-prefix t)
-  ;;
-  ;; deft で org-roam の title を parse するための workaround
-  ;; see: https://github.com/jrblevin/deft/issues/75
-  (advice-add 'deft-parse-title :override
-    (lambda (file contents)
-      (if deft-use-filename-as-title
-          (deft-base-filename file)
-        (let* ((case-fold-search 't)
-               (begin (string-match "title: " contents))
-               (end-of-begin (match-end 0))
-               (end (string-match "\n" contents begin)))
-          (if begin
-              (substring contents end-of-begin end)
-            (format "%s" file)))))))

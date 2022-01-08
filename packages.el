@@ -32,8 +32,7 @@
 (package! org-roam-bibtex
   :recipe (:host github :repo "org-roam/org-roam-bibtex"))
 
-(package! org-pdftools)
-(package! org-noter-pdftools)
+(package! org-ref)
 
 (package! ace-link)
 (package! perfect-margin)
@@ -89,3 +88,5 @@
 (unpin! org-roam)
 (unpin! bibtex-completion ivy-bibtex)
 
+;; バグがあるのにdoomが古いversionしかつかわないので. 2022.01.08
+(unpin! vertico)
