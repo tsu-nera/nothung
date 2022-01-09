@@ -9,7 +9,10 @@
 (add-hook! 'twittering-mode-hook
   (setq twittering-allow-insecure-server-cert t))
 
-(use-package! eww)
+(use-package! eww
+  :bind
+  ("C-c s w" . eww-search-words)
+  ("C-c o w" . eww-open-in-new-buffer))
 
 (use-package! ace-link
   :config
@@ -17,23 +20,16 @@
   (ace-link-setup-default))
 
 (use-package! org-web-tools
-  :after eww pocket-reader
-  :config
-  (map!
-   :leader
-   :prefix ("u" . "eww")
-     "w" #'eww
-     "o" #'eww-open-in-new-buffer
-     "i" #'org-web-tools-insert-link-for-url
-     "p" #'pocket-reader-add-link
-))
+  :bind
+  ("C-c i l" . org-web-tools-insert-link-for-url))
 
 (global-set-key (kbd "C-x w p") 'pocket-reader)
 (use-package! pocket-reader
+  :bind
+  ("C-x w l" . pocker-reader-add-link)
   :config
   (setq pocket-reader-open-url-default-function #'eww)
-  (setq pocket-reader-pop-to-url-default-function #'eww)
-)
+  (setq pocket-reader-pop-to-url-default-function #'eww))
 
 ;; elfeed
 (global-set-key (kbd "C-x w w") 'elfeed)
@@ -219,11 +215,12 @@
   ;; https://orgmode.org/worg/agenda-optimization.html
 
   ;; 何でもかんでも agenda すると思いので厳選.
-  (setq org-agenda-files '("~/keido/notes/gtd/gtd_projects.org"))
-  ;;                          "~/keido/notes/journals/daily"))
+  (setq org-agenda-files '("~/Dropbox/keido/notes/gtd/gtd_projects.org"
+                           "~/Dropbox/keido/notes/gtd/projects"
+                           "~/Dropbox/keido/notes/journals/journal.org"))
 
   ;; 期間を限定
-  (setq org-agenda-span 30)
+  (setq org-agenda-span 7)
                                         ; Inhibit the dimming of blocked tasks:
   (setq org-agenda-dim-blocked-tasks nil)
   ;; Inhibit agenda files startup options:
@@ -380,11 +377,12 @@
 ;;     ("~" (:background "blue" :foreground "white")) cddddd;; 根拠
 ;;     ("+" (:background "green" :foreground "black")))) ;; 自分の考え
 
-;; org-clock 関連 使わないのでいったんマスクだが使いこなしたいので消さない.
-;; (require 'org-toggl)
-;; (setq toggl-auth-token "xxx")
-;; (setq org-toggl-inherit-toggl-properties nil)
-;; (org-toggl-integration-mode)
+(use-package! org-toggl
+  :after org
+  :config
+  (setq org-toggl-inherit-toggl-properties t)
+  (toggl-get-projects)
+  (org-toggl-integration-mode))
 
 (use-package! ox-hugo
   :after 'ox)
@@ -409,8 +407,6 @@
   (org-journal-file-format "%Y-%m-%d.org")
   (org-journal-dir (file-truename "~/keido/notes/journals/daily"))
   (org-journal-date-format "%Y-%m-%d")
-  
-  ; :config
   :config
   (setq org-journal-enable-agenda-integration t)
   (defun org-journal-file-header-func (time)
@@ -452,8 +448,7 @@
         "r" #'org-roam-ref-add
         "R" #'org-roam-ref-remove
         "o" #'org-id-get-create
-        "w" #'org-roam-db-sync
-        "u" #'org-roam-update-org-id-locations
+        "u" #'my/org-roam-update
         )
   :custom
   ;; ファイル名を ID にする.
@@ -467,7 +462,7 @@
                          "#+title:🎓${title}\n")
       :unnarrowed t)
      ("w" "📝 Wiki" plain "%?"
-      :target (file+head "wiki/%<%Y%m%d%H%M%S>.org"
+      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:📝${title}\n")
       :unnarrowed t)
      ("f" "🦊 Darkfox" plain "%?"
@@ -483,7 +478,7 @@
 - publisher: %^{publisher}
 - url: http://www.amazon.co.jp/dp/%^{isbn}
 "
-      :target (file+head "wiki/%<%Y%m%d%H%M%S>.org"
+      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:📚${title} - ${author}(${date})\n")
       :unnarrowed t)
      ("t" "🎤 Talk" plain
@@ -494,7 +489,7 @@
 - date: %^{date}
 - url: %^{url}
 "
-      :target (file+head "wiki/%<%Y%m%d%H%M%S>.org"
+      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:🎤${title} - ${editor}(${date})\n")
       :unnarrowed t)
      ("o" "💻 Online" plain
@@ -504,20 +499,19 @@
 - authors: %^{author}
 - url: %^{url}
 "
-      :target (file+head "wiki/%<%Y%m%d%H%M%S>.org"
+      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:💻${title}\n")
       :unnarrowed t)))
   (org-roam-extract-new-file-path "%<%Y%m%d%H%M%S>.org")
   ;;        :map org-mode-map
   ;;        ("C-M-i"    . completion-at-point)
   :config
-  ;; (setq org-roam-dailies-capture-templates
-  ;;      '(("d" "default" item "%?"
-  ;;         :if-new (file+head "%<%Y-%m-%d>.org" "#+Title: %<%Y-%m-%d>")
-  ;;         :unnarrowed t)))
+  (defun my/org-roam-update ()
+    (interactive)
+    (org-roam-update-org-id-locations)
+    (org-roam-db-sync))
 
   (setq +org-roam-open-buffer-on-find-file nil)
-  ;; (require 'org-roam-dailies) ; Ensure the keymap is available
   (org-roam-db-autosync-mode))
 
 
@@ -663,6 +657,12 @@
 ;; https://github.com/hlissner/doom-emacs/issues/314
 (after! doom-modeline
   (setq doom-modeline-persp-name t))
+
+(after! emojify
+  (setq emojify-emoji-set "twemoji-v2-22"))
+
+;; doomだと C-c i eでemojify-insert-emoji
+(global-set-key (kbd "C-c i E") 'emoji-search)
 
 (use-package! perfect-margin
   :config

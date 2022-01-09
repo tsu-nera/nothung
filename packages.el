@@ -23,7 +23,6 @@
 ;; (package! org-bars
 ;;   :recipe (:host github :repo "tonyaldon/org-bars"))
 ;; (package! monkeytype)
-;; (package! org-toggl :recipe (:host github :repo "mbork/org-toggl"))
 ;; (package! zh-align :recipe (:host github :repo "chen-chao/zh-align.el"))
 
 (package! ox-rst)
@@ -31,6 +30,7 @@
 (package! org-roam-timestamps)
 (package! org-roam-bibtex
   :recipe (:host github :repo "org-roam/org-roam-bibtex"))
+(package! org-toggl :recipe (:host github :repo "mbork/org-toggl"))
 
 (package! org-ref)
 

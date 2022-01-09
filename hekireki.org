@@ -33,15 +33,19 @@ ref: https://github.com/tsu-nera/hekireki
 #+end_src
 
 ** eww
-Emacsのテキストブラウザ.
+Emacsのテキストブラウザ([[https://www.gnu.org/software/emacs/manual/html_mono/eww.html][Manual]])
 
-note: 
+notes:
 - ewwを起動しただけだとminibufferなのでC-gで消えてしまうので大きくC-x 1とかで大きくする.
+- C-u M-x ewwでひとつのbufferを使いまわすのではなく別のBufferでewwを開く.
 - M-RETでURLを新しいBufferで開く.
 - Doom EmacsだとC-c s o(online)でいろいろと検索できる(w/Chrome). helm-google-suggest的な.
 
 #+begin_src emacs-lisp :tangle yes
-(use-package! eww)
+(use-package! eww
+  :bind
+  ("C-c s w" . eww-search-words)
+  ("C-c o w" . eww-open-in-new-buffer))
 #+end_src
 
 - ace-linkをつかうとewwのlinkをインタラクティブに選択できて便利.
@@ -58,16 +62,8 @@ ewwとorgを便利にするツール群(https://github.com/alphapapa/org-web-too
 
 #+begin_src emacs-lisp :tangle yes
 (use-package! org-web-tools
-  :after eww pocket-reader
-  :config
-  (map!
-   :leader
-   :prefix ("u" . "eww")
-     "w" #'eww
-     "o" #'eww-open-in-new-buffer
-     "i" #'org-web-tools-insert-link-for-url
-     "p" #'pocket-reader-add-link
-))
+  :bind
+  ("C-c i l" . org-web-tools-insert-link-for-url))
 #+end_src
 
 ** Pocket
@@ -76,10 +72,11 @@ ewwとorgを便利にするツール群(https://github.com/alphapapa/org-web-too
 #+begin_src emacs-lisp :tangle yes
 (global-set-key (kbd "C-x w p") 'pocket-reader)
 (use-package! pocket-reader
+  :bind
+  ("C-x w l" . pocker-reader-add-link)
   :config
   (setq pocket-reader-open-url-default-function #'eww)
-  (setq pocket-reader-pop-to-url-default-function #'eww)
-)
+  (setq pocket-reader-pop-to-url-default-function #'eww))
 #+end_src
 
 ** RSS(Elfeed)
@@ -307,11 +304,14 @@ ewwとorgを便利にするツール群(https://github.com/alphapapa/org-web-too
   ;; https://orgmode.org/worg/agenda-optimization.html
 
   ;; 何でもかんでも agenda すると思いので厳選.
-  (setq org-agenda-files '("~/keido/notes/gtd/gtd_projects.org"))
-  ;;                          "~/keido/notes/journals/daily"))
+  (setq org-agenda-files '("~/Dropbox/keido/notes/gtd/gtd_projects.org"
+                           "~/Dropbox/keido/notes/journals/journal.org"
+                           ;; projectsディレクトリにある.orgをみる.
+                           ;; その配下のorgファイルは対象にはならない.
+                           "~/Dropbox/keido/notes/gtd/projects"))
 
   ;; 期間を限定
-  (setq org-agenda-span 30)
+  (setq org-agenda-span 7)
                                         ; Inhibit the dimming of blocked tasks:
   (setq org-agenda-dim-blocked-tasks nil)
   ;; Inhibit agenda files startup options:
@@ -468,12 +468,19 @@ ewwとorgを便利にするツール群(https://github.com/alphapapa/org-web-too
 ;;     ("~" (:background "blue" :foreground "white")) cddddd;; 根拠
 ;;     ("+" (:background "green" :foreground "black")))) ;; 自分の考え
 
-;; org-clock 関連 使わないのでいったんマスクだが使いこなしたいので消さない.
-;; (require 'org-toggl)
-;; (setq toggl-auth-token "xxx")
-;; (setq org-toggl-inherit-toggl-properties nil)
-;; (org-toggl-integration-mode)
+#+end_src
 
+** org-toggl
+org-modeをTogglと連携させる.
+https://github.com/mbork/org-toggl
+
+#+begin_src emacs-lisp :tangle yes
+(use-package! org-toggl
+  :after org
+  :config
+  (setq org-toggl-inherit-toggl-properties t)
+  (toggl-get-projects)
+  (org-toggl-integration-mode))
 #+end_src
 
 ** ox-hugo
@@ -519,8 +526,6 @@ https://github.com/bastibe/org-journal
   (org-journal-file-format "%Y-%m-%d.org")
   (org-journal-dir (file-truename "~/keido/notes/journals/daily"))
   (org-journal-date-format "%Y-%m-%d")
-  
-  ; :config
   :config
   (setq org-journal-enable-agenda-integration t)
   (defun org-journal-file-header-func (time)
@@ -570,8 +575,7 @@ org-roam-dialiesよりもorg-journalを利用する(org-agendaの都合).
         "r" #'org-roam-ref-add
         "R" #'org-roam-ref-remove
         "o" #'org-id-get-create
-        "w" #'org-roam-db-sync
-        "u" #'org-roam-update-org-id-locations
+        "u" #'my/org-roam-update
         )
   :custom
   ;; ファイル名を ID にする.
@@ -585,7 +589,7 @@ org-roam-dialiesよりもorg-journalを利用する(org-agendaの都合).
                          "#+title:🎓${title}\n")
       :unnarrowed t)
      ("w" "📝 Wiki" plain "%?"
-      :target (file+head "wiki/%<%Y%m%d%H%M%S>.org"
+      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:📝${title}\n")
       :unnarrowed t)
      ("f" "🦊 Darkfox" plain "%?"
@@ -601,7 +605,7 @@ org-roam-dialiesよりもorg-journalを利用する(org-agendaの都合).
 - publisher: %^{publisher}
 - url: http://www.amazon.co.jp/dp/%^{isbn}
 "
-      :target (file+head "wiki/%<%Y%m%d%H%M%S>.org"
+      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:📚${title} - ${author}(${date})\n")
       :unnarrowed t)
      ("t" "🎤 Talk" plain
@@ -612,7 +616,7 @@ org-roam-dialiesよりもorg-journalを利用する(org-agendaの都合).
 - date: %^{date}
 - url: %^{url}
 "
-      :target (file+head "wiki/%<%Y%m%d%H%M%S>.org"
+      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:🎤${title} - ${editor}(${date})\n")
       :unnarrowed t)
      ("o" "💻 Online" plain
@@ -622,20 +626,19 @@ org-roam-dialiesよりもorg-journalを利用する(org-agendaの都合).
 - authors: %^{author}
 - url: %^{url}
 "
-      :target (file+head "wiki/%<%Y%m%d%H%M%S>.org"
+      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:💻${title}\n")
       :unnarrowed t)))
   (org-roam-extract-new-file-path "%<%Y%m%d%H%M%S>.org")
   ;;        :map org-mode-map
   ;;        ("C-M-i"    . completion-at-point)
   :config
-  ;; (setq org-roam-dailies-capture-templates
-  ;;      '(("d" "default" item "%?"
-  ;;         :if-new (file+head "%<%Y-%m-%d>.org" "#+Title: %<%Y-%m-%d>")
-  ;;         :unnarrowed t)))
+  (defun my/org-roam-update ()
+    (interactive)
+    (org-roam-update-org-id-locations)
+    (org-roam-db-sync))
 
   (setq +org-roam-open-buffer-on-find-file nil)
-  ;; (require 'org-roam-dailies) ; Ensure the keymap is available
   (org-roam-db-autosync-mode))
 
 
@@ -830,6 +833,30 @@ PDFからOutlineを抜き出してOrg fileに生成して，
 ;; https://github.com/hlissner/doom-emacs/issues/314
 (after! doom-modeline
   (setq doom-modeline-persp-name t))
+#+end_src
+
+** emojify
+
+Emacsで絵文字をつかう.
+
+どうもemojifyの絵文字辞書は，emojione-v2.2.6-22というものでやや古い.
+Twitterが好きなのでTwitterのオープンソース辞書のtwemojiに変更.
+
+https://github.com/iqbalansari/emacs-emojify/blob/master/data/emoji-sets.json
+
+#+begin_src emacs-lisp :tangle yes
+(after! emojify
+  (setq emojify-emoji-set "twemoji-v2-22"))
+#+end_src
+
+ただ，2022現在twemojiはv13なのでv2は古いな..というかでないやつもおおい.
+
+Emacsの機能でemoji-searchがあるのでこれも設定しておこう. 
+こっちの辞書のほうが扱える文字か多い.
+
+#+begin_src emacs-lisp :tangle yes
+;; doomだと C-c i eでemojify-insert-emoji
+(global-set-key (kbd "C-c i E") 'emoji-search)
 #+end_src
 
 ** perfect-margin
