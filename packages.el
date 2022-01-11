@@ -41,6 +41,13 @@
 (package! pocket-reader)
 (package! org-web-tools)
 
+;; ch11ng/exwm #771
+;; (package! xelb :recipe (:no-byte-compile t :no-native-compile t))
+;; (package! exwm :recipe (:no-byte-compile t :no-native-compile t))
+;; (package! xelb)
+;; (package! exwm)
+
+
 ;; To install a package directly from a remote git repo, you must specify a
 ;; `:recipe'. You'll find documentation on what `:recipe' accepts here:
 ;; https://github.com/raxod502/straight.el#the-recipe-format

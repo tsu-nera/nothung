@@ -216,8 +216,10 @@
 
   ;; 何でもかんでも agenda すると思いので厳選.
   (setq org-agenda-files '("~/Dropbox/keido/notes/gtd/gtd_projects.org"
-                           "~/Dropbox/keido/notes/gtd/projects"
-                           "~/Dropbox/keido/notes/journals/journal.org"))
+                           "~/Dropbox/keido/notes/journals/journal.org"
+                           ;; projectsディレクトリにある.orgをみる.
+                           ;; その配下のorgファイルは対象にはならない.
+                           "~/Dropbox/keido/notes/gtd/projects"))
 
   ;; 期間を限定
   (setq org-agenda-span 7)
