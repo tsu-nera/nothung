@@ -14,6 +14,14 @@
 ;;      Alternatively, press 'gd' (or 'C-c c d') on a module to browse its
 ;;      directory (for easy access to its source code).
 
+;; (use-package comp
+;;   :config
+;;   (setq comp-deferred-compilation t)
+;;   ;; Don't try to native compile these files
+;;   (add-to-list 'native-comp-deferred-compilation-deny-list "/exwm.*\\.el")
+;;   (add-to-list 'native-comp-deferred-compilation-deny-list "/xcb.*\\.el")
+;;   (add-to-list 'native-comp-deferred-compilation-deny-list "init\\.el"))
+
 (doom! :input
        ;;chinese
        ;;japanese

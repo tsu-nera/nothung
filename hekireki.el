@@ -71,10 +71,10 @@
 
 (use-package! swiper
   :bind
-  ;; ("C-s" . swiper) migemo とうまく連携しないので isearch 置き換えを保留. C-c s s で swiper 起動.
+;  ("C-s" . swiper) ;; migemo とうまく連携しないので isearch 置き換えを保留. C-c s s で swiper 起動.
   :config
   (ivy-mode 1))
-
+  
 ;; avy-migemo-e.g.swiper だけバクる
 ;; https://github.com/abo-abo/swiper/issues/2249
 ;;(after! avy-migemo
@@ -128,6 +128,7 @@
 
 ;; Emacs
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(pixel-scroll-precision-mode)
 
 ;; Email
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -137,12 +138,6 @@
 (set-language-environment "Japanese")
 (prefer-coding-system 'utf-8)
 (set-default 'buffer-filecoding-system 'utf-8)
-(use-package! fcitx
-  :config
-  (setq fcitx-remote-command "fcitx5-remote")
-  (fcitx-aggressive-setup)
-  ;; Linux なら t が推奨されるものの、fcitx5 には未対応なためここは nil
-  (setq fcitx-use-dbus nil))
 
 ;; migemo
 (use-package! migemo
@@ -159,6 +154,24 @@
 
 ;; OS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package! exwm
+  :config
+
+  (require 'exwm-randr)
+  (setq exwm-randr-workspace-output-plist '(0 "HDMI-1"))
+  (add-hook 'exwm-randr-screen-change-hook
+            (lambda ()
+              (start-process-shell-command
+               "xrandr" nil "xrandr --output HDMI-1 --primary --right-of eDP-1 --auto")))
+  (exwm-randr-enable)
+
+  (require 'exwm-systemtray)
+  (exwm-systemtray-enable)
+
+  (require 'exwm-config)
+  (exwm-config-default)
+
+  (setq exwm-workspace-number 2))
 
 ;; Org mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

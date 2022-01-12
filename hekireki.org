@@ -3,8 +3,6 @@
 :ROAM_ALIASES: hekireki
 :END:
 #+STARTUP: overview
-#+EXPORT_FILE_NAME: ~/repo/futurismo4/zk/hekireki.rst
-#+OPTIONS: toc:t num:nil todo:nil pri:nil ^:nil author:nil *:t prop:nil
 #+TITLE: ⚡My Emacs Config - 霹靂一閃
 
 Emacsの呼吸壱ノ型, 霹靂一閃.
@@ -129,10 +127,10 @@ ewwとorgを便利にするツール群(https://github.com/alphapapa/org-web-too
 
 (use-package! swiper
   :bind
-  ;; ("C-s" . swiper) migemo とうまく連携しないので isearch 置き換えを保留. C-c s s で swiper 起動.
+;  ("C-s" . swiper) ;; migemo とうまく連携しないので isearch 置き換えを保留. C-c s s で swiper 起動.
   :config
   (ivy-mode 1))
-
+  
 ;; avy-migemo-e.g.swiper だけバクる
 ;; https://github.com/abo-abo/swiper/issues/2249
 ;;(after! avy-migemo
@@ -143,6 +141,17 @@ ewwとorgを便利にするツール群(https://github.com/alphapapa/org-web-too
 ;; company はなにげに使いそうだからな，TAB でのみ補完発動させるか.
 (setq company-idle-delay nil)
 (global-set-key (kbd "TAB") #'company-indent-or-complete-common)
+#+end_src
+
+** all-the-icons-completion
+
+https://github.com/iyefrat/all-the-icons-completion
+
+#+begin_src emacs-lisp :tangle no
+(use-package! all-the-icons-completion
+  :init
+  (all-the-icons-completion-mode))
+(add-hook! marginalia-mode-hook #'all-the-icons-completion-marginalia-setup)
 #+end_src
 
 * Config
@@ -194,6 +203,7 @@ ewwとorgを便利にするツール群(https://github.com/alphapapa/org-web-too
 #+begin_src emacs-lisp :tangle yes
 ;; Emacs
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(pixel-scroll-precision-mode)
 #+end_src
 
 ** ace-window
@@ -216,12 +226,6 @@ ewwとorgを便利にするツール群(https://github.com/alphapapa/org-web-too
 (set-language-environment "Japanese")
 (prefer-coding-system 'utf-8)
 (set-default 'buffer-filecoding-system 'utf-8)
-(use-package! fcitx
-  :config
-  (setq fcitx-remote-command "fcitx5-remote")
-  (fcitx-aggressive-setup)
-  ;; Linux なら t が推奨されるものの、fcitx5 には未対応なためここは nil
-  (setq fcitx-use-dbus nil))
 
 ;; migemo
 (use-package! migemo
@@ -235,6 +239,17 @@ ewwとorgを便利にするツール群(https://github.com/alphapapa/org-web-too
   (migemo-init))
 #+end_src
 
+** fcitx
+
+#+begin_src emacs-lisp :tangle no
+(use-package! fcitx
+  :config
+  (setq fcitx-remote-command "fcitx5-remote")
+  (fcitx-aggressive-setup)
+  ;; Linux なら t が推奨されるものの、fcitx5 には未対応なためここは nil
+  (setq fcitx-use-dbus nil))
+#+end_src
+
 * Lang
 #+begin_src emacs-lisp :tangle yes
 #+end_src
@@ -243,8 +258,24 @@ ewwとorgを便利にするツール群(https://github.com/alphapapa/org-web-too
 #+begin_src emacs-lisp :tangle yes
 ;; OS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package! exwm
+  :config
 
+  (require 'exwm-randr)
+  (setq exwm-randr-workspace-output-plist '(0 "HDMI-1"))
+  (add-hook 'exwm-randr-screen-change-hook
+            (lambda ()
+              (start-process-shell-command
+               "xrandr" nil "xrandr --output HDMI-1 --primary --right-of eDP-1 --auto")))
+  (exwm-randr-enable)
 
+  (require 'exwm-systemtray)
+  (exwm-systemtray-enable)
+
+  (require 'exwm-config)
+  (exwm-config-default)
+
+  (setq exwm-workspace-number 2))
 #+end_src
 
 * Org mode
