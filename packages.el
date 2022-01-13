@@ -46,6 +46,9 @@
 ;; ch11ng/exwm #771
 (package! xelb)
 (package! exwm)
+(package! exwm-edit)
+
+(package! habitica)
 
 ;; To install a package directly from a remote git repo, you must specify a
 ;; `:recipe'. You'll find documentation on what `:recipe' accepts here:

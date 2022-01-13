@@ -47,6 +47,12 @@
     (format-time-string "%Y-%m-%d %H:%M" (seconds-to-time date)))
   )
 
+(use-package! habitica
+  :config
+  (setq habitica-show-completed-todo t)
+  (setq habitica-show-streak t)
+  (setq habitica-turn-on-highlighting nil))
+
 ;; Checkers
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -155,8 +161,26 @@
 ;; OS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package! exwm
+  :after counsel
+  :init
+  (setq counsel-linux-app-format-function #'counsel-linux-app-format-function-name-only)
+  (map!
+        :leader
+        :prefix ("x" . "exwm")
+        "c" #'exwm-reset
+        "o" (lambda (command)
+                         (interactive (list (read-shell-command "$ ")))
+                         (start-process-shell-command command nil command))
+        "w" #'exwm-workspace-switch
+        "a" #'counsel-linux-app
+        "s" #'counsel-search  ;; open chrome and search
+        )
+  (add-hook 'exwm-input--input-mode-change-hook
+            'force-mode-line-update)
+  (add-hook 'exwm-update-class-hook
+            (lambda ()
+              (exwm-workspace-rename-buffer exwm-class-name)))
   :config
-
   (require 'exwm-randr)
   (setq exwm-randr-workspace-output-plist '(0 "HDMI-1"))
   (add-hook 'exwm-randr-screen-change-hook
@@ -165,13 +189,51 @@
                "xrandr" nil "xrandr --output HDMI-1 --primary --right-of eDP-1 --auto")))
   (exwm-randr-enable)
 
+
   (require 'exwm-systemtray)
   (exwm-systemtray-enable)
 
-  (require 'exwm-config)
-  (exwm-config-default)
+  ;; edit-server的な. C-c 'で編集できるのでよりbetter
+  ;; 一度入力したものを再度開くと文字化けする.
+  (require 'exwm-edit)
+  (setq exwm-edit-split t)
 
-  (setq exwm-workspace-number 2))
+  (setf epg-pinentry-mode 'loopback)
+  (defun pinentry-emacs (desc prompt ok error)
+    (let ((str (read-passwd
+                (concat (replace-regexp-in-string "%22" "\""
+                                                  (replace-regexp-in-string "%0A" "\n" desc)) prompt ": "))))
+      str))
+
+  ;; from https://github.com/ch11ng/exwm/wiki/Configuration-Example
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (fringe-mode 1)
+
+  ;; Turn on `display-time-mode' if you don't use an external bar.
+  (setq display-time-default-load-average nil)
+  (display-time-mode t)
+  (display-battery-mode 1)
+
+  (setq exwm-workspace-number 2)
+
+  (setq exwm-input-simulation-keys
+        '(([?\C-b] . [left])
+          ;; Chromeページ内検索のために空ける
+          ;; Chrome Extentionsをつかってもカスタムで検索のキーバインドは設定できないので
+          ;; ([?\C-f] . [right]) 
+          ([?\C-p] . [up])
+          ([?\C-n] . [down])
+          ([?\C-a] . [home])
+          ([?\C-e] . [end])
+          ([?\M-v] . [prior])
+          ([?\C-v] . [next])
+          ([?\C-d] . [delete])
+          ([?\C-k] . [S-end delete])))
+
+
+  (exwm-enable))
 
 ;; Org mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -400,7 +462,10 @@
   (org-toggl-integration-mode))
 
 (use-package! ox-hugo
-  :after 'ox)
+  :after 'ox
+  :config
+  ;; なんか.dir-locals.elに書いても反映してくれないな. ココに書いとく.
+  (setq org-export-with-author nil))
 
 (use-package! ox-rst
   :after 'ox)
