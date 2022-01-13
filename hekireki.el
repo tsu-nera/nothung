@@ -50,7 +50,6 @@
 
 (use-package! habitica
   :config
-  (setq habitica-show-completed-todo t)
   (setq habitica-show-streak t)
   (setq habitica-turn-on-highlighting nil))
 
@@ -167,7 +166,7 @@
   (setq counsel-linux-app-format-function #'counsel-linux-app-format-function-name-only)
   (map!
         :leader
-        :prefix ("x" . "exwm")
+        :prefix ("z" . "exwm")
         "c" #'exwm-reset
         "o" (lambda (command)
                          (interactive (list (read-shell-command "$ ")))
@@ -232,7 +231,6 @@
           ([?\C-v] . [next])
           ([?\C-d] . [delete])
           ([?\C-k] . [S-end delete])))
-
 
   (exwm-enable))
 

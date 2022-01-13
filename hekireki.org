@@ -103,7 +103,6 @@ ewwとorgを便利にするツール群(https://github.com/alphapapa/org-web-too
 #+begin_src emacs-lisp :tangle yes
 (use-package! habitica
   :config
-  (setq habitica-show-completed-todo t)
   (setq habitica-show-streak t)
   (setq habitica-turn-on-highlighting nil))
 #+end_src
@@ -122,8 +121,8 @@ ewwとorgを便利にするツール群(https://github.com/alphapapa/org-web-too
 (use-package! avy
   :bind
   ("M-g c" . avy-goto-char) ;; doom の keybind 上書き.
-  ("M-g g" . avy-goto-line) ;; doom の keybind 上書き.
-  ("M-g s". avy-goto-word-1))
+  ("M-g l" . avy-goto-line) ;; doom の keybind 上書き.
+  ("M-g g". avy-goto-word-1))
 
 ;; うまく動かないので封印 doom との相性が悪いのかも.
 ;; ひとまず migemo したいときは isearch で対応.
@@ -276,12 +275,12 @@ https://github.com/iyefrat/all-the-icons-completion
   (setq counsel-linux-app-format-function #'counsel-linux-app-format-function-name-only)
   (map!
         :leader
-        :prefix ("x" . "exwm")
+        :prefix ("z" . "exwm")
         "c" #'exwm-reset
         "o" (lambda (command)
                          (interactive (list (read-shell-command "$ ")))
                          (start-process-shell-command command nil command))
-        "w" #'exwm-workspace-switch
+        "z" #'exwm-workspace-switch
         "a" #'counsel-linux-app
         "s" #'counsel-search  ;; open chrome and search
         )
@@ -298,7 +297,6 @@ https://github.com/iyefrat/all-the-icons-completion
               (start-process-shell-command
                "xrandr" nil "xrandr --output HDMI-1 --primary --right-of eDP-1 --auto")))
   (exwm-randr-enable)
-
 
   (require 'exwm-systemtray)
   (exwm-systemtray-enable)
@@ -342,12 +340,8 @@ https://github.com/iyefrat/all-the-icons-completion
           ([?\C-d] . [delete])
           ([?\C-k] . [S-end delete])))
 
-
   (exwm-enable))
 #+end_src
-
-#+RESULTS:
-: t
 
 * Org mode
 #+begin_src emacs-lisp :tangle yes
@@ -691,15 +685,19 @@ org-roam-dialiesよりもorg-journalを利用する(org-agendaの都合).
       :unnarrowed t)
      ("z" "🎓 Zettelkasten" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:🎓${title}\n")
+                         "#+title:🎓${title}\n#+filetags: :CONCEPT:\n")
       :unnarrowed t)
      ("w" "📝 Wiki" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:📝${title}\n")
+                         "#+title:📝${title}\n#+filetags: :WIKI:\n")
+      :unnarrowed t)
+     ("t" "🏷 Tag" plain "%?"
+      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                         "#+title:List of ${title} (alias 🏷${title}) \n#+filetags: :TAG:\n")
       :unnarrowed t)
      ("f" "🦊 Darkfox" plain "%?"
       :target (file+head "darkfox/%<%Y%m%d%H%M%S>.org"
-                         "#+title:🦊${title}\n")
+                         "#+title:🦊${title}\n#+filetags: :DARKFOX:\n")
       :unnarrowed t)
      ("b" "📚 Book" plain
       "%?
@@ -711,9 +709,9 @@ org-roam-dialiesよりもorg-journalを利用する(org-agendaの都合).
 - url: http://www.amazon.co.jp/dp/%^{isbn}
 "
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:📚${title} - ${author}(${date})\n")
+                         "#+title:📚${title} - ${author}(${date})\n#+filetags: :BOOK:SOURCE:\n")
       :unnarrowed t)
-     ("t" "🎤 Talk" plain
+     ("s" "🎙‍ Talk" plain
       "%?
 
 - title: %^{title}
@@ -722,7 +720,7 @@ org-roam-dialiesよりもorg-journalを利用する(org-agendaの都合).
 - url: %^{url}
 "
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:🎤${title} - ${editor}(${date})\n")
+                         "#+title:🎙 ${title} - ${editor}(${date})\n#+filetags: :TALK:SOURCE:\n")
       :unnarrowed t)
      ("o" "💻 Online" plain
       "%?
@@ -732,7 +730,7 @@ org-roam-dialiesよりもorg-journalを利用する(org-agendaの都合).
 - url: %^{url}
 "
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:💻${title}\n")
+                         "#+title:💻${title}\n#+filetags: :ONLINE:SOURCE:\n")
       :unnarrowed t)))
   (org-roam-extract-new-file-path "%<%Y%m%d%H%M%S>.org")
   ;;        :map org-mode-map
