@@ -13,6 +13,7 @@ ref: https://github.com/tsu-nera/hekireki
 
 #+begin_src emacs-lisp :tangle yes
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
+(load-file "~/.doom.d/private/config.el")
 #+end_src
 
 * App

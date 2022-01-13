@@ -1,4 +1,5 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
+(load-file "~/.doom.d/private/config.el")
 
 ;; App
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
