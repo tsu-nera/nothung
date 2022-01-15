@@ -17,7 +17,8 @@
 (package! pangu-spacing)
 (package! electric-operator)
 
-(package! anki-editor)
+;; (package! anki-editor)
+(package! org-anki)
 (package! csv-mode)
 
 ;; (package! org-bars
