@@ -727,6 +727,17 @@
    org-noter-notes-search-path (list (file-truename "~/keido/notes/wiki"))
    ))
 
+(use-package! org-anki
+  :after org
+  :custom
+  ;; one big deckの原則に従う.
+  ;; ref: http://augmentingcognition.com/ltm.html
+  (org-anki-default-deck "Default")
+  :config
+  (define-key org-mode-map (kbd "C-c n A s") #'org-anki-sync-entry)
+  (define-key org-mode-map (kbd "C-c n A u") #'org-anki-update-all)
+  (define-key org-mode-map (kbd "C-c n A d") #'org-anki-delete-entry))
+
 ;; Term
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

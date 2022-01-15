@@ -348,7 +348,7 @@ https://github.com/iyefrat/all-the-icons-completion
           ([?\C-d] . [delete])
           ([?\C-m] . [return])
           ([?\C-h] . [backspace])
-          ([?\C-k] . [S-end delete]))
+          ([?\C-k] . [S-end delete])))
 
   (exwm-enable))
 #+end_src
