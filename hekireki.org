@@ -102,6 +102,9 @@ ewwとorgを便利にするツール群(https://github.com/alphapapa/org-web-too
 
 #+begin_src emacs-lisp :tangle yes
 (use-package! habitica
+  :commands habitica-tasks
+  :init
+  (bind-key "C-x t g" 'habitica-tasks)
   :config
   (setq habitica-show-streak t)
   (setq habitica-turn-on-highlighting nil))
@@ -215,6 +218,11 @@ https://github.com/iyefrat/all-the-icons-completion
 ;; Emacs
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (pixel-scroll-precision-mode)
+
+;; doomだとhelpが割り当てられていたがdoomのhelpはF1をつかう.
+
+(global-set-key (kbd "C-h") 'backward-delete-char)
+(global-set-key (kbd "C-c h r") 'doom/reload)
 #+end_src
 
 ** ace-window
@@ -338,7 +346,9 @@ https://github.com/iyefrat/all-the-icons-completion
           ([?\M-v] . [prior])
           ([?\C-v] . [next])
           ([?\C-d] . [delete])
-          ([?\C-k] . [S-end delete])))
+          ([?\C-m] . [return])
+          ([?\C-h] . [backspace])
+          ([?\C-k] . [S-end delete]))
 
   (exwm-enable))
 #+end_src

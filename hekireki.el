@@ -49,6 +49,9 @@
   )
 
 (use-package! habitica
+  :commands habitica-tasks
+  :init
+  (bind-key "C-x t g" 'habitica-tasks)
   :config
   (setq habitica-show-streak t)
   (setq habitica-turn-on-highlighting nil))
@@ -61,8 +64,8 @@
 (use-package! avy
   :bind
   ("M-g c" . avy-goto-char) ;; doom の keybind 上書き.
-  ("M-g g" . avy-goto-line) ;; doom の keybind 上書き.
-  ("M-g s". avy-goto-word-1))
+  ("M-g l" . avy-goto-line) ;; doom の keybind 上書き.
+  ("M-g g". avy-goto-word-1))
 
 ;; うまく動かないので封印 doom との相性が悪いのかも.
 ;; ひとまず migemo したいときは isearch で対応.
@@ -136,6 +139,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (pixel-scroll-precision-mode)
 
+;; doomだとhelpが割り当てられていたがdoomのhelpはF1をつかう.
+
+(global-set-key (kbd "C-h") 'backward-delete-char)
+(global-set-key (kbd "C-c h r") 'doom/reload)
+
 ;; Email
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -171,7 +179,7 @@
         "o" (lambda (command)
                          (interactive (list (read-shell-command "$ ")))
                          (start-process-shell-command command nil command))
-        "w" #'exwm-workspace-switch
+        "z" #'exwm-workspace-switch
         "a" #'counsel-linux-app
         "s" #'counsel-search  ;; open chrome and search
         )
@@ -188,7 +196,6 @@
               (start-process-shell-command
                "xrandr" nil "xrandr --output HDMI-1 --primary --right-of eDP-1 --auto")))
   (exwm-randr-enable)
-
 
   (require 'exwm-systemtray)
   (exwm-systemtray-enable)
@@ -230,6 +237,8 @@
           ([?\M-v] . [prior])
           ([?\C-v] . [next])
           ([?\C-d] . [delete])
+          ([?\C-m] . [return])
+          ([?\C-h] . [backspace])
           ([?\C-k] . [S-end delete])))
 
   (exwm-enable))
@@ -538,15 +547,19 @@
       :unnarrowed t)
      ("z" "🎓 Zettelkasten" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:🎓${title}\n")
+                         "#+title:🎓${title}\n#+filetags: :CONCEPT:\n")
       :unnarrowed t)
      ("w" "📝 Wiki" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:📝${title}\n")
+                         "#+title:📝${title}\n#+filetags: :WIKI:\n")
+      :unnarrowed t)
+     ("t" "🏷 Tag" plain "%?"
+      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                         "#+title:List of ${title} (alias 🏷${title}) \n#+filetags: :TAG:\n")
       :unnarrowed t)
      ("f" "🦊 Darkfox" plain "%?"
       :target (file+head "darkfox/%<%Y%m%d%H%M%S>.org"
-                         "#+title:🦊${title}\n")
+                         "#+title:🦊${title}\n#+filetags: :DARKFOX:\n")
       :unnarrowed t)
      ("b" "📚 Book" plain
       "%?
@@ -558,9 +571,9 @@
 - url: http://www.amazon.co.jp/dp/%^{isbn}
 "
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:📚${title} - ${author}(${date})\n")
+                         "#+title:📚${title} - ${author}(${date})\n#+filetags: :BOOK:SOURCE:\n")
       :unnarrowed t)
-     ("t" "🎤 Talk" plain
+     ("s" "🎙‍ Talk" plain
       "%?
 
 - title: %^{title}
@@ -569,7 +582,7 @@
 - url: %^{url}
 "
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:🎤${title} - ${editor}(${date})\n")
+                         "#+title:🎙 ${title} - ${editor}(${date})\n#+filetags: :TALK:SOURCE:\n")
       :unnarrowed t)
      ("o" "💻 Online" plain
       "%?
@@ -579,7 +592,7 @@
 - url: %^{url}
 "
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:💻${title}\n")
+                         "#+title:💻${title}\n#+filetags: :ONLINE:SOURCE:\n")
       :unnarrowed t)))
   (org-roam-extract-new-file-path "%<%Y%m%d%H%M%S>.org")
   ;;        :map org-mode-map
