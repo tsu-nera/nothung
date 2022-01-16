@@ -540,13 +540,9 @@
         "u" #'my/org-roam-update
         )
   :custom
-  ;; ファイル名を ID にする.
+  ;;ファイル名を ID にする.
   (org-roam-capture-templates
-   '(("d" "default" plain "%?"
-      :target (file+head "%<%Y%m%d%H%M%S>.org"
-                         "#+title: ${title}\n")
-      :unnarrowed t)
-     ("z" "🎓 Zettelkasten" plain "%?"
+   '(("z" "🎓 Zettelkasten" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:🎓${title}\n#+filetags: :CONCEPT:\n")
       :unnarrowed t)
@@ -558,15 +554,15 @@
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:List of ${title} (alias 🏷${title}) \n#+filetags: :TAG:\n")
       :unnarrowed t)
-     ("t" "📂 TOC" plain "%?"
+     ("i" "📂 TOC" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:Index of {title} (alias 📂${title}) \n#+filetags: :TOC:\n")
+                         "#+title:Index of {title} (alias 📂${title})\n#+filetags: :TOC:\n")
       :unnarrowed t)
-     ("t" "🏛 MOC" plain "%?"
+     ("m" "🏛 MOC" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:🏛${title} \n#+filetags: :MOC:\n")
       :unnarrowed t)
-     ("t" "🗒 DOC" plain "%?"
+     ("d" "🗒 DOC" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:🗒${title}\n#+filetags: :DOC:\n")
       :unnarrowrd t)
