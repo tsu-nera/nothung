@@ -42,6 +42,7 @@
           ("https://www.youtube.com/feeds/videos.xml?channel_id=UCFo4kqllbcQ4nV83WCyraiw" youtube) ; 中田敦彦
           ("https://www.youtube.com/feeds/videos.xml?channel_id=UCFdBehO71GQaIom4WfVeGSw" youtube) ;メンタリストDaiGo
           ("https://www.youtube.com/feeds/videos.xml?playlist_id=PL3N_SB4Wr_S2cGYuI02bdb4UN9XTZRNDu" youtube) ; 与沢の流儀
+          ("http://www.aaronsw.com/2002/feeds/pgessays.rss" blog) ; Paul Graham
           ))
   (setq-default elfeed-search-filter "@1-week-ago +unread ")
   (defun elfeed-search-format-date (date)
@@ -363,7 +364,7 @@
            :kill-buffer t)
           ("p" "🍅 Pomodoro" entry
            (file+headline (lambda () (my/create-date-org-file "~/keido/notes/journals/daily"))
-                          "Pomodoros")
+                          "DeepWork")
            "* 🍅 %?\n%T"
            :empty-lines 1
            :unnarrowed t
@@ -384,7 +385,7 @@
            (file (lambda () (my/create-date-org-file "~/keido/notes/journals/daily")))
              "%?\nSource: [[%:link][%:description]]\nCaptured On: %U\n"
            :empty-lines 1
-           :unnarrowed t
+           :unnrrowed t
            :kill-buffer t)
           ("z" "🎓 Zettelkasten" plain
            (file (lambda () (my/create-timestamped-org-file "~/keido/notes/zk")))
@@ -557,6 +558,18 @@
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:List of ${title} (alias 🏷${title}) \n#+filetags: :TAG:\n")
       :unnarrowed t)
+     ("t" "📂 TOC" plain "%?"
+      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                         "#+title:Index of {title} (alias 📂${title}) \n#+filetags: :TOC:\n")
+      :unnarrowed t)
+     ("t" "🏛 MOC" plain "%?"
+      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                         "#+title:🏛${title} \n#+filetags: :MOC:\n")
+      :unnarrowed t)
+     ("t" "🗒 DOC" plain "%?"
+      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                         "#+title:🗒${title}\n#+filetags: :DOC:\n")
+      :unnarrowrd t)
      ("f" "🦊 Darkfox" plain "%?"
       :target (file+head "darkfox/%<%Y%m%d%H%M%S>.org"
                          "#+title:🦊${title}\n#+filetags: :DARKFOX:\n")
