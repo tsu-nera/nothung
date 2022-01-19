@@ -167,6 +167,9 @@
 
 (add-hook! 'clojure-mode-hook 'smartparens-strict-mode)
 
+;; やりすぎindent mode
+(add-hook! 'clojure-mode-hook 'aggressive-indent-mode)
+
 ;; OS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package! exwm
@@ -798,4 +801,4 @@
 ;; EXWMの場合suspend-frameでハングするのはたちが悪いので封印.
 (use-package! frame
   :bind
-  ("C-z" . nil)
+  ("C-z" . nil))

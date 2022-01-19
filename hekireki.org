@@ -1059,6 +1059,6 @@ Emacsの機能でemoji-searchがあるのでこれも設定しておこう.
 ;; EXWMの場合suspend-frameでハングするのはたちが悪いので封印.
 (use-package! frame
   :bind
-  ("C-z" . nil)
+  ("C-z" . nil))
 #+end_src
 
