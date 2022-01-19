@@ -293,6 +293,10 @@ ref: [[https://github.com/hlissner/doom-emacs/blob/develop/modules/lang/clojure/
 + cljstyle ([[https://qiita.com/lagenorhynque/items/a5d83b4a36a1cf1cacbe][ref]]) : formatter
 
 #+begin_src emacs-lisp :tangle yes
+(add-hook! 'clojure-mode-hook 'smartparens-strict-mode)
+
+;; やりすぎindent mode
+(add-hook! 'clojure-mode-hook 'aggressive-indent-mode)
 #+end_src
 
 * OS

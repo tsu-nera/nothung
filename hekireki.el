@@ -165,7 +165,7 @@
   (setq migemo-coding-system 'utf-8-unix)
   (migemo-init))
 
-
+(add-hook! 'clojure-mode-hook 'smartparens-strict-mode)
 
 ;; OS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -795,6 +795,7 @@
   ;; default の e でもいいけど，mule 時代に v に bind されてたので, emacs でも v に bind しておく.
   (define-key view-mode-map (kbd "v") 'read-only-mode))
 
+;; EXWMの場合suspend-frameでハングするのはたちが悪いので封印.
 (use-package! frame
   :bind
   ("C-z" . nil)
