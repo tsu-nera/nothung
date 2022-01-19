@@ -271,6 +271,27 @@ https://github.com/iyefrat/all-the-icons-completion
 #+end_src
 
 * Lang
+
+** Clojure
+
+ref: [[https://github.com/hlissner/doom-emacs/blob/develop/modules/lang/clojure/README.org][doom-emacs/README.org - GitHub]]
+
+とりあえず，doomのclojureモジュール有効.
+
++ cider
++ clj-refactor
++ flycheck-clj-kondo
+
+その他，
+
++ rainbow-delimiters, smartparensはdoomのcoreパッケージとしてすでにはいっている.
++ pereditはciderの中に入っている.
+
+検討中...
+
++ clj-kondo ([[https://qiita.com/lagenorhynque/items/dd9d6a1d97cbea738bc0][ref]]) : linter
++ cljstyle ([[https://qiita.com/lagenorhynque/items/a5d83b4a36a1cf1cacbe][ref]]) : formatter
+
 #+begin_src emacs-lisp :tangle yes
 #+end_src
 
@@ -1012,7 +1033,6 @@ Emacsの機能でemoji-searchがあるのでこれも設定しておこう.
   (perfect-margin-mode 1))
 #+end_src
 
-
 ** Others
 
 #+begin_src emacs-lisp :tangle yes
@@ -1032,5 +1052,9 @@ Emacsの機能でemoji-searchがあるのでこれも設定しておこう.
   ;; default の e でもいいけど，mule 時代に v に bind されてたので, emacs でも v に bind しておく.
   (define-key view-mode-map (kbd "v") 'read-only-mode))
 
+;; EXWMの場合suspend-frameでハングするのはたちが悪いので封印.
+(use-package! frame
+  :bind
+  ("C-z" . nil)
 #+end_src
 

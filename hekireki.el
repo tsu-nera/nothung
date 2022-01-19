@@ -794,3 +794,7 @@
   (define-key view-mode-map (kbd "n") 'view-scroll-line-forward)
   ;; default の e でもいいけど，mule 時代に v に bind されてたので, emacs でも v に bind しておく.
   (define-key view-mode-map (kbd "v") 'read-only-mode))
+
+(use-package! frame
+  :bind
+  ("C-z" . nil)
