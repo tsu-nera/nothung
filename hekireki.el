@@ -7,7 +7,8 @@
 ;; twittering-mode
 ;; この設定がないと認証が失敗した.
 ;; twittering-oauth-get-access-token: Failed to retrieve a request token
-(add-hook! 'twittering-mode-hook
+(use-package! twittering-mode
+  :init
   (setq twittering-allow-insecure-server-cert t))
 
 (use-package! eww
@@ -245,6 +246,9 @@
           ([?\C-h] . [backspace])
           ([?\C-k] . [S-end delete])))
 
+  ;; どうもChromeを立ち上げるとハングするので無効にしておく.
+  (winner-mode -1)
+
   (exwm-enable))
 
 ;; Org mode
@@ -389,16 +393,7 @@
              "%?\nSource: [[%:link][%:description]]\nCaptured On: %U\n"
            :empty-lines 1
            :unnrrowed t
-           :kill-buffer t)
-          ("z" "🎓 Zettelkasten" plain
-           (file (lambda () (my/create-timestamped-org-file "~/keido/notes/zk")))
-           "#+TITLE:🎓%?\n")
-          ("w" "📝 Wiki" plain
-           (file (lambda () (my/create-timestamped-org-file "~/keido/notes/wiki")))
-           "#+EXPORT_FILE_NAME: ~/repo/futurismo4/wiki/xxx.rst
-#+OPTIONS: toc:t num:nil todo:nil pri:nil ^:nil author:nil *:t prop:nil
-#+TITLE:📝%?\n")
-          ))
+           :kill-buffer t)))
 
   ;; org-babel
   ;; 評価でいちいち質問されないように.
