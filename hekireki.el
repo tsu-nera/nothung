@@ -185,6 +185,7 @@
                          (interactive (list (read-shell-command "$ ")))
                          (start-process-shell-command command nil command))
         "z" #'exwm-workspace-switch
+        "m" #'exwm-workspace-move-window
         "a" #'counsel-linux-app
         "s" #'counsel-search  ;; open chrome and search
         )

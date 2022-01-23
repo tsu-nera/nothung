@@ -1,10 +1,10 @@
-# hekireki
+* hekireki
 
 My configration files of Doom Emacs.
 
-Emacsを極限まで叩き上げ, なによりも強靭な刃にする. 
+Emacsを極限まで叩き上げ, なによりも強靭な刃にする. [fn:1]
 
-一つのことを極める, 霹靂一閃.
+一つのことを極める, 霹靂一閃.[fn:2]
 
 ```
 ██╗  ██╗███████╗██╗  ██╗██╗██████╗ ███████╗██╗  ██╗██╗
@@ -22,8 +22,13 @@ Emacsを極限まで叩き上げ, なによりも強靭な刃にする.
 ╚═╝╚══════╝╚══════╝╚══════╝╚═╝  ╚═══╝
 ```
 
-## refs
+---
 
 昔の設定は大きくなりすぎたのでDoom Emacsをベースに再構築. *Keep it Simple, Stupid* だよ.
 
 https://github.com/tsu-nera/dotfiles/tree/master/.emacs.d
+
+* Notes
+
+[fn:1] https://www.youtube.com/watch?v=B6wChr_geAg
+[fn:2] https://www.youtube.com/watch?v=04L18rQiIgw
