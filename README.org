@@ -2,15 +2,13 @@
 
 My configration files of Doom Emacs.
 
-Emacsを極限まで叩き上げ, なによりも強靭な刃にする. [fn:1]
+[[https://www.youtube.com/watch?v=B6wChr_geAg][Emacs]]を極限まで叩き上げ, なによりも強靭な刃にする. 
 
-一つのことを極める, 霹靂一閃.[fn:2]
+一つのことを極める, [[https://www.youtube.com/watch?v=04L18rQiIgw][霹靂一閃]].
 
-** Notes
+---
 
 昔の設定は大きくなりすぎたのでDoom Emacsをベースに再構築. *Keep it Simple, Stupid* だよ.
 
 https://github.com/tsu-nera/dotfiles/tree/master/.emacs.d
 
-[fn:1] https://www.youtube.com/watch?v=B6wChr_geAg
-[fn:2] https://www.youtube.com/watch?v=04L18rQiIgw
