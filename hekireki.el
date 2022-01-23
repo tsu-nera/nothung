@@ -466,6 +466,7 @@
   :config
   (setq org-toggl-inherit-toggl-properties t)
   (toggl-get-projects)
+  (setq toggl-default-project "GTD")
   (org-toggl-integration-mode))
 
 (use-package! ox-hugo

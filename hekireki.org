@@ -299,6 +299,32 @@ ref: [[https://github.com/hlissner/doom-emacs/blob/develop/modules/lang/clojure/
 (add-hook! 'clojure-mode-hook 'aggressive-indent-mode)
 #+end_src
 
+*** smartparens
+https://github.com/Fuco1/smartparens
+
+Emacsでカッコの対応を取りつつ編集をするminor-mode. pareditを新しくrewriteした.
+
++ (, [, {などで自動で閉じカッコが挿入される.
++ block movement
+  - ()の中で)を入力すると，現在の)の末尾に飛ぶ.
+  - []の中で]を入力すると，現在の]の末尾に飛ぶ.
++ Navigation
+  - C-M-a: sp-beggining-of-sexp 現在のカッコの先頭へ移動.
+  - C-M-e: sp-end-of-sexp現在のカッコの末尾へ移動.
+  - C-M-d: sp-donw-sexp 現在のカッコのひとつ内側のカッコの先頭へ移動.
+  - C-M-u: sp-up-sexp 現在のカッコのひとつ外側のカッコの末尾へ移動.
+  - C-M-b: sp-backward-sexp
+  - C-M-f: sp-forward-sexp
+  - C-M-n:  
+  - C-M-p:
++ wrapping
+  + C-M-Spaceで現在の部分からwordの末尾までをマーク.
+    - (とか[でマークした部分を囲む.
+refs:
+
+- https://ebzzry.com/en/emacs-pairs/
+- http://kimi.im/2021-11-27-sexp-operations-in-emacs
+
 * OS
 #+begin_src emacs-lisp :tangle yes
 ;; OS
@@ -315,6 +341,7 @@ ref: [[https://github.com/hlissner/doom-emacs/blob/develop/modules/lang/clojure/
                          (interactive (list (read-shell-command "$ ")))
                          (start-process-shell-command command nil command))
         "z" #'exwm-workspace-switch
+        "m" #'exwm-workspace-move-window
         "a" #'counsel-linux-app
         "s" #'counsel-search  ;; open chrome and search
         )
@@ -606,6 +633,7 @@ https://github.com/mbork/org-toggl
   :config
   (setq org-toggl-inherit-toggl-properties t)
   (toggl-get-projects)
+  (setq toggl-default-project "GTD")
   (org-toggl-integration-mode))
 #+end_src
 
