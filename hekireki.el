@@ -146,6 +146,10 @@
 (global-set-key (kbd "C-h") 'backward-delete-char)
 (global-set-key (kbd "C-c h r") 'doom/reload)
 
+;; Emacs起動時にいちいち質問されるのはうざい.
+;; default tではなぜか無視できないので:allを設定しておく.
+(setq enable-local-variables :all)
+
 ;; Email
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
