@@ -170,10 +170,12 @@
   (setq migemo-coding-system 'utf-8-unix)
   (migemo-init))
 
-(add-hook! 'clojure-mode-hook 'smartparens-strict-mode)
-
 ;; やりすぎindent mode
 (add-hook! 'clojure-mode-hook 'aggressive-indent-mode)
+
+(use-package! smartparens-config
+  :config
+  (add-hook! 'clojure-mode-hook 'smartparens-strict-mode))
 
 ;; OS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
