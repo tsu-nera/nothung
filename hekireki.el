@@ -137,6 +137,13 @@
 ;; 記号の前後にスペースを入れる.
 (use-package! electric-operator)
 
+;; とりあえず100でハイライトしておく.
+;; 今の自分のディスプレイだと100でいいかな.
+(use-package! whitespace
+  :config
+  (setq whitespace-line-column 100) ;; limit line length
+  (setq whitespace-style '(face lines-tail)))
+
 ;; Emacs
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (pixel-scroll-precision-mode)
@@ -172,8 +179,18 @@
 
 ;; やりすぎindent mode
 (add-hook! 'clojure-mode-hook 'aggressive-indent-mode)
+;; 自動でalign整形.
+(setq clojure-align-forms-automatically t)
 
 (use-package! smartparens-config
+  :bind
+  ("C-<right>" . sp-forward-slurp-sexp)
+  ("M-<right>" . sp-forward-barf-sexp)
+  ("C-<left>"  . sp-backward-slurp-sexp)
+  ("M-<left>"  . sp-backward-barf-sexp)
+  ("C-M-w" . sp-copy-sexp)
+  ("M-[" . sp-backward-unwrap-sexp)
+  ("M-]" . sp-unwrap-sexp)
   :config
   (add-hook! 'clojure-mode-hook 'smartparens-strict-mode))
 

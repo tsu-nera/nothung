@@ -311,18 +311,47 @@ ref: [[https://github.com/hlissner/doom-emacs/blob/develop/modules/lang/clojure/
 #+end_src
 
 *** smartparens
+
 https://github.com/Fuco1/smartparens
 
 Emacsでカッコの対応を取りつつ編集をするminor-mode. pareditを新しくrewriteした.
 
-[[https://github.com/hlissner/doom-emacs/blob/master/modules/config/default/%2Bemacs-bindings.el][doom emacsのsmartparens定義]]. 足りないのは自分で定義する必要あり.
-
 refs:
+
 - https://ebzzry.com/en/emacs-pairs/
 - http://kimi.im/2021-11-27-sexp-operations-in-emacs
 
+[[https://github.com/hlissner/doom-emacs/blob/master/modules/config/default/%2Bemacs-bindings.el][doom emacsのsmartparens定義]]. +bindings +smartparensで有効.
+
+#+begin_src emacs-lisp :tangle no
+;;; smartparens
+(:after smartparens
+  :map smartparens-mode-map
+  "C-M-a"           #'sp-beginning-of-sexp
+  "C-M-e"           #'sp-end-of-sexp
+  "C-M-f"           #'sp-forward-sexp
+  "C-M-b"           #'sp-backward-sexp
+  "C-M-n"           #'sp-next-sexp
+  "C-M-p"           #'sp-previous-sexp
+  "C-M-u"           #'sp-up-sexp
+  "C-M-d"           #'sp-down-sexp
+  "C-M-k"           #'sp-kill-sexp
+  "C-M-t"           #'sp-transpose-sexp
+  "C-M-<backspace>" #'sp-splice-sexp)
+#+end_src
+
+足りないのは自分で定義する必要あり. というかいろいろ再定義するか...
+
 #+begin_src emacs-lisp :tangle yes
 (use-package! smartparens-config
+  :bind
+  ("C-<right>" . sp-forward-slurp-sexp)
+  ("M-<right>" . sp-forward-barf-sexp)
+  ("C-<left>"  . sp-backward-slurp-sexp)
+  ("M-<left>"  . sp-backward-barf-sexp)
+  ("C-M-w" . sp-copy-sexp)
+  ("M-[" . sp-backward-unwrap-sexp)
+  ("M-]" . sp-unwrap-sexp)
   :config
   (add-hook! 'clojure-mode-hook 'smartparens-strict-mode))
 #+end_src
