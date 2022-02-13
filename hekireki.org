@@ -155,7 +155,21 @@ ewwとorgを便利にするツール群(https://github.com/alphapapa/org-web-too
 ;; company はなにげに使いそうだからな，TAB でのみ補完発動させるか.
 (setq company-idle-delay nil)
 (global-set-key (kbd "TAB") #'company-indent-or-complete-common)
+#+end_src
 
+** affe
+
+fuzzy find. あいまい検索 for consult.
+
+https://github.com/minad/affe
+
+#+begin_src emacs-lisp :tangle yes
+(use-package! affe
+  :config
+  (defun affe-orderless-regexp-compiler (input _type)
+    (setq input (orderless-pattern-compiler input))
+    (cons input (lambda (str) (orderless--highlight input str))))
+  (setq affe-regexp-compiler #'affe-orderless-regexp-compiler))
 #+end_src
 
 ** all-the-icons-completion

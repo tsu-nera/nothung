@@ -63,6 +63,8 @@
 
 ;; Completion
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package! affe)
+
 (use-package! avy
   :bind
   ("M-g c" . avy-goto-char) ;; doom の keybind 上書き.
