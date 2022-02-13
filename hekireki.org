@@ -312,7 +312,8 @@ ref: [[https://github.com/hlissner/doom-emacs/blob/develop/modules/lang/clojure/
 
 (use-package! cider
   :bind
-  ;; desing journal用にbinding追加
+  
+;; desing journal用にbinding追加
   ("C-c C-v C-p" . cider-pprint-eval-defun-to-comment)
   ("C-c C-v M-p" . cider-pprint-eval-last-sexp-to-comment))
 #+end_src

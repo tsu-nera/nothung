@@ -182,6 +182,14 @@
 ;; 自動でalign整形.
 (setq clojure-align-forms-automatically t)
 
+
+(use-package! cider
+  :bind
+  
+;; desing journal用にbinding追加
+  ("C-c C-v C-p" . cider-pprint-eval-defun-to-comment)
+  ("C-c C-v M-p" . cider-pprint-eval-last-sexp-to-comment))
+
 (use-package! smartparens-config
   :bind
   ("C-<right>" . sp-forward-slurp-sexp)
