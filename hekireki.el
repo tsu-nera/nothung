@@ -63,8 +63,6 @@
 
 ;; Completion
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package! affe)
-
 (use-package! avy
   :bind
   ("M-g c" . avy-goto-char) ;; doom の keybind 上書き.
@@ -98,6 +96,13 @@
 ;; company はなにげに使いそうだからな，TAB でのみ補完発動させるか.
 (setq company-idle-delay nil)
 (global-set-key (kbd "TAB") #'company-indent-or-complete-common)
+
+(use-package! affe
+  :config
+  (defun affe-orderless-regexp-compiler (input _type)
+    (setq input (orderless-pattern-compiler input))
+    (cons input (lambda (str) (orderless--highlight input str))))
+  (setq affe-regexp-compiler #'affe-orderless-regexp-compiler))
 
 ;; Config
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
