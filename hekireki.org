@@ -1153,5 +1153,8 @@ Emacsの機能でemoji-searchがあるのでこれも設定しておこう.
 (use-package! frame
   :bind
   ("C-z" . nil))
+
+;; 実験, どうもマウス操作でEmacsの制御が効かなくなることがあるので.
+(setq make-pointer-invisible nil)
 #+end_src
 

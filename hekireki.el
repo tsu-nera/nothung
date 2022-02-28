@@ -106,13 +106,6 @@
 
 ;; Config
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; memo:
-;; use-package! は:defer, :hook, :commands, or :after が省略されると起動時に load される.
-;; after! は package が load されたときに評価される.
-;; add-hook! は mode 有効化のとき. setq-hook!は equivalent.
-;; どれを使うかの正解はないがすべて use-package!だと起動が遅くなるので
-;; 場合によってカスタマイズせよ，とのこと.
-;; https://github.com/hlissner/doom-emacs/blob/develop/docs/getting_started.org#configuring-packages
 ;;
 ;; doom specific config
 ;; (setq user-full-name "John Doe"
@@ -189,13 +182,17 @@
 ;; 自動でalign整形.
 (setq clojure-align-forms-automatically t)
 
-
 (use-package! cider
   :bind
-  
-;; desing journal用にbinding追加
+  ;; desing journal用にbinding追加
   ("C-c C-v C-p" . cider-pprint-eval-defun-to-comment)
   ("C-c C-v M-p" . cider-pprint-eval-last-sexp-to-comment))
+
+(add-hook! clojure-mode
+  (clj-refactor-mode 1)
+  (yas-minor-mode 1) ; for adding require/use/import statements
+  ;; This choice of keybinding leaves cider-macroexpand-1 unbound
+  (cljr-add-keybindings-with-prefix "C-c C-m"))
 
 (use-package! smartparens-config
   :bind
@@ -837,3 +834,6 @@
 (use-package! frame
   :bind
   ("C-z" . nil))
+
+;; 実験, どうもマウス操作でEmacsの制御が効かなくなることがあるので.
+(setq make-pointer-invisible nil)
