@@ -98,6 +98,7 @@
 (global-set-key (kbd "TAB") #'company-indent-or-complete-common)
 
 (use-package! affe
+  :after consult
   :config
   (defun affe-orderless-regexp-compiler (input _type)
     (setq input (orderless-pattern-compiler input))
@@ -177,6 +178,18 @@
   (setq migemo-coding-system 'utf-8-unix)
   (migemo-init))
 
+(use-package! smartparens-config
+  :bind
+  ("C-<right>" . sp-forward-slurp-sexp)
+  ("M-<right>" . sp-forward-barf-sexp)
+  ("C-<left>"  . sp-backward-slurp-sexp)
+  ("M-<left>"  . sp-backward-barf-sexp)
+  ("C-M-w" . sp-copy-sexp)
+  ("M-[" . sp-backward-unwrap-sexp)
+  ("M-]" . sp-unwrap-sexp)
+  :config
+  (add-hook! 'clojure-mode-hook 'smartparens-strict-mode))
+
 ;; やりすぎindent mode
 (add-hook! 'clojure-mode-hook 'aggressive-indent-mode)
 ;; 自動でalign整形.
@@ -194,20 +207,9 @@
   ;; This choice of keybinding leaves cider-macroexpand-1 unbound
   (cljr-add-keybindings-with-prefix "C-c C-m"))
 
-(use-package! smartparens-config
-  :bind
-  ("C-<right>" . sp-forward-slurp-sexp)
-  ("M-<right>" . sp-forward-barf-sexp)
-  ("C-<left>"  . sp-backward-slurp-sexp)
-  ("M-<left>"  . sp-backward-barf-sexp)
-  ("C-M-w" . sp-copy-sexp)
-  ("M-[" . sp-backward-unwrap-sexp)
-  ("M-]" . sp-unwrap-sexp)
-  :config
-  (add-hook! 'clojure-mode-hook 'smartparens-strict-mode))
-
 ;; OS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (use-package! exwm
   :after counsel
   :init
@@ -229,6 +231,9 @@
   (add-hook 'exwm-update-class-hook
             (lambda ()
               (exwm-workspace-rename-buffer exwm-class-name)))
+  ;; どうもChromeを立ち上げるとハングするので無効にしておく.
+  (winner-mode -1)
+
   :config
   (require 'exwm-randr)
   (setq exwm-randr-workspace-output-plist '(0 "HDMI-1"))
@@ -259,6 +264,10 @@
   (scroll-bar-mode -1)
   (fringe-mode 1)
 
+  ;; google-chromeを起動するとmouse on menu-barがpopupしてハングする対策
+  ;; https://stackoverflow.com/questions/17280845/emacs-disable-pop-up-menus-on-mouse-clicks
+  (fset 'menu-bar-open nil)
+
   ;; Turn on `display-time-mode' if you don't use an external bar.
   (setq display-time-default-load-average nil)
   (display-time-mode t)
@@ -281,9 +290,6 @@
           ([?\C-m] . [return])
           ([?\C-h] . [backspace])
           ([?\C-k] . [S-end delete])))
-
-  ;; どうもChromeを立ち上げるとハングするので無効にしておく.
-  (winner-mode -1)
 
   (exwm-enable))
 
@@ -497,13 +503,15 @@
 ;;     ("~" (:background "blue" :foreground "white")) cddddd;; 根拠
 ;;     ("+" (:background "green" :foreground "black")))) ;; 自分の考え
 
-(use-package! org-toggl
-  :after org
-  :config
-  (setq org-toggl-inherit-toggl-properties t)
-  (toggl-get-projects)
-  (setq toggl-default-project "GTD")
-  (org-toggl-integration-mode))
+(after! org
+  ;; https://stackoverflow.com/questions/53469017/org-mode-source-editing-indents-code-after-exiting-source-code-block-editor
+  ;; インデント. default 2になっているとへんな隙間が先頭に入る.
+  (setq org-edit-src-content-indentation 0)
+  (setq org-src-preserve-indentation t)
+  ;; TABの挙動
+  (setq org-src-tab-acts-natively t)
+  ;; font
+  (setq org-src-fontify-natively t))
 
 (use-package! ox-hugo
   :after 'ox
@@ -520,6 +528,14 @@
       (replace-regexp-in-string "\\(\\.org>`_\\)" ">`" (concat ":doc:" text) nil nil 1)))
   (add-to-list 'org-export-filter-link-functions
                'my/rst-to-sphinx-link-format))
+
+(use-package! org-toggl
+  :after org
+  :config
+  (setq org-toggl-inherit-toggl-properties t)
+  (toggl-get-projects)
+  (setq toggl-default-project "GTD")
+  (org-toggl-integration-mode))
 
 (use-package! org-journal
   :after org
@@ -596,6 +612,10 @@
      ("m" "🏛 MOC" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:🏛${title} \n#+filetags: :MOC:\n")
+      :unnarrowed t)
+     ("i" "💡 Issue" plain "%?"
+      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                         "#+title:💡${title} \n#+filetags: :ISSUE:\n")
       :unnarrowed t)
      ("d" "🗒 DOC" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"

@@ -176,6 +176,7 @@ https://github.com/minad/affe
 
 #+begin_src emacs-lisp :tangle yes
 (use-package! affe
+  :after consult
   :config
   (defun affe-orderless-regexp-compiler (input _type)
     (setq input (orderless-pattern-compiler input))
@@ -301,6 +302,75 @@ https://github.com/iyefrat/all-the-icons-completion
 
 * Lang
 
+編集補助の中でも特にコーディング支援をまとめる.
+
+** Common
+
+*** smartparens
+
+https://github.com/Fuco1/smartparens
+
+Emacsでカッコの対応を取りつつ編集をするminor-mode. pareditを新しくrewriteした.
+
+refs:
+
+- https://ebzzry.com/en/emacs-pairs/
+- http://kimi.im/2021-11-27-sexp-operations-in-emacs
+
+[[https://github.com/hlissner/doom-emacs/blob/master/modules/config/default/%2Bemacs-bindings.el][doom emacsのsmartparens定義]]. +bindings +smartparensで有効.
+
+#+begin_src emacs-lisp :tangle no
+;;; smartparens
+(:after smartparens
+  :map smartparens-mode-map
+  "C-M-a"           #'sp-beginning-of-sexp
+  "C-M-e"           #'sp-end-of-sexp
+  "C-M-f"           #'sp-forward-sexp
+  "C-M-b"           #'sp-backward-sexp
+  "C-M-n"           #'sp-next-sexp
+  "C-M-p"           #'sp-previous-sexp
+  "C-M-u"           #'sp-up-sexp
+  "C-M-d"           #'sp-down-sexp
+  "C-M-k"           #'sp-kill-sexp
+  "C-M-t"           #'sp-transpose-sexp
+  "C-M-<backspace>" #'sp-splice-sexp)
+#+end_src
+
+足りないのは自分で定義する必要あり. というかいろいろ再定義するか...
+
+#+begin_src emacs-lisp :tangle yes
+(use-package! smartparens-config
+  :bind
+  ("C-<right>" . sp-forward-slurp-sexp)
+  ("M-<right>" . sp-forward-barf-sexp)
+  ("C-<left>"  . sp-backward-slurp-sexp)
+  ("M-<left>"  . sp-backward-barf-sexp)
+  ("C-M-w" . sp-copy-sexp)
+  ("M-[" . sp-backward-unwrap-sexp)
+  ("M-]" . sp-unwrap-sexp)
+  :config
+  (add-hook! 'clojure-mode-hook 'smartparens-strict-mode))
+#+end_src
+
+
+*** symbol-overlay
+
+シンボルのハイライトをキー入力で制御できる.
+
+https://github.com/wolray/symbol-overlay/
+
+使ってないし companyとkeybindがかぶったのでいったん封印.
+
+#+begin_src emacs-lisp :tangle no
+(use-package! symbol-overlay
+  :config
+  (global-set-key (kbd "M-i") 'symbol-overlay-put)
+  (global-set-key (kbd "M-n") 'symbol-overlay-switch-forward)
+  (global-set-key (kbd "M-p") 'symbol-overlay-switch-backward)
+  (global-set-key (kbd "<f7>") 'symbol-overlay-mode)
+  (global-set-key (kbd "<f8>") 'symbol-overlay-remove-all))
+#+end_src
+
 ** Clojure
 
 ref: [[https://github.com/hlissner/doom-emacs/blob/develop/modules/lang/clojure/README.org][doom-emacs/README.org - GitHub]]
@@ -350,56 +420,11 @@ https://github.com/clojure-emacs/clj-refactor.el
 
 + cljr-clean-nsでnamespaceを整理, cljr-project-cleanでプロジェクト全体に適用.
 
-*** smartparens
-
-https://github.com/Fuco1/smartparens
-
-Emacsでカッコの対応を取りつつ編集をするminor-mode. pareditを新しくrewriteした.
-
-refs:
-
-- https://ebzzry.com/en/emacs-pairs/
-- http://kimi.im/2021-11-27-sexp-operations-in-emacs
-
-[[https://github.com/hlissner/doom-emacs/blob/master/modules/config/default/%2Bemacs-bindings.el][doom emacsのsmartparens定義]]. +bindings +smartparensで有効.
-
-#+begin_src emacs-lisp :tangle no
-;;; smartparens
-(:after smartparens
-  :map smartparens-mode-map
-  "C-M-a"           #'sp-beginning-of-sexp
-  "C-M-e"           #'sp-end-of-sexp
-  "C-M-f"           #'sp-forward-sexp
-  "C-M-b"           #'sp-backward-sexp
-  "C-M-n"           #'sp-next-sexp
-  "C-M-p"           #'sp-previous-sexp
-  "C-M-u"           #'sp-up-sexp
-  "C-M-d"           #'sp-down-sexp
-  "C-M-k"           #'sp-kill-sexp
-  "C-M-t"           #'sp-transpose-sexp
-  "C-M-<backspace>" #'sp-splice-sexp)
-#+end_src
-
-足りないのは自分で定義する必要あり. というかいろいろ再定義するか...
-
-#+begin_src emacs-lisp :tangle yes
-(use-package! smartparens-config
-  :bind
-  ("C-<right>" . sp-forward-slurp-sexp)
-  ("M-<right>" . sp-forward-barf-sexp)
-  ("C-<left>"  . sp-backward-slurp-sexp)
-  ("M-<left>"  . sp-backward-barf-sexp)
-  ("C-M-w" . sp-copy-sexp)
-  ("M-[" . sp-backward-unwrap-sexp)
-  ("M-]" . sp-unwrap-sexp)
-  :config
-  (add-hook! 'clojure-mode-hook 'smartparens-strict-mode))
-#+end_src
-
 * OS
 #+begin_src emacs-lisp :tangle yes
 ;; OS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (use-package! exwm
   :after counsel
   :init
@@ -421,6 +446,9 @@ refs:
   (add-hook 'exwm-update-class-hook
             (lambda ()
               (exwm-workspace-rename-buffer exwm-class-name)))
+  ;; どうもChromeを立ち上げるとハングするので無効にしておく.
+  (winner-mode -1)
+
   :config
   (require 'exwm-randr)
   (setq exwm-randr-workspace-output-plist '(0 "HDMI-1"))
@@ -451,6 +479,10 @@ refs:
   (scroll-bar-mode -1)
   (fringe-mode 1)
 
+  ;; google-chromeを起動するとmouse on menu-barがpopupしてハングする対策
+  ;; https://stackoverflow.com/questions/17280845/emacs-disable-pop-up-menus-on-mouse-clicks
+  (fset 'menu-bar-open nil)
+
   ;; Turn on `display-time-mode' if you don't use an external bar.
   (setq display-time-default-load-average nil)
   (display-time-mode t)
@@ -474,13 +506,13 @@ refs:
           ([?\C-h] . [backspace])
           ([?\C-k] . [S-end delete])))
 
-  ;; どうもChromeを立ち上げるとハングするので無効にしておく.
-  (winner-mode -1)
-
   (exwm-enable))
 #+end_src
 
-* Org mode
+* Org-mode
+
+ご存知！
+
 #+begin_src emacs-lisp :tangle yes
 ;; Org mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -694,19 +726,35 @@ refs:
 
 #+end_src
 
-** org-toggl
-org-modeをTogglと連携させる.
-https://github.com/mbork/org-toggl
+** org-babel
+
+Org-modeのなかでLiterature Programming.
+
+基本操作:
+
+- C-c C-, コードブロックの挿入テンプレート呼び出し(org-insert-structure-tempate)
+- C-c C-c コード実行(org-babel-execute-src-block)
+- C-c C-o コード実行結果を開く(org-babel-open-src-block-result)
+- C-c ' ソースコード編集(org-edit-src-code)
+  - どうもEoom Emacsだと keybindingが外れいてる.
+  - C-c l '(org-edit-special)で開く.
 
 #+begin_src emacs-lisp :tangle yes
-(use-package! org-toggl
-  :after org
-  :config
-  (setq org-toggl-inherit-toggl-properties t)
-  (toggl-get-projects)
-  (setq toggl-default-project "GTD")
-  (org-toggl-integration-mode))
+(after! org
+  ;; https://stackoverflow.com/questions/53469017/org-mode-source-editing-indents-code-after-exiting-source-code-block-editor
+  ;; インデント. default 2になっているとへんな隙間が先頭に入る.
+  (setq org-edit-src-content-indentation 0)
+  (setq org-src-preserve-indentation t)
+  ;; TABの挙動
+  (setq org-src-tab-acts-natively t)
+  ;; font
+  (setq org-src-fontify-natively t))
 #+end_src
+
+refs:
+
+- [[https://orgmode.org/manual/Key-bindings-and-Useful-Functions.html][org-babel Key bindings and Useful Functions (The Org Manual)]]
+- [[https://misohena.jp/blog/2017-10-26-how-to-use-code-block-of-emacs-org-mode.html][org-modeのコードブロック(Babel)の使い方 | Misohena Blog]]
 
 ** ox-hugo
 
@@ -738,6 +786,20 @@ Org-modeで書いたWiki用のページをSphinxで公開するためにreST形�
       (replace-regexp-in-string "\\(\\.org>`_\\)" ">`" (concat ":doc:" text) nil nil 1)))
   (add-to-list 'org-export-filter-link-functions
                'my/rst-to-sphinx-link-format))
+#+end_src
+
+** org-toggl
+org-modeをTogglと連携させる.
+https://github.com/mbork/org-toggl
+
+#+begin_src emacs-lisp :tangle yes
+(use-package! org-toggl
+  :after org
+  :config
+  (setq org-toggl-inherit-toggl-properties t)
+  (toggl-get-projects)
+  (setq toggl-default-project "GTD")
+  (org-toggl-integration-mode))
 #+end_src
 
 ** org-journal
@@ -775,7 +837,7 @@ https://github.com/bastibe/org-journal
 )
 #+end_src
 
-** Org-roam
+** org-roam
 
 Zettelkasten MethodのOrg-roam実装.
 
@@ -827,6 +889,10 @@ org-roam-dialiesよりもorg-journalを利用する(org-agendaの都合).
      ("m" "🏛 MOC" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:🏛${title} \n#+filetags: :MOC:\n")
+      :unnarrowed t)
+     ("i" "💡 Issue" plain "%?"
+      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                         "#+title:💡${title} \n#+filetags: :ISSUE:\n")
       :unnarrowed t)
      ("d" "🗒 DOC" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
@@ -1075,6 +1141,8 @@ https://github.com/eyeinsky/org-anki
 
 * UI
 
+みため周りの設定.
+
 ** Doom
 
 #+begin_src emacs-lisp :tangle yes
@@ -1133,7 +1201,6 @@ Emacsの機能でemoji-searchがあるのでこれも設定しておこう.
 ** Others
 
 #+begin_src emacs-lisp :tangle yes
-
 (setq display-line-numbers-type t) ; 行番号表示
 
 ;; less でのファイル閲覧に操作性を似せる mode.

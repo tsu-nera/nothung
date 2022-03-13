@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: my/require
+# key: my/require
+# --
+(require '[$1])
