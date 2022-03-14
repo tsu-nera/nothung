@@ -482,6 +482,7 @@ https://github.com/clojure-emacs/clj-refactor.el
   ;; google-chromeを起動するとmouse on menu-barがpopupしてハングする対策
   ;; https://stackoverflow.com/questions/17280845/emacs-disable-pop-up-menus-on-mouse-clicks
   (fset 'menu-bar-open nil)
+  (fset 'x-menu-bar-open nil)
 
   ;; Turn on `display-time-mode' if you don't use an external bar.
   (setq display-time-default-load-average nil)
@@ -1161,8 +1162,11 @@ https://github.com/eyeinsky/org-anki
 ;; counselとdoom-modelineが相性悪いようなのでworkspace name表示のためには追加で設定.
 ;; https://github.com/hlissner/doom-emacs/issues/314
 (after! doom-modeline
-  (setq doom-modeline-persp-name t))
+  (setq doom-modeline-icon (display-graphic-p))
+  (setq doom-modeline-major-mode-icon t))
 #+end_src
+
+https://github.com/seagle0128/doom-modeline
 
 ** emojify
 
