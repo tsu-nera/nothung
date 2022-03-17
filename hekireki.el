@@ -207,6 +207,10 @@
   ;; This choice of keybinding leaves cider-macroexpand-1 unbound
   (cljr-add-keybindings-with-prefix "C-c C-m"))
 
+(add-hook! clojure-mode
+  (set-formatter! 'cljstyle "cljstyle pipe" :modes '(clojure-mode))
+  (add-hook 'before-save-hook 'format-all-buffer t t))
+
 ;; OS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -322,10 +326,6 @@
   (setq org-startup-folded 'show2levels);; 見出しの階層指定
   (setq org-startup-truncated nil) ;; 長い文は折り返す.
 
-  ;; org-babel のソースをキレイに表示.
-  (setq org-src-fontify-natively t)
-  (setq org-fontify-whole-heading-line t)
-
   ;; electric-indent は org-mode で誤作動の可能性があることのこと
   ;; たまにいきなり org-mode の tree 構造が壊れるから，とりあえず設定しておく.
   ;; この設定の効果が以下の記事で gif である.
@@ -438,14 +438,7 @@
            :unnrrowed t
            :kill-buffer t)))
 
-  ;; org-babel
-  ;; 評価でいちいち質問されないように.
-  (setq org-confirm-babel-evaluate nil)
-  ;; org-babel で 実行した言語を書く. デフォルトでは emacs-lisp だけ.
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((lisp . t)
-     (shell . t)))
+
   )
 
 ;; org-mode で timestamp のみを挿入するカスタム関数(hh:mm)
@@ -511,8 +504,19 @@
   (setq org-src-preserve-indentation t)
   ;; TABの挙動
   (setq org-src-tab-acts-natively t)
-  ;; font
-  (setq org-src-fontify-natively t))
+  ;; org-babel のソースをキレイに表示.
+  (setq org-src-fontify-natively t)
+  (setq org-fontify-whole-heading-line t)
+
+  ;; 評価でいちいち質問されないように.
+  (setq org-confirm-babel-evaluate nil)
+
+  ;; org-babel で 実行した言語を書く. デフォルトでは emacs-lisp だけ.
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((lisp . t)
+     (shell . t)
+     (clojure . t))))
 
 (use-package! ox-hugo
   :after 'ox
@@ -824,8 +828,6 @@
 ;; counselとdoom-modelineが相性悪いようなのでworkspace name表示のためには追加で設定.
 ;; https://github.com/hlissner/doom-emacs/issues/314
 (after! doom-modeline
-  (setq doom-modeline-workspace-name t)
-
   (setq doom-modeline-icon (display-graphic-p))
   (setq doom-modeline-major-mode-icon t))
 

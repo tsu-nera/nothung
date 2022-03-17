@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: sh
+# key: sh
+# --
+#+begin_src sh
+$ $1
+#+end_src

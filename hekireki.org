@@ -386,11 +386,6 @@ ref: [[https://github.com/hlissner/doom-emacs/blob/develop/modules/lang/clojure/
 + rainbow-delimiters, smartparensはdoomのcoreパッケージとしてすでにはいっている.
 + pereditはciderの中に入っている.
 
-検討中...
-
-+ clj-kondo ([[https://qiita.com/lagenorhynque/items/dd9d6a1d97cbea738bc0][ref]]) : linter
-+ cljstyle ([[https://qiita.com/lagenorhynque/items/a5d83b4a36a1cf1cacbe][ref]]) : formatter
-
 #+begin_src emacs-lisp :tangle yes
 ;; やりすぎindent mode
 (add-hook! 'clojure-mode-hook 'aggressive-indent-mode)
@@ -419,6 +414,23 @@ https://github.com/clojure-emacs/clj-refactor.el
 #+end_src
 
 + cljr-clean-nsでnamespaceを整理, cljr-project-cleanでプロジェクト全体に適用.
+
+*** cljstyle: formatter for Clojure
+
+ref: [[https://qiita.com/lagenorhynque/items/a5d83b4a36a1cf1cacbe][GitHub]]
+
+Doom Emascの editor/format moduleと連携可能.
+Clojureだとdefaultが node-cljfmtなのでcljstyleを使うには設定が必要.
+
+#+begin_src emacs-lisp :tangle yes
+(add-hook! clojure-mode
+  (set-formatter! 'cljstyle "cljstyle pipe" :modes '(clojure-mode))
+  (add-hook 'before-save-hook 'format-all-buffer t t))
+#+end_src
+
+*** clj-kondo: linter for Clojure
+
+ref: [[https://qiita.com/lagenorhynque/items/dd9d6a1d97cbea738bc0][GitHub]]
 
 * OS
 #+begin_src emacs-lisp :tangle yes
@@ -543,10 +555,6 @@ https://github.com/clojure-emacs/clj-refactor.el
   (setq org-startup-folded 'show2levels);; 見出しの階層指定
   (setq org-startup-truncated nil) ;; 長い文は折り返す.
 
-  ;; org-babel のソースをキレイに表示.
-  (setq org-src-fontify-natively t)
-  (setq org-fontify-whole-heading-line t)
-
   ;; electric-indent は org-mode で誤作動の可能性があることのこと
   ;; たまにいきなり org-mode の tree 構造が壊れるから，とりあえず設定しておく.
   ;; この設定の効果が以下の記事で gif である.
@@ -659,14 +667,7 @@ https://github.com/clojure-emacs/clj-refactor.el
            :unnrrowed t
            :kill-buffer t)))
 
-  ;; org-babel
-  ;; 評価でいちいち質問されないように.
-  (setq org-confirm-babel-evaluate nil)
-  ;; org-babel で 実行した言語を書く. デフォルトでは emacs-lisp だけ.
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((lisp . t)
-     (shell . t)))
+
   )
 
 ;; org-mode で timestamp のみを挿入するカスタム関数(hh:mm)
@@ -748,8 +749,19 @@ Org-modeのなかでLiterature Programming.
   (setq org-src-preserve-indentation t)
   ;; TABの挙動
   (setq org-src-tab-acts-natively t)
-  ;; font
-  (setq org-src-fontify-natively t))
+  ;; org-babel のソースをキレイに表示.
+  (setq org-src-fontify-natively t)
+  (setq org-fontify-whole-heading-line t)
+
+  ;; 評価でいちいち質問されないように.
+  (setq org-confirm-babel-evaluate nil)
+
+  ;; org-babel で 実行した言語を書く. デフォルトでは emacs-lisp だけ.
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((lisp . t)
+     (shell . t)
+     (clojure . t))))
 #+end_src
 
 refs:
