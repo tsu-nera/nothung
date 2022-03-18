@@ -199,7 +199,13 @@
   :bind
   ;; desing journal用にbinding追加
   ("C-c C-v C-p" . cider-pprint-eval-defun-to-comment)
-  ("C-c C-v M-p" . cider-pprint-eval-last-sexp-to-comment))
+  ("C-c C-v M-p" . cider-pprint-eval-last-sexp-to-comment)
+  :config
+  ;; connectとともにREPL bufferを表示.
+  (setq  cider-repl-pop-to-buffer-on-connect t)
+  ;; replに 出力しすぎてEmacsがハングするのを防ぐ.
+  (setq  cider-repl-buffer-size-limit 100)
+)
 
 (add-hook! clojure-mode
   (clj-refactor-mode 1)
@@ -516,7 +522,8 @@
    'org-babel-load-languages
    '((lisp . t)
      (shell . t)
-     (clojure . t))))
+     (clojure . t)))
+)
 
 (use-package! ox-hugo
   :after 'ox
@@ -817,7 +824,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; どうもフォントが奇数だと org-table の表示が崩れる.
 ;; Source Han Code JP だとそもそも org-table の表示が崩れる.
-;; terminal だと大丈夫な模様.そもそも Terminal はこの設定ではなくて Terminal Emulator の設定がきく.
+;; terminal だと大丈夫な模様.そもそも Terminal はこの設定ではなくて 
+;; Terminal Emulator の設定がきく.
 
 ;; (setq doom-font (font-spec :family "Source Han Code JP" :size 12 ))
 (setq doom-font (font-spec :family "Ricty Diminished" :size 15))
@@ -825,11 +833,15 @@
 (setq doom-theme 'doom-monokai-pro)
 (doom-themes-org-config)
 
-;; counselとdoom-modelineが相性悪いようなのでworkspace name表示のためには追加で設定.
+;; counselとdoom-modelineが相性悪いようなので
+;; workspace name表示のためには追加で設定.
 ;; https://github.com/hlissner/doom-emacs/issues/314
 (after! doom-modeline
   (setq doom-modeline-icon (display-graphic-p))
   (setq doom-modeline-major-mode-icon t))
+
+(setq-default display-fill-column-indicator-column 80)
+(global-display-fill-column-indicator-mode)
 
 (after! emojify
   (setq emojify-emoji-set "twemoji-v2-22"))
@@ -853,7 +865,8 @@
   ;; less っぼく.
   (define-key view-mode-map (kbd "p") 'view-scroll-line-backward)
   (define-key view-mode-map (kbd "n") 'view-scroll-line-forward)
-  ;; default の e でもいいけど，mule 時代に v に bind されてたので, emacs でも v に bind しておく.
+  ;; default の e でもいいけど，mule 時代に v に bind されてたので, 
+  ;; emacs でも v に bind しておく.
   (define-key view-mode-map (kbd "v") 'read-only-mode))
 
 ;; EXWMの場合suspend-frameでハングするのはたちが悪いので封印.
