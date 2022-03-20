@@ -205,6 +205,13 @@
   (setq  cider-repl-pop-to-buffer-on-connect t)
   ;; replに 出力しすぎてEmacsがハングするのを防ぐ.
   (setq  cider-repl-buffer-size-limit 100)
+
+  ;; companyでのあいまい補完.
+  (add-hook 'cider-repl-mode-hook #'cider-company-enable-fuzzy-completion)
+  (add-hook 'cider-mode-hook #'cider-company-enable-fuzzy-completion)
+
+  ;; stack-frame表示をプロジェクトに限定
+  (setq cider-stacktrace-default-filters '(project))
 )
 
 (add-hook! clojure-mode
@@ -216,6 +223,18 @@
 (add-hook! clojure-mode
   (set-formatter! 'cljstyle "cljstyle pipe" :modes '(clojure-mode))
   (add-hook 'before-save-hook 'format-all-buffer t t))
+
+(use-package! restclient
+  :mode (("\\.rest\\'" . restclient-mode)
+         ("\\.restclient\\'" . restclient-mode)))
+(use-package! ob-restclient
+  :after org restclient
+  :init
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((restclient . t))))
+;; (use-package! restclient-jq
+;;  :after restclient)
 
 ;; OS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -356,10 +375,10 @@
 
   ;; 何でもかんでも agenda すると思いので厳選.
   (setq org-agenda-files '("~/Dropbox/keido/notes/gtd/gtd_projects.org"
-                           "~/Dropbox/keido/notes/journals/journal.org"
+                           "~/Dropbox/keido/notes/journals/journal.org"))
                            ;; projectsディレクトリにある.orgをみる.
                            ;; その配下のorgファイルは対象にはならない.
-                           "~/Dropbox/keido/notes/gtd/projects"))
+                           ;; "~/Dropbox/keido/notes/gtd/projects")
 
   ;; 期間を限定
   (setq org-agenda-span 7)
@@ -540,6 +559,12 @@
       (replace-regexp-in-string "\\(\\.org>`_\\)" ">`" (concat ":doc:" text) nil nil 1)))
   (add-to-list 'org-export-filter-link-functions
                'my/rst-to-sphinx-link-format))
+
+(use-package! ob-html
+  :after org
+  :config
+  ;; C-c C-o でブラウザで開く.
+  (org-babel-html-enable-open-src-block-result-temporary))
 
 (use-package! org-toggl
   :after org
