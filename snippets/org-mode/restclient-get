@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: restclient-get
+# key: rest-get
+# --
+#+begin_src restclient
+GET $1
+#+end_src

@@ -1,0 +1,12 @@
+# -*- mode: snippet -*-
+# name: restclient-post
+# key: restclient-post
+# --
+#+begin_src restclient
+POST $1
+Content-Type: application/json
+
+{
+
+}
+#+end_src
