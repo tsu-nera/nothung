@@ -6,7 +6,9 @@
 #+filetags: :Emacs:
 #+TITLE: ⚡My Emacs Config - Nothung
 
-ノートォング(Nothung)とは勇者ジークフリートの持つ伝説の剣である.
+Emacsを極限まで叩き上げ, なによりも強靭な刃にする. 一つのことを極める.
+
+副題のノートォング(Nothung)とは勇者ジークフリートの持つ伝説の剣である.
 
 - https://www.youtube.com/watch?v=B6wChr_geAg
 - https://www.youtube.com/watch?v=v31N8zxGhQY
@@ -1269,6 +1271,39 @@ https://github.com/eyeinsky/org-anki
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #+end_src
 
+** forge
+
+magit拡張, EmacsとGitHubを連携.
+
+doom emacsだと [[https://github.com/hlissner/doom-emacs/blob/develop/modules/tools/magit/README.org][(magit +forge)]] のオプションでインストールできる.
+
+ref: [[https://magit.vc/manual/forge/][Forge User and Developer Manual]]
+
+#+begin_src emacs-lisp :tangle yes
+(after! magit
+  (setq auth-sources '("~/.authinfo"))
+  (setq magit-revision-show-gravatars '("^Author:     " . "^Commit:     "))
+  ;; (setq magit-diff-refine-hunk 'all)
+)
+#+end_src
+
+リポジトリ名を変更した場合はissueやPRの作成が失敗する.
+これは .git/configの問題なのでローカルのファイルを修正する.
+
+** git-link
+
+現在のバッファの位置のGitHubのurlを取得.
+
+[[https://github.com/sshaw/git-link][sshaw/git-link]]
+
+#+begin_src emacs-lisp :tangle yes
+(global-set-key (kbd "C-c g l") 'git-link)
+(use-package! git-link
+  :config
+  ;; urlにbranchではなくcommit番号をつかう.
+  ;; org-journalへの貼り付けを想定しているのでこの設定にしておく.
+  (setq git-link-use-commit t))
+#+end_src
 
 * UI
 

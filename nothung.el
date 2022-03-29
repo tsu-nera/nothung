@@ -864,6 +864,15 @@
 ;; Tools
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(after! magit
+  (setq auth-sources '("~/.authinfo"))
+  (setq magit-revision-show-gravatars '("^Author:     " . "^Commit:     "))
+  ;; (setq magit-diff-refine-hunk 'all)
+)
+
+(use-package! git-link)
+(global-set-key (kbd "C-c g l") 'git-link)
+
 ;; UI
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; どうもフォントが奇数だと org-table の表示が崩れる.
