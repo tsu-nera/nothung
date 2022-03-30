@@ -237,13 +237,28 @@ https://github.com/iyefrat/all-the-icons-completion
 
 ;; 記号の前後にスペースを入れる.
 (use-package! electric-operator)
+(add-hook! 'org-mode-hook #'electric-operator-mode)
 
-;; とりあえず100でハイライトしておく.
-;; 今の自分のディスプレイだと100でいいかな.
 (use-package! whitespace
   :config
-  (setq whitespace-line-column 100) ;; limit line length
+  (setq whitespace-line-column 80) ;; limit lie length
   (setq whitespace-style '(face lines-tail)))
+#+end_src
+
+** display-fill-column-indicator-mode
+
+Emacsの画面に1行80文字のところに線を薄く引く.
+
+プログラミングの世界では昔から80 columns ruleがあり, 
+Emacsで80文字目を表示する機能もいろいろあったものの,
+Emacs 27.0.90からdefault機能として提供されるようになった.
+
+(最も80charは昔の話で, 
+今のディスプレイの大きさだと100charがいいという議論もある).
+
+#+begin_src emacs-lisp :tangle yes
+(setq-default display-fill-column-indicator-column 80)
+(global-display-fill-column-indicator-mode)
 #+end_src
 
 * Emacs
@@ -1335,21 +1350,6 @@ ref: [[https://magit.vc/manual/forge/][Forge User and Developer Manual]]
 
 https://github.com/seagle0128/doom-modeline
 
-** display-fill-column-indicator-mode
-
-Emacsの画面に1行80文字のところに線を薄く引く.
-
-プログラミングの世界では昔から80 columns ruleがあり, 
-Emacsで80文字目を表示する機能もいろいろあったものの,
-Emacs 27.0.90からdefault機能として提供されるようになった.
-
-(最も80charは昔の話で, 
-今のディスプレイの大きさだと100charがいいという議論もある).
-
-#+begin_src emacs-lisp :tangle yes
-(setq-default display-fill-column-indicator-column 80)
-(global-display-fill-column-indicator-mode)
-#+end_src
 
 ** emojify
 

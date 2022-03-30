@@ -137,13 +137,15 @@
 
 ;; 記号の前後にスペースを入れる.
 (use-package! electric-operator)
+(add-hook! 'org-mode-hook #'electric-operator-mode)
 
-;; とりあえず100でハイライトしておく.
-;; 今の自分のディスプレイだと100でいいかな.
 (use-package! whitespace
   :config
-  (setq whitespace-line-column 100) ;; limit line length
+  (setq whitespace-line-column 80) ;; limit lie length
   (setq whitespace-style '(face lines-tail)))
+
+(setq-default display-fill-column-indicator-column 80)
+(global-display-fill-column-indicator-mode)
 
 ;; Emacs
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -870,8 +872,12 @@
   ;; (setq magit-diff-refine-hunk 'all)
 )
 
-(use-package! git-link)
 (global-set-key (kbd "C-c g l") 'git-link)
+(use-package! git-link
+  :config
+  ;; urlにbranchではなくcommit番号をつかう.
+  ;; org-journalへの貼り付けを想定しているのでこの設定にしておく.
+  (setq git-link-use-commit t))
 
 ;; UI
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -892,9 +898,6 @@
 (after! doom-modeline
   (setq doom-modeline-icon (display-graphic-p))
   (setq doom-modeline-major-mode-icon t))
-
-(setq-default display-fill-column-indicator-column 80)
-(global-display-fill-column-indicator-mode)
 
 (after! emojify
   (setq emojify-emoji-set "twemoji-v2-22"))
