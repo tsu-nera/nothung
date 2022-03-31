@@ -28,6 +28,8 @@ ref: https://github.com/tsu-nera/nothung
 どれを使うかの正解はないがすべて use-package!だと起動が遅くなるので
 場合によってカスタマイズせよ，とのこと.
 
+ref. 過去の設定は[[https://github.com/tsu-nera/dotfiles/tree/master/.emacs.d/inits][こちら]]. 
+
 #+begin_src emacs-lisp :tangle yes
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 (load-file "~/.doom.d/private/config.el")
@@ -228,6 +230,7 @@ https://github.com/iyefrat/all-the-icons-completion
 #+begin_src emacs-lisp :tangle yes
 ;; Editor
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;; 英数字と日本語の間にスペースをいれる.
 (use-package! pangu-spacing
   :config
@@ -239,6 +242,20 @@ https://github.com/iyefrat/all-the-icons-completion
 (use-package! electric-operator)
 (add-hook! 'org-mode-hook #'electric-operator-mode)
 #+end_src
+
+** 改行(newline)と折り返し(wrap)
+
+まず改行(newline)と折り返し(wrap)の２つの概念があることに注意. 
+
+方針として自動改行は無効, 自動折り返しは許す. 
+
+auto-fill-modeで自動改行される. これは無効にする. 
+
+#+begin_src emacs-lisp :tangle yes
+(auto-fill-mode -1)
+#+end_src
+
+折り返しoff/onは, M-x toggle-truncate-linesで切り替えることができる. 
 
 ** whitespace
 
@@ -1361,7 +1378,6 @@ ref: [[https://magit.vc/manual/forge/][Forge User and Developer Manual]]
 #+end_src
 
 https://github.com/seagle0128/doom-modeline
-
 
 ** emojify
 

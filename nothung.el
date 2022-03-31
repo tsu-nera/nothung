@@ -128,6 +128,7 @@
 
 ;; Editor
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;; 英数字と日本語の間にスペースをいれる.
 (use-package! pangu-spacing
   :config
@@ -138,6 +139,16 @@
 ;; 記号の前後にスペースを入れる.
 (use-package! electric-operator)
 (add-hook! 'org-mode-hook #'electric-operator-mode)
+
+(auto-fill-mode -1)
+
+;; 文字が画面から飛び出る時にでる$マークを表示させない。
+;; https://stackoverflow.com/questions/8370778/remove-glyph-at-end-of-truncated-lines
+(set-display-table-slot standard-display-table 0 ?\ )
+
+;; 改行の時にバックスラッシュを表示させない
+;; https://www.emacswiki.org/emacs/LineWrap
+(set-display-table-slot standard-display-table 'wrap ?\ )
 
 (use-package! whitespace
   :config

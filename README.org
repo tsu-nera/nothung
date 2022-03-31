@@ -10,3 +10,6 @@ My configration files of Doom Emacs.
 - https://www.youtube.com/watch?v=v31N8zxGhQY
 
 Emacsを極限まで叩き上げ, なによりも強靭な刃にする. [[https://www.youtube.com/watch?v=04L18rQiIgw][一つのことを極める]].
+
+
+
