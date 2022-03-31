@@ -141,8 +141,14 @@
 
 (use-package! whitespace
   :config
-  (setq whitespace-line-column 80) ;; limit lie length
-  (setq whitespace-style '(face lines-tail)))
+  ;; limit lie length -> display-fill-column-indicator-modeを使うためマスク. 
+  ;; (setq whitespace-line-column 80) 
+  (setq whitespace-style '(face 
+                           ;;lines-tail
+                           ))
+  ;; 全角スペースを可視化
+  (setq whitespace-space-regexp "\\(\u3000+\\)")
+  (global-whitespace-mode 1))
 
 (setq-default display-fill-column-indicator-column 80)
 (global-display-fill-column-indicator-mode)
