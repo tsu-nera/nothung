@@ -142,6 +142,22 @@
 
 (auto-fill-mode -1)
 
+;; / を削除
+(set-display-table-slot standard-display-table 'wrap ?\ )
+;; $ を削除
+(set-display-table-slot standard-display-table 0 ?\ )
+
+(unless (display-graphic-p)
+  ;; ターミナルの縦分割線をUTF-8できれいに描く
+  (defun my-change-window-divider ()
+    (interactive)
+    (let ((display-table (or buffer-display-table
+           standard-display-table
+           (make-display-table))))
+      (set-display-table-slot display-table 5 ?│)
+      (set-window-display-table (selected-window) display-table)))
+  (add-hook 'window-configuration-change-hook 'my-change-window-divider))
+
 (use-package! whitespace
   :config
   ;; limit lie length -> display-fill-column-indicator-modeを使うためマスク. 
@@ -153,7 +169,7 @@
   (setq whitespace-space-regexp "\\(\u3000+\\)")
   (global-whitespace-mode 1))
 
-(setq-default display-fill-column-indicator-column 80)
+(setq-default display-fill-column-indicator-column 74)
 (global-display-fill-column-indicator-mode)
 
 ;; Emacs
