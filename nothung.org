@@ -255,6 +255,10 @@ auto-fill-modeで自動改行される. これは無効にする.
 (auto-fill-mode -1)
 #+end_src
 
+これにより折り返しで / や $ 記号が表示される. この消し方は調査中. 
+
+さらに折り返しの次のラインにインデントが挿入される. これはelectric-indent-modeの仕業. 現在org-modeのみで無効中. 
+
 折り返しoff/onは, M-x toggle-truncate-linesで切り替えることができる. 
 
 ** whitespace
