@@ -140,12 +140,26 @@
 (use-package! electric-operator)
 (add-hook! 'org-mode-hook #'electric-operator-mode)
 
+;; (auto-fill-mode -1)
+
 (auto-fill-mode -1)
+(remove-hook 'org-mode-hook #'auto-fill-mode)
+;; (remove-hook 'org-mode-hook #'turn-on-auto-fill)
+;; (remove-hook 'text-mode-hook #'auto-fill-mode)
+;; (remove-hook 'text-mode-hook #'turn-on-auto-fill)
+;; (add-hook 'org-mode-hook #'turn-off-auto-fill)
+;; (add-hook 'text-mode-hook #'turn-off-auto-fill)
+;; (add-hook 'org-roam-mode-hook #'turn-off-auto-fill)
+
+(setq-default fill-column 99999)
+(setq fill-column 99999)
 
 ;; / を削除
 (set-display-table-slot standard-display-table 'wrap ?\ )
 ;; $ を削除
 (set-display-table-slot standard-display-table 0 ?\ )
+
+(add-hook! visual-line-mode 'visual-fill-column-mode)
 
 (unless (display-graphic-p)
   ;; ターミナルの縦分割線をUTF-8できれいに描く
