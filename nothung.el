@@ -908,15 +908,16 @@
   (define-key org-mode-map (kbd "C-c n A u") #'org-anki-update-all)
   (define-key org-mode-map (kbd "C-c n A d") #'org-anki-delete-entry))
 
-(setq
- ;; Agenda styling
- org-agenda-block-separator ?─
- org-agenda-time-grid
- '((daily today require-timed)
-   (800 1000 1200 1400 1600 1800 2000)
-   " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
- org-agenda-current-time-string
- "⭠ now ─────────────────────────────────────────────────)
+(after! org-modern
+  (setq
+   ;; Agenda styling
+   org-agenda-block-separator ?─
+   org-agenda-time-grid
+   '((daily today require-timed)
+     (800 1000 1200 1400 1600 1800 2000)
+     " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+   org-agenda-current-time-string
+   "⭠ now ─────────────────────────────────────────────────"))
 
 (add-hook 'org-mode-hook #'org-modern-mode)
 (add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
@@ -950,7 +951,7 @@
 ;; (setq doom-font (font-spec :family "Source Han Code JP" :size 12 ))
 (setq doom-font (font-spec :family "Ricty Diminished" :size 15))
 ;; doom-molokaiやdoom-monokai-classicだとewwの表示がいまいち.
-(setq doom-theme 'doom-monokai-pro)
+(setq doom-theme 'doom-molokai)
 (doom-themes-org-config)
 
 ;; counselとdoom-modelineが相性悪いようなので
@@ -969,22 +970,23 @@
 (use-package! svg-tag-mode
   :config
   (setq svg-tag-tags
-        '(("\\(:[A-Z]+:\\)" .
-           ((lambda (tag)
-              (svg-tag-make tag :beg 1 :end -1))))))
-  (setq svg-tag-tags
-        '(("\\(:[A-Z]+\\)\|[a-zA-Z#0-9]+:" .
-           ((lambda (tag)
-              (svg-tag-make tag :beg 1 :inverse t
-                            :margin 0 :crop-right t))))
-        (":[A-Z]+\\(\|[a-zA-Z#0-9]+:\\)" .
-         ((lambda (tag)
-            (svg-tag-make tag :beg 1 :end -1))
-                                  
-  (setq svg-tag-tags
-      '(("\\(:#[A-Za-z0-9]+\\)" . ((lambda (tag)
-                                     (svg-tag-make tag :beg 2))))
-        ("\\(:#[A-Za-z0-9]+:\\)$" . ((lambda (tag))
+        '(
+          ;; :XXX:
+          ("\\(:[A-Z]+:\\)" . ((lambda (tag)
+                                 (svg-tag-make tag :beg 1 :end -1))))          
+          ;; :XXX|YYY:
+          ("\\(:[A-Z]+\\)\|[a-zA-Z#0-9]+:" . ((lambda (tag)
+                                                (svg-tag-make tag :beg 1 :inverse t
+                                                              :margin 0 :crop-right t))))
+          (":[A-Z]+\\(\|[a-zA-Z#0-9]+:\\)" . ((lambda (tag)
+                                                (svg-tag-make tag :beg 1 :end -1
+                                                              :margin 0 :crop-left t))))
+          ;; :#TAG1:#TAG2:…:$
+          ("\\(:#[A-Za-z0-9]+\\)" . ((lambda (tag)
+                                       (svg-tag-make tag :beg 2))))
+          ("\\(:#[A-Za-z0-9]+:\\)$" . ((lambda (tag)
+                                       (svg-tag-make tag :beg 2 :end -1))))
+          )))
 
 (setq display-line-numbers-type t) ; 行番号表示
 
