@@ -315,11 +315,23 @@ ref: [[https://www.reddit.com/r/emacs/comments/ov2s2r/wordwrap_problem_with_chin
 Doomだといらないかもだけど. 
 
 #+begin_src emacs-lisp :tangle yes
-(add-hook! visual-line-mode 'visual-fill-column-mode)
+;; (add-hook! visual-line-mode 'visual-fill-column-mode)
 #+end_src
+
+-> perfect-marginとの相性が悪い気がするのでいったん無効. 
 
 - ref.
   -  [[http://sleepboy-zzz.blogspot.com/2015/12/emacs-visual-fill-columnel_29.html][memo: Emacs の visual-fill-column.el が便利だった]]
+
+** perfect-margin
+
+いい感じにmarginをとってくれる (https://github.com/mpwang/perfect-margin)
+
+#+begin_src emacs-lisp :tangle yes
+(use-package! perfect-margin
+  :config
+  (perfect-margin-mode 1))
+#+end_src
 
 ** ターミナルの縦分割線をUTF-8できれいに描く
 
@@ -774,6 +786,7 @@ EmacsのWindow Manager.
   (setq org-return-follows-link t) ;; Enter でリンク先へジャンプ
   (setq org-use-speed-commands t)  ;; bullet にカーソルがあると高速移動
   (setq org-hide-emphasis-markers t) ;; * を消して表示.
+  (setq org-pretty-entities t)
 
   (setq org-footnote-section "Notes") ;; defaultではFootnotesなので変える.
   (setq org-footnote-auto-adjust t)
@@ -1402,6 +1415,27 @@ https://github.com/eyeinsky/org-anki
   (define-key org-mode-map (kbd "C-c n A d") #'org-anki-delete-entry))
 #+end_src
 
+** org-modern
+
+[[https://github.com/minad/org-modern][GitHub - minad/org-modern: Modern Org Style]]
+
+開発途中なのかいまいち, コードブロックの線もでない...様子見かな...
+
+#+begin_src emacs-lisp :tangle yes
+(setq
+ ;; Agenda styling
+ org-agenda-block-separator ?─
+ org-agenda-time-grid
+ '((daily today require-timed)
+   (800 1000 1200 1400 1600 1800 2000)
+   " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+ org-agenda-current-time-string
+ "⭠ now ─────────────────────────────────────────────────)
+
+(add-hook 'org-mode-hook #'org-modern-mode)
+(add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
+#+end_src
+
 * Term 
 #+begin_src emacs-lisp :tangle yes
 ;; Term
@@ -1502,14 +1536,32 @@ Emacsの機能でemoji-searchがあるのでこれも設定しておこう.
 (global-set-key (kbd "C-c i E") 'emoji-search)
 #+end_src
 
-** perfect-margin
+** svg-tag-mode
 
-いい感じにmarginをとってくれる (https://github.com/mpwang/perfect-margin)
+TODOほかラベルを美しく. 
+
+[[https://github.com/rougier/svg-tag-mode][GitHub - rougier/svg-tag-mode]]
 
 #+begin_src emacs-lisp :tangle yes
-(use-package! perfect-margin
+(use-package! svg-tag-mode
   :config
-  (perfect-margin-mode 1))
+  (setq svg-tag-tags
+        '(("\\(:[A-Z]+:\\)" .
+           ((lambda (tag)
+              (svg-tag-make tag :beg 1 :end -1))))))
+  (setq svg-tag-tags
+        '(("\\(:[A-Z]+\\)\|[a-zA-Z#0-9]+:" .
+           ((lambda (tag)
+              (svg-tag-make tag :beg 1 :inverse t
+                            :margin 0 :crop-right t))))
+        (":[A-Z]+\\(\|[a-zA-Z#0-9]+:\\)" .
+         ((lambda (tag)
+            (svg-tag-make tag :beg 1 :end -1))
+                                  
+  (setq svg-tag-tags
+      '(("\\(:#[A-Za-z0-9]+\\)" . ((lambda (tag)
+                                     (svg-tag-make tag :beg 2))))
+        ("\\(:#[A-Za-z0-9]+:\\)$" . ((lambda (tag))
 #+end_src
 
 ** Others

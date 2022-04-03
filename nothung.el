@@ -159,7 +159,13 @@
 ;; $ を削除
 (set-display-table-slot standard-display-table 0 ?\ )
 
-(add-hook! visual-line-mode 'visual-fill-column-mode)
+(setq word-wrap-by-category t)
+
+;; (add-hook! visual-line-mode 'visual-fill-column-mode)
+
+(use-package! perfect-margin
+  :config
+  (perfect-margin-mode 1))
 
 (unless (display-graphic-p)
   ;; ターミナルの縦分割線をUTF-8できれいに描く
@@ -398,6 +404,7 @@
   (setq org-return-follows-link t) ;; Enter でリンク先へジャンプ
   (setq org-use-speed-commands t)  ;; bullet にカーソルがあると高速移動
   (setq org-hide-emphasis-markers t) ;; * を消して表示.
+  (setq org-pretty-entities t)
 
   (setq org-footnote-section "Notes") ;; defaultではFootnotesなので変える.
   (setq org-footnote-auto-adjust t)
@@ -901,6 +908,19 @@
   (define-key org-mode-map (kbd "C-c n A u") #'org-anki-update-all)
   (define-key org-mode-map (kbd "C-c n A d") #'org-anki-delete-entry))
 
+(setq
+ ;; Agenda styling
+ org-agenda-block-separator ?─
+ org-agenda-time-grid
+ '((daily today require-timed)
+   (800 1000 1200 1400 1600 1800 2000)
+   " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+ org-agenda-current-time-string
+ "⭠ now ─────────────────────────────────────────────────)
+
+(add-hook 'org-mode-hook #'org-modern-mode)
+(add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
+
 ;; Term
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -946,9 +966,25 @@
 ;; doomだと C-c i eでemojify-insert-emoji
 (global-set-key (kbd "C-c i E") 'emoji-search)
 
-(use-package! perfect-margin
+(use-package! svg-tag-mode
   :config
-  (perfect-margin-mode 1))
+  (setq svg-tag-tags
+        '(("\\(:[A-Z]+:\\)" .
+           ((lambda (tag)
+              (svg-tag-make tag :beg 1 :end -1))))))
+  (setq svg-tag-tags
+        '(("\\(:[A-Z]+\\)\|[a-zA-Z#0-9]+:" .
+           ((lambda (tag)
+              (svg-tag-make tag :beg 1 :inverse t
+                            :margin 0 :crop-right t))))
+        (":[A-Z]+\\(\|[a-zA-Z#0-9]+:\\)" .
+         ((lambda (tag)
+            (svg-tag-make tag :beg 1 :end -1))
+                                  
+  (setq svg-tag-tags
+      '(("\\(:#[A-Za-z0-9]+\\)" . ((lambda (tag)
+                                     (svg-tag-make tag :beg 2))))
+        ("\\(:#[A-Za-z0-9]+:\\)$" . ((lambda (tag))
 
 (setq display-line-numbers-type t) ; 行番号表示
 
