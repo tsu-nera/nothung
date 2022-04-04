@@ -1029,6 +1029,25 @@ refs:
 - [[https://orgmode.org/manual/Key-bindings-and-Useful-Functions.html][org-babel Key bindings and Useful Functions (The Org Manual)]]
 - [[https://misohena.jp/blog/2017-10-26-how-to-use-code-block-of-emacs-org-mode.html][org-modeのコードブロック(Babel)の使い方 | Misohena Blog]]
 
+
+** org-export
+
+Org-modeのファイルをエクスポートする機能.
+
+サブパッケージが数多くあるが, ここでは共通情報まとめ.
+
+org-export-with-xxxという設定項目でいろいろ制御できる.
+
+[[https://orgmode.org/manual/Export-Settings.html][Export Settings (The Org Manual)]]
+
+しかし, 以下が自動的に変換されてしまう...
+
+- > &gt; 
+- < &lt;
+- & &amp;
+
+この文字に対する制御方法が見つからない...
+
 ** ox-hugo
 
 Org-modeで書いたブログ記事をHugoにあったMarkdown形式に変換する.
@@ -1042,6 +1061,8 @@ Org-modeで書いたブログ記事をHugoにあったMarkdown形式に変換す
   ;; なんか.dir-locals.elに書いても反映してくれないな. ココに書いとく.
   (setq org-export-with-author nil))
 #+end_src
+
+このox-hugoで出力されるMarkdownはどうもリスト表示でスペースが4つ入ってしまう. GitHub Favorite Markdownのようにリストでのスペース２であって欲しいものの解決方法が見つからない.
 
 ** ox-rst
 
