@@ -1029,7 +1029,6 @@ refs:
 - [[https://orgmode.org/manual/Key-bindings-and-Useful-Functions.html][org-babel Key bindings and Useful Functions (The Org Manual)]]
 - [[https://misohena.jp/blog/2017-10-26-how-to-use-code-block-of-emacs-org-mode.html][org-modeのコードブロック(Babel)の使い方 | Misohena Blog]]
 
-
 ** org-export
 
 Org-modeのファイルをエクスポートする機能.
@@ -1040,13 +1039,48 @@ org-export-with-xxxという設定項目でいろいろ制御できる.
 
 [[https://orgmode.org/manual/Export-Settings.html][Export Settings (The Org Manual)]]
 
-しかし, 以下が自動的に変換されてしまう...
+しかし, 以下が自動的に変換されてしまう...この文字に対する制御方法が見つからない...
 
 - > &gt; 
 - < &lt;
 - & &amp;
 
-この文字に対する制御方法が見つからない...
+どうもHTML tagとかHTML Entitiesと呼ばれている(ref. [[https://orgmode.org/org.html#Headlines-in-HTML-export][The Org Manual]]).
+
+#+begin_quote
+The HTML export back-end transforms ‘<’ and ‘>’ to ‘&lt;’ and ‘&gt;’.
+#+end_quote
+
+ただox-html.elにはこういう設定がdefaultでされている. 他のexportへの移植が必要.
+
+#+begin_src emacs-lisp :tangle no
+(setq org-export-html-protect-char-alist
+  '(("&" . "&amp;")
+    ("<" . "&lt;")
+    (">" . "&gt;"))
+#+end_src
+
+[[https://orgmode.org/manual/Advanced-Export-Configuration.html][Advanced Export Configuration (The Org Manual)]]
+
+おそらく, exportをかけたあとにhook関数によって文字列変換が必要.
+
+#+begin_src emacs-lisp :tangle yes
+(defun my-hugo-filter-html-amp (text backend info)
+  (when (org-export-derived-backend-p backend 'hugo)
+    (replace-regexp-in-string "&amp;" "&" text)))
+(defun my-hugo-filter-html-gt (text backend info)
+  (when (org-export-derived-backend-p backend 'hugo)
+    (replace-regexp-in-string "&gt;" ">" text)))
+(defun my-hugo-filter-html-lt (text backend info)
+  (when (org-export-derived-backend-p backend 'hugo)
+    (replace-regexp-in-string "&lt;" "<" text)))
+(add-to-list 
+'org-export-filter-plain-text-functions 'my-hugo-filter-html-amp)
+(add-to-list 
+'org-export-filter-plain-text-functions 'my-hugo-filter-html-gt)
+(add-to-list 
+'org-export-filter-plain-text-functions 'my-hugo-filter-html-lt)
+#+end_src
 
 ** ox-hugo
 
