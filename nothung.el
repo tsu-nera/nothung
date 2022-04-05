@@ -613,21 +613,22 @@
   (org-defkey org-mode-map "\C-u\C-x\C-e" 'cider-eval-last-sexp)
 )
 
-(defun my-hugo-filter-html-amp (text backend info)
-  (when (org-export-derived-backend-p backend 'hugo)
-    (replace-regexp-in-string "&amp;" "&" text)))
-(defun my-hugo-filter-html-gt (text backend info)
-  (when (org-export-derived-backend-p backend 'hugo)
-    (replace-regexp-in-string "&gt;" ">" text)))
-(defun my-hugo-filter-html-lt (text backend info)
-  (when (org-export-derived-backend-p backend 'hugo)
-    (replace-regexp-in-string "&lt;" "<" text)))
-(add-to-list 
-'org-export-filter-plain-text-functions 'my-hugo-filter-html-amp)
-(add-to-list 
-'org-export-filter-plain-text-functions 'my-hugo-filter-html-gt)
-(add-to-list 
-'org-export-filter-plain-text-functions 'my-hugo-filter-html-lt)
+(after! ox
+  (defun my/hugo-filter-html-amp (text backend info)
+    (when (org-export-derived-backend-p backend 'hugo)
+      (replace-regexp-in-string "&amp;" "&" text)))
+  (defun my/hugo-filter-html-gt (text backend info)
+    (when (org-export-derived-backend-p backend 'hugo)
+      (replace-regexp-in-string "&gt;" ">" text)))
+  (defun my/hugo-filter-html-lt (text backend info)
+    (when (org-export-derived-backend-p backend 'hugo)
+      (replace-regexp-in-string "&lt;" "<" text)))
+  (add-to-list
+   'org-export-filter-plain-text-functions 'my/hugo-filter-html-amp)
+  (add-to-list
+   'org-export-filter-plain-text-functions 'my/hugo-filter-html-gt)
+  (add-to-list
+   'org-export-filter-plain-text-functions 'my/hugo-filter-html-lt))
 
 (use-package! ox-hugo
   :after 'ox
