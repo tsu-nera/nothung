@@ -842,14 +842,6 @@ EmacsのWindow Manager.
 
   )
 
-;; org-mode で timestamp のみを挿入するカスタム関数(hh:mm)
-(after! org
-  (defun my/insert-timestamp ()
-    "Insert time stamp."
-    (interactive)
-    (insert (format-time-string "%H:%M")))
-  (map! :map org-mode-map "C-c C-." #'my/insert-timestamp))
-
 ;; +pretty(org-superstar-mode)関連
 ;;; Titles and Sections
 ;; hide #+TITLE:
@@ -898,6 +890,21 @@ EmacsのWindow Manager.
 ;;     ("~" (:background "blue" :foreground "white")) cddddd;; 根拠
 ;;     ("+" (:background "green" :foreground "black")))) ;; 自分の考え
 
+#+end_src
+
+org-mode で timestamp のみを挿入するカスタム関数.
+Doom Emacsのせいか C-u C-c .が動作しないので.
+
+#+begin_src emacs-lisp :tangle yes
+;; 
+(after! org
+  (defun my/insert-timestamp ()
+    "Insert time stamp."
+    (interactive)
+    (org-insert-time-stamp (current-time) t)
+    ;; (insert (format-time-string "%H:%M"))
+    )
+  (map! :map org-mode-map "C-c C-." #'my/insert-timestamp))
 #+end_src
 
 ** org-capture

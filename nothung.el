@@ -460,14 +460,6 @@
 
   )
 
-;; org-mode で timestamp のみを挿入するカスタム関数(hh:mm)
-(after! org
-  (defun my/insert-timestamp ()
-    "Insert time stamp."
-    (interactive)
-    (insert (format-time-string "%H:%M")))
-  (map! :map org-mode-map "C-c C-." #'my/insert-timestamp))
-
 ;; +pretty(org-superstar-mode)関連
 ;;; Titles and Sections
 ;; hide #+TITLE:
@@ -515,6 +507,16 @@
 ;;     ("=" (:background "red" :foreground "white")) ;; 書き手の主張
 ;;     ("~" (:background "blue" :foreground "white")) cddddd;; 根拠
 ;;     ("+" (:background "green" :foreground "black")))) ;; 自分の考え
+
+;; 
+(after! org
+  (defun my/insert-timestamp ()
+    "Insert time stamp."
+    (interactive)
+    (org-insert-time-stamp (current-time) t)
+    ;; (insert (format-time-string "%H:%M"))
+    )
+  (map! :map org-mode-map "C-c C-." #'my/insert-timestamp))
 
 (after! org
   (defun my/create-timestamped-org-file (path)
