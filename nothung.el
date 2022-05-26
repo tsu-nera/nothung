@@ -244,6 +244,8 @@
 ;; 自動でalign整形.
 (setq clojure-align-forms-automatically t)
 
+
+
 (use-package! cider
   :bind
   ;; desing journal用にbinding追加
@@ -258,6 +260,11 @@
   ;; companyでのあいまい補完.
   (add-hook 'cider-repl-mode-hook #'cider-company-enable-fuzzy-completion)
   (add-hook 'cider-mode-hook #'cider-company-enable-fuzzy-completion)
+
+  ;; うまくうごかないな.. 
+  (setq cider-special-mode-truncate-lines nil)
+  ;; (add-hook 'cider-stacktrace-mode-hook (lambda () (setq truncate-lines nil)))
+  ;; (add-hook 'cider-inspector-mode-hook (lambda () (setq truncate-lines nil)))
 
   ;; stack-frame表示をプロジェクトに限定
   (setq cider-stacktrace-default-filters '(project))
@@ -720,35 +727,35 @@
   (org-roam-capture-templates
    '(("z" "🎓 Zettelkasten" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:🎓${title}\n#+filetags: :CONCEPT:\n")
+                         "#+STARTUP: showeverything\n#+title:🎓${title}\n#+filetags: :CONCEPT:\n")
       :unnarrowed t)
      ("w" "📝 Wiki" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:📝${title}\n#+filetags: :WIKI:\n")
+                         "#+STARTUP: showeverything\n#+title:📝${title}\n#+filetags: :WIKI:\n")
       :unnarrowed t)
      ("t" "🏷 Tag" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:List of ${title} (alias 🏷${title}) \n#+filetags: :TAG:\n")
+                         "#+STARTUP: showeverything\n#+title:List of ${title} (alias 🏷${title}) \n#+filetags: :TAG:\n")
       :unnarrowed t)
      ("i" "📂 TOC" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:Index of {title} (alias 📂${title})\n#+filetags: :TOC:\n")
+                         "#+STARTUP: showeverything\n#+title:Index of {title} (alias 📂${title})\n#+filetags: :TOC:\n")
       :unnarrowed t)
      ("m" "🏛 MOC" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:🏛${title} \n#+filetags: :MOC:\n")
+                         "#+STARTUP: showeverything\n#+title:🏛${title} \n#+filetags: :MOC:\n")
       :unnarrowed t)
      ("i" "💡 Issue" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:💡${title} \n#+filetags: :ISSUE:\n")
+                         "#+STARTUP: showeverything\n#+title:💡${title} \n#+filetags: :ISSUE:\n")
       :unnarrowed t)
      ("d" "🗒 DOC" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:🗒${title}\n#+filetags: :DOC:\n")
+                         "#+STARTUP: showeverything\n#+title:🗒${title}\n#+filetags: :DOC:\n")
       :unnarrowrd t)
      ("f" "🦊 Darkfox" plain "%?"
       :target (file+head "darkfox/%<%Y%m%d%H%M%S>.org"
-                         "#+title:🦊${title}\n#+filetags: :DARKFOX:\n")
+                         "#+STARTUP: showeverything\n#+title:🦊${title}\n#+filetags: :DARKFOX:\n")
       :unnarrowed t)
      ("b" "📚 Book" plain
       "%?
@@ -760,7 +767,7 @@
 - url: http://www.amazon.co.jp/dp/%^{isbn}
 "
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:📚${title} - ${author}(${date})\n#+filetags: :BOOK:SOURCE:\n")
+                         "#+STARTUP: showeverything\n#+title:📚${title} - ${author}(${date})\n#+filetags: :BOOK:SOURCE:\n")
       :unnarrowed t)
      ("s" "🎙‍ Talk" plain
       "%?
@@ -771,7 +778,7 @@
 - url: %^{url}
 "
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:🎙 ${title} - ${editor}(${date})\n#+filetags: :TALK:SOURCE:\n")
+                         "#+STARTUP: showeverything\n#+title:🎙 ${title} - ${editor}(${date})\n#+filetags: :TALK:SOURCE:\n")
       :unnarrowed t)
      ("o" "💻 Online" plain
       "%?
@@ -781,7 +788,7 @@
 - url: %^{url}
 "
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:💻${title}\n#+filetags: :ONLINE:SOURCE:\n")
+                         "#+STARTUP: showeverything\n#+title:💻${title}\n#+filetags: :ONLINE:SOURCE:\n")
       :unnarrowed t)))
   (org-roam-extract-new-file-path "%<%Y%m%d%H%M%S>.org")
   ;;        :map org-mode-map
@@ -926,20 +933,6 @@
   (define-key org-mode-map (kbd "C-c n A s") #'org-anki-sync-entry)
   (define-key org-mode-map (kbd "C-c n A u") #'org-anki-update-all)
   (define-key org-mode-map (kbd "C-c n A d") #'org-anki-delete-entry))
-
-(after! org-modern
-  (setq
-   ;; Agenda styling
-   org-agenda-block-separator ?─
-   org-agenda-time-grid
-   '((daily today require-timed)
-     (800 1000 1200 1400 1600 1800 2000)
-     " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
-   org-agenda-current-time-string
-   "⭠ now ─────────────────────────────────────────────────"))
-
-(add-hook 'org-mode-hook #'org-modern-mode)
-(add-hook 'org-agenda-finalize-hook #'org-modern-agenda)
 
 ;; Term
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
