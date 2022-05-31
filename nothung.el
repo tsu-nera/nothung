@@ -244,8 +244,6 @@
 ;; 自動でalign整形.
 (setq clojure-align-forms-automatically t)
 
-
-
 (use-package! cider
   :bind
   ;; desing journal用にbinding追加
@@ -278,7 +276,12 @@
   (clj-refactor-mode 1)
   (yas-minor-mode 1) ; for adding require/use/import statements
   ;; This choice of keybinding leaves cider-macroexpand-1 unbound
-  (cljr-add-keybindings-with-prefix "C-c C-m"))
+  (cljr-add-keybindings-with-prefix "C-c C-m")
+
+  ;; cljr-rename-symbolでのプロンプト抑止. 
+  ;; どうも初回実行が遅く２回目からは問題ない. 
+  (setq cljr-warn-on-eval nil)
+)
 
 (add-hook! clojure-mode
   (set-formatter! 'cljstyle "cljstyle pipe" :modes '(clojure-mode))
@@ -424,7 +427,7 @@
   (setq org-startup-indented t)
   (setq org-indent-mode-turns-on-hiding-stars nil)
 
-  (setq org-startup-folded 'show2levels);; 見出しの階層指定
+  (setq org-startup-folded 'showeverything) ;; 見出しの階層指定
   (setq org-startup-truncated nil) ;; 長い文は折り返す.
 
   ;; electric-indent は org-mode で誤作動の可能性があることのこと
@@ -912,16 +915,6 @@
     (setq orb-preformat-keywords '("author" "date" "url" "title" "isbn" "publisher" "urldate" "editor" "file"))
     (setq orb-process-file-keyword t)
     (setq orb-attached-file-extensions '("pdf")))
-
-(use-package! org-noter
-  :after (:any org pdf-view)
-  :config
-  (setq
-   ;; I want to see the whole file
-   org-noter-hide-other nil
-   ;; Everything is relative to the main notes file
-   org-noter-notes-search-path (list (file-truename "~/keido/notes/wiki"))
-   ))
 
 (use-package! org-anki
   :after org

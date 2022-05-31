@@ -32,6 +32,7 @@
 (package! org-roam-bibtex
   :recipe (:host github :repo "org-roam/org-roam-bibtex"))
 (package! org-toggl :recipe (:host github :repo "mbork/org-toggl"))
+;; (package! org-trello :recipe (:build (:not native-compile)))
 
 (package! org-ref)
 

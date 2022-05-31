@@ -398,6 +398,7 @@ Emacsの画面に1行80文字のところに線を薄く引く.
 (setq enable-local-variables :all)
 #+end_src
 
+
 ** ace-window
 
 - 3つ以上のwindowの選択が番号でできる. defaultでC-x oを上書きしてる?
@@ -568,8 +569,6 @@ ref: [[https://github.com/hlissner/doom-emacs/blob/develop/modules/lang/clojure/
 ;; 自動でalign整形.
 (setq clojure-align-forms-automatically t)
 
-
-
 (use-package! cider
   :bind
   ;; desing journal用にbinding追加
@@ -610,10 +609,19 @@ https://github.com/clojure-emacs/clj-refactor.el
   (clj-refactor-mode 1)
   (yas-minor-mode 1) ; for adding require/use/import statements
   ;; This choice of keybinding leaves cider-macroexpand-1 unbound
-  (cljr-add-keybindings-with-prefix "C-c C-m"))
+  (cljr-add-keybindings-with-prefix "C-c C-m")
+
+  ;; cljr-rename-symbolでのプロンプト抑止. 
+  ;; どうも初回実行が遅く２回目からは問題ない. 
+  (setq cljr-warn-on-eval nil)
+)
 #+end_src
 
-+ cljr-clean-nsでnamespaceを整理, cljr-project-cleanでプロジェクト全体に適用.
+- cljr-clean-ns
+  - namespaceを整理, cljr-project-cleanでプロジェクト全体に適用.
+- cljr-rename-symbol 
+  - シンボル(関数名や変数名含む). 
+  - どうも遅いのてLSPのほうがここはいいのかも. 
 
 *** cljstyle: formatter for Clojure
 
@@ -804,7 +812,7 @@ EmacsのWindow Manager.
   (setq org-startup-indented t)
   (setq org-indent-mode-turns-on-hiding-stars nil)
 
-  (setq org-startup-folded 'show2levels);; 見出しの階層指定
+  (setq org-startup-folded 'showeverything) ;; 見出しの階層指定
   (setq org-startup-truncated nil) ;; 長い文は折り返す.
 
   ;; electric-indent は org-mode で誤作動の可能性があることのこと
@@ -896,6 +904,9 @@ EmacsのWindow Manager.
 ;;     ("+" (:background "green" :foreground "black")))) ;; 自分の考え
 
 #+end_src
+
+#+RESULTS:
+: t
 
 org-mode で timestamp のみを挿入するカスタム関数.
 Doom Emacsのせいか C-u C-c .が動作しないので.
@@ -1436,39 +1447,12 @@ consult-ripgrepを [[https://jblevins.org/projects/deft/][deft]] の代わりに
     (setq orb-attached-file-extensions '("pdf")))
 #+end_src
 
-** Org-noter
-
-PDFの注釈を管理する. [[https://github.com/weirdNox/org-noter][:link:weirdNox/org-noter]]
-
-はじめの起動がどうやればいいのかワカラなかった. 
-特定のファイルに記録を残したい場合はPDFのBufferではなく, 
-適当なheading作成してM-x org-noterを起動するとPDFを選択できる.
-
-M-x org-noter-create-skeltonという関数がヤばい. [[https://youtu.be/lCc3UoQku-E?t=68][🔗Youtube動画(1:08)]]
-PDFからOutlineを抜き出してOrg fileに生成して，
-あとはそのOrg-fileのBulletのカーソルを移動するとPDFのほうもシンクロして移動できる. 
-
-凄すぎて笑った😂
-
-#+begin_src emacs-lisp :tangle yes
-(use-package! org-noter
-  :after (:any org pdf-view)
-  :config
-  (setq
-   ;; I want to see the whole file
-   org-noter-hide-other nil
-   ;; Everything is relative to the main notes file
-   org-noter-notes-search-path (list (file-truename "~/keido/notes/wiki"))
-   ))
-#+end_src
-
 ** org-anki
 
 Org-modeとAnkiをつなぐ．
 https://github.com/eyeinsky/org-anki
 
-今までanki-editorを利用していたものの，その記法とwikiの相性が悪かった（冗長）.
-これならorg-modeのheadlineがそのままつかえるのでよさそう.
+今までanki-editorを利用していたものの，その記法とwikiの相性が悪かった（冗長）. これならorg-modeのheadlineがそのままつかえるのでよさそう.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package! org-anki
@@ -1483,6 +1467,56 @@ https://github.com/eyeinsky/org-anki
   (define-key org-mode-map (kbd "C-c n A d") #'org-anki-delete-entry))
 #+end_src
 
+URLの挿入はorg-link形式でできる. これは便利.
+
+** Org-noter(disabled)
+
+PDFの注釈を管理する. [[https://github.com/weirdNox/org-noter][:link:weirdNox/org-noter]]
+
+はじめの起動がどうやればいいのかワカラなかった. 特定のファイルに記録を残したい場合はPDFのBufferではなく, 適当なheading作成してM-x org-noterを起動するとPDFを選択できる.
+
+M-x org-noter-create-skeltonという関数がヤばい. [[https://youtu.be/lCc3UoQku-E?t=68][🔗Youtube動画(1:08)]] PDFからOutlineを抜き出してOrg fileに生成して，あとはそのOrg-fileのBulletのカーソルを移動するとPDFのほうもシンクロして移動できる. 
+
+凄すぎて笑った😂
+
+#+begin_src emacs-lisp :tangle no
+(use-package! org-noter
+  :after (:any org pdf-view)
+  :config
+  (setq
+   ;; I want to see the whole file
+   org-noter-hide-other nil
+   ;; Everything is relative to the main notes file
+   org-noter-notes-search-path (list (file-truename "~/keido/notes/wiki"))))
+#+end_src
+
+** org-trello(disabled)
+
+Kanbanツール Trello連携. 
+
+- refs.
+  - [[http://org-trello.github.io/][org-trello(official)]]
+  - [[https://github.com/org-trello/org-trello][GitHub - org-trello/org-trello]]
+
+古いプロジェクトだがメンテもされていてスターも500以上ついている.
+
+ただし動かない...native comp無効で行けるか. -> いけた.
+https://github.com/org-trello/org-trello/issues/418
+
+#+begin_src emacs-lisp :tangle no
+(use-package! org-trello)
+#+end_src
+
+どうもDoom Emacsだと C-uが効かない. そしてそれによってtrello->org-fileへのdownloadがC-u C-c o sに頼っているので不便になる. *(org-trello-sync-buffer t)* を評価するとダウンロードが走るという仕様のためこれを関数にして呼ぶことによって代替.
+
+[[https://github.com/org-trello/org-trello/issues/409][Synching from and to Trello does not work · Issue #409]]
+
+#+begin_src emacs-lisp :tangle no
+(after! org-trello
+  (defun my/org-trello-sync-from-trello ()
+    (interactive)
+    (org-trello-sync-buffer t)))
+#+end_src
 
 * Term
 #+begin_src emacs-lisp :tangle yes
