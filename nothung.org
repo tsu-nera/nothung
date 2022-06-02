@@ -1237,35 +1237,35 @@ org-roam-dialiesよりもorg-journalを利用する(org-agendaの都合).
   (org-roam-capture-templates
    '(("z" "🎓 Zettelkasten" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+STARTUP: showeverything\n#+title:🎓${title}\n#+filetags: :CONCEPT:\n")
+                         "#+title:🎓${title}\n#+filetags: :CONCEPT:\n")
       :unnarrowed t)
      ("w" "📝 Wiki" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+STARTUP: showeverything\n#+title:📝${title}\n#+filetags: :WIKI:\n")
+                         "#+title:📝${title}\n#+filetags: :WIKI:\n")
       :unnarrowed t)
      ("t" "🏷 Tag" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+STARTUP: showeverything\n#+title:List of ${title} (alias 🏷${title}) \n#+filetags: :TAG:\n")
+                         "#+title:List of ${title} (alias 🏷${title}) \n#+filetags: :TAG:\n")
       :unnarrowed t)
      ("i" "📂 TOC" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+STARTUP: showeverything\n#+title:Index of {title} (alias 📂${title})\n#+filetags: :TOC:\n")
+                         "#+title:Index of {title} (alias 📂${title})\n#+filetags: :TOC:\n")
       :unnarrowed t)
      ("m" "🏛 MOC" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+STARTUP: showeverything\n#+title:🏛${title} \n#+filetags: :MOC:\n")
+                         "#+title:🏛${title} \n#+filetags: :MOC:\n")
       :unnarrowed t)
      ("i" "💡 Issue" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+STARTUP: showeverything\n#+title:💡${title} \n#+filetags: :ISSUE:\n")
+                         "#+title:💡${title} \n#+filetags: :ISSUE:\n")
       :unnarrowed t)
      ("d" "🗒 DOC" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+STARTUP: showeverything\n#+title:🗒${title}\n#+filetags: :DOC:\n")
+                         "#+title:🗒${title}\n#+filetags: :DOC:\n")
       :unnarrowrd t)
      ("f" "🦊 Darkfox" plain "%?"
       :target (file+head "darkfox/%<%Y%m%d%H%M%S>.org"
-                         "#+STARTUP: showeverything\n#+title:🦊${title}\n#+filetags: :DARKFOX:\n")
+                         "#+title:🦊${title}\n#+filetags: :DARKFOX:\n")
       :unnarrowed t)
      ("b" "📚 Book" plain
       "%?
@@ -1277,7 +1277,7 @@ org-roam-dialiesよりもorg-journalを利用する(org-agendaの都合).
 - url: http://www.amazon.co.jp/dp/%^{isbn}
 "
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+STARTUP: showeverything\n#+title:📚${title} - ${author}(${date})\n#+filetags: :BOOK:SOURCE:\n")
+                         "#+title:📚${title} - ${author}(${date})\n#+filetags: :BOOK:SOURCE:\n")
       :unnarrowed t)
      ("s" "🎙‍ Talk" plain
       "%?
@@ -1288,7 +1288,7 @@ org-roam-dialiesよりもorg-journalを利用する(org-agendaの都合).
 - url: %^{url}
 "
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+STARTUP: showeverything\n#+title:🎙 ${title} - ${editor}(${date})\n#+filetags: :TALK:SOURCE:\n")
+                         "#+title:🎙 ${title} - ${editor}(${date})\n#+filetags: :TALK:SOURCE:\n")
       :unnarrowed t)
      ("o" "💻 Online" plain
       "%?
@@ -1298,7 +1298,7 @@ org-roam-dialiesよりもorg-journalを利用する(org-agendaの都合).
 - url: %^{url}
 "
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+STARTUP: showeverything\n#+title:💻${title}\n#+filetags: :ONLINE:SOURCE:\n")
+                         "#+title:💻${title}\n#+filetags: :ONLINE:SOURCE:\n")
       :unnarrowed t)))
   (org-roam-extract-new-file-path "%<%Y%m%d%H%M%S>.org")
   ;;        :map org-mode-map
@@ -1672,5 +1672,6 @@ TODOほかラベルを美しく.
   ("C-z" . nil))
 
 ;; 実験, どうもマウス操作でEmacsの制御が効かなくなることがあるので.
-(setq make-pointer-invisible nil)
+(setq make-pointer-invisible n
+il)
 #+end_src
