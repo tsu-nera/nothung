@@ -812,7 +812,7 @@ EmacsのWindow Manager.
   (setq org-startup-indented t)
   (setq org-indent-mode-turns-on-hiding-stars nil)
 
-  (setq org-startup-folded 'showeverything) ;; 見出しの階層指定
+  (setq org-startup-folded 'showall) ;; 見出しの階層指定
   (setq org-startup-truncated nil) ;; 長い文は折り返す.
 
   ;; electric-indent は org-mode で誤作動の可能性があることのこと
@@ -1672,6 +1672,5 @@ TODOほかラベルを美しく.
   ("C-z" . nil))
 
 ;; 実験, どうもマウス操作でEmacsの制御が効かなくなることがあるので.
-(setq make-pointer-invisible n
-il)
+(setq make-pointer-invisible nil)
 #+end_src

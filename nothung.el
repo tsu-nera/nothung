@@ -427,7 +427,7 @@
   (setq org-startup-indented t)
   (setq org-indent-mode-turns-on-hiding-stars nil)
 
-  (setq org-startup-folded 'showeverything) ;; 見出しの階層指定
+  (setq org-startup-folded 'showall) ;; 見出しの階層指定
   (setq org-startup-truncated nil) ;; 長い文は折り返す.
 
   ;; electric-indent は org-mode で誤作動の可能性があることのこと
@@ -730,35 +730,35 @@
   (org-roam-capture-templates
    '(("z" "🎓 Zettelkasten" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+STARTUP: showeverything\n#+title:🎓${title}\n#+filetags: :CONCEPT:\n")
+                         "#+title:🎓${title}\n#+filetags: :CONCEPT:\n")
       :unnarrowed t)
      ("w" "📝 Wiki" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+STARTUP: showeverything\n#+title:📝${title}\n#+filetags: :WIKI:\n")
+                         "#+title:📝${title}\n#+filetags: :WIKI:\n")
       :unnarrowed t)
      ("t" "🏷 Tag" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+STARTUP: showeverything\n#+title:List of ${title} (alias 🏷${title}) \n#+filetags: :TAG:\n")
+                         "#+title:🏷${title}\n#+filetags: :TAG:\n")
       :unnarrowed t)
      ("i" "📂 TOC" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+STARTUP: showeverything\n#+title:Index of {title} (alias 📂${title})\n#+filetags: :TOC:\n")
+                         "#+title:📂${title}\n#+filetags: :TOC:\n")
       :unnarrowed t)
      ("m" "🏛 MOC" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+STARTUP: showeverything\n#+title:🏛${title} \n#+filetags: :MOC:\n")
+                         "#+title:🏛${title}\n#+filetags: :MOC:\n")
       :unnarrowed t)
      ("i" "💡 Issue" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+STARTUP: showeverything\n#+title:💡${title} \n#+filetags: :ISSUE:\n")
+                         "#+title:💡${title} \n#+filetags: :ISSUE:\n")
       :unnarrowed t)
      ("d" "🗒 DOC" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+STARTUP: showeverything\n#+title:🗒${title}\n#+filetags: :DOC:\n")
+                         "#+title:🗒${title}\n#+filetags: :DOC:\n")
       :unnarrowrd t)
      ("f" "🦊 Darkfox" plain "%?"
       :target (file+head "darkfox/%<%Y%m%d%H%M%S>.org"
-                         "#+STARTUP: showeverything\n#+title:🦊${title}\n#+filetags: :DARKFOX:\n")
+                         "#+title:🦊${title}\n#+filetags: :DARKFOX:\n")
       :unnarrowed t)
      ("b" "📚 Book" plain
       "%?
@@ -770,7 +770,7 @@
 - url: http://www.amazon.co.jp/dp/%^{isbn}
 "
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+STARTUP: showeverything\n#+title:📚${title} - ${author}(${date})\n#+filetags: :BOOK:SOURCE:\n")
+                         "#+title:📚${title} - ${author}(${date})\n#+filetags: :BOOK:SOURCE:\n")
       :unnarrowed t)
      ("s" "🎙‍ Talk" plain
       "%?
@@ -781,7 +781,7 @@
 - url: %^{url}
 "
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+STARTUP: showeverything\n#+title:🎙 ${title} - ${editor}(${date})\n#+filetags: :TALK:SOURCE:\n")
+                         "#+title:🎙 ${title} - ${editor}(${date})\n#+filetags: :TALK:SOURCE:\n")
       :unnarrowed t)
      ("o" "💻 Online" plain
       "%?
@@ -791,7 +791,7 @@
 - url: %^{url}
 "
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+STARTUP: showeverything\n#+title:💻${title}\n#+filetags: :ONLINE:SOURCE:\n")
+                         "#+title:💻${title}\n#+filetags: :ONLINE:SOURCE:\n")
       :unnarrowed t)))
   (org-roam-extract-new-file-path "%<%Y%m%d%H%M%S>.org")
   ;;        :map org-mode-map
