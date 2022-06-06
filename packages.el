@@ -116,4 +116,4 @@
 (unpin! vertico)
 
 ;; 最新版を使いたい.
-(unpin! cider)
+;; (unpin! cider)

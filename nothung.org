@@ -1202,7 +1202,7 @@ https://github.com/bastibe/org-journal
 )
 #+end_src
 
-** org-roam
+** Org-roam
 
 Zettelkasten MethodのOrg-roam実装.
 
@@ -1245,19 +1245,19 @@ org-roam-dialiesよりもorg-journalを利用する(org-agendaの都合).
       :unnarrowed t)
      ("t" "🏷 Tag" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:List of ${title} (alias 🏷${title}) \n#+filetags: :TAG:\n")
+                         "#+title:🔖${title}\n#+filetags: :TAG:\n")
       :unnarrowed t)
      ("i" "📂 TOC" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:Index of {title} (alias 📂${title})\n#+filetags: :TOC:\n")
+                         "#+title:📂${title}\n#+filetags: :TOC:\n")
       :unnarrowed t)
      ("m" "🏛 MOC" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:🏛${title} \n#+filetags: :MOC:\n")
+                         "#+title:🏛${title}\n#+filetags: :MOC:\n")
       :unnarrowed t)
      ("i" "💡 Issue" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:💡${title} \n#+filetags: :ISSUE:\n")
+                         "#+title:💡${title}\n#+filetags: :ISSUE:\n")
       :unnarrowed t)
      ("d" "🗒 DOC" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"

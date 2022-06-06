@@ -738,7 +738,7 @@
       :unnarrowed t)
      ("t" "🏷 Tag" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:🏷${title}\n#+filetags: :TAG:\n")
+                         "#+title:🔖${title}\n#+filetags: :TAG:\n")
       :unnarrowed t)
      ("i" "📂 TOC" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
@@ -750,7 +750,7 @@
       :unnarrowed t)
      ("i" "💡 Issue" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:💡${title} \n#+filetags: :ISSUE:\n")
+                         "#+title:💡${title}\n#+filetags: :ISSUE:\n")
       :unnarrowed t)
      ("d" "🗒 DOC" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
