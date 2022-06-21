@@ -905,11 +905,7 @@ EmacsのWindow Manager.
 
 #+end_src
 
-#+RESULTS:
-: t
-
-org-mode で timestamp のみを挿入するカスタム関数.
-Doom Emacsのせいか C-u C-c .が動作しないので.
+org-mode で timestamp のみを挿入するカスタム関数. Doom EmacsのせいでC-u C-c .が動作しないので.
 
 #+begin_src emacs-lisp :tangle yes
 ;; 
@@ -923,17 +919,21 @@ Doom Emacsのせいか C-u C-c .が動作しないので.
   (map! :map org-mode-map "C-c C-." #'my/insert-timestamp))
 #+end_src
 
+未分類(後で整理).
+
+#+begin_src emacs-lisp :tangle yes
+;;
+;; 空白が保存時に削除されると bullet 表示がおかしくなる.
+;; なお wl-bulter は doom emacs のデフォルトで組み込まれている.
+(add-hook! 'org-mode-hook (ws-butler-mode -1))
+#+end_src
+
 ** org-capture
 
-https://orgmode.org/manual/Capture-templates.html
+[[https://orgmode.org/manual/Capture-templates.html][Capture templates (The Org Manual)]]
 
 #+begin_src emacs-lisp :tangle yes
 (after! org
-  (defun my/create-timestamped-org-file (path)
-    (expand-file-name (format "%s.org" (format-time-string "%Y%m%d%H%M%S")) path))
-  (defun my/create-date-org-file (path)
-    (expand-file-name (format "%s.org" (format-time-string "%Y-%m-%d")) path))
-
   (defconst my/captured-notes-file "~/keido/inbox/inbox.org")
 
   (setq org-capture-templates
@@ -947,60 +947,91 @@ https://orgmode.org/manual/Capture-templates.html
           ("q" "📥+🌐 Inbox+Browser(quote)" entry
            (file "~/keido/inbox/inbox.org")
            "* %?\nSource: [[%:link][%:description]]\nCaptured On: %U\n%i\n"
-           :klll-buffer t)
-          ("c" "☑ Planning" plain
-           (file+headline (lambda () (my/create-date-org-file "~/keido/notes/journals/daily"))
-                          "Planning")
-           "%?"
-           :unnarrowed t
-           :kill-buffer t)
-          ("t" "🤔 Thought" entry
-           (file+headline (lambda () (my/create-date-org-file "~/keido/notes/journals/daily"))
-                          "Thoughts")
-           "* 🤔 %?\n%T"
-           :empty-lines 1
-           :unnarrowed t
-           :kill-buffer t)
-          ("T" "🤔+📃 Thought+Ref" entry
-           (file+headline (lambda () (my/create-date-org-file "~/keido/notes/journals/daily"))
-                          "Thoughts")
-           "* 🤔 %?\n%T from %a\n"
-           :empty-lines 1
-           :unnarrowed t
-           :kill-buffer t)
-          ("l" "🤔+🌐 Thought+Browser" entry
-           (file+headline (lambda () (my/create-date-org-file "~/keido/notes/journals/daily"))
-                          "Thoughts")
+           :klll-buffer t))))
+#+end_src
+
+*** capture to daily journal
+
+#+begin_src emacs-lisp :tangle yes
+(defun my/create-date-org-file (path)
+  (expand-file-name (format "%s.org" (format-time-string "%Y-%m-%d")) path))
+
+;; 現状つかってないのでマスク
+;; (defun my/create-timestamped-org-file (path)
+;;   (expand-file-name (format "%s.org" (format-time-string "%Y%m%d%H%M%S")) path))
+
+(after! org
+  (defconst my/daily-journal-dir "~/keido/notes/journals/daily")
+  (setq org-capture-templates
+        (append 
+          '(("c" "☑ Planning" plain
+             (file+headline
+              (lambda () (my/create-date-org-file my/daily-journal-dir))
+              "Planning")
+             "%?"
+             :unnarrowed t
+             :kill-buffer t)
+            ("t" "🤔 Thought" entry
+             (file+headline
+              (lambda () (my/create-date-org-file my/daily-journal-dir))
+              "Thoughts")
+             "* 🤔 %?\n%T"
+             :empty-lines 1
+             :unnarrowed t
+             :kill-buffer t)
+            ("T" "🤔+📃 Thought+Ref" entry
+             (file+headline
+              (lambda () (my/create-date-org-file my/daily-journal-dir))
+              "Thoughts")
+             "* 🤔 %?\n%T from %a\n"
+             :empty-lines 1
+             :unnarrowed t
+             :kill-buffer t)
+            ("l" "🤔+🌐 Thought+Browser" entry
+             (file+headline
+              (lambda () (my/create-date-org-file my/daily-journal-dir))
+              "Thoughts")
              "* 🤔 %?\n%T from [[%:link][%:description]]\n"
-           :empty-lines 1
-           :unnarrowed t
-           :kill-buffer t)
-          ("p" "🍅 Pomodoro" entry
-           (file+headline (lambda () (my/create-date-org-file "~/keido/notes/journals/daily"))
-                          "DeepWork")
-           "* 🍅 %?\n%T"
-           :empty-lines 1
-           :unnarrowed t
-           :kill-buffer t)
-          ("j" "🖊 Journal" plain
-           (file (lambda () (my/create-date-org-file "~/keido/notes/journals/daily")))
-           "%?"
-           :empty-lines 1
-           :unnarrowed t
-           :kill-buffer t)
-          ("J" "🖊+📃 Journal+Ref" plain
-           (file (lambda () (my/create-date-org-file "~/keido/notes/journals/daily")))
-           "%?\n%a"
-           :empty-lines 1
-           :unnarrowed t
-           :kill-buffer t)
-          ("L" "🖊+🌐 Journal+Browser" plain
-           (file (lambda () (my/create-date-org-file "~/keido/notes/journals/daily")))
+             :empty-lines 1
+             :unnarrowed t
+             :kill-buffer t)
+            ("p" "🍅 Pomodoro" entry
+             (file+headline
+              (lambda () (my/create-date-org-file my/daily-journal-dir))
+              "DeepWork")
+             "* 🍅 %?\n%T"
+             :empty-lines 1
+             :unnarrowed t
+             :kill-buffer t)
+            ("r" "🧘 Recovery" entry
+             (file+headline
+              (lambda () (my/create-date-org-file my/daily-journal-dir))
+              "Recovery")
+             "* 🧘 %?\n%T"
+             :empty-lines 1
+             :unnarrowed t
+             :kill-buffer t)
+            ("j" "🖊 Journal" plain
+             (file (lambda ()
+                     (my/create-date-org-file my/daily-journal-dir)))
+             "%?"
+             :empty-lines 1
+             :unnarrowed t
+             :kill-buffer t)
+            ("J" "🖊+📃 Journal+Ref" plain
+             (file (lambda ()
+                     (my/create-date-org-file my/daily-journal-dir)))
+             "%?\n%a"
+             :empty-lines 1
+             :unnarrowed t
+             :kill-buffer t)
+            ("L" "🖊+🌐 Journal+Browser" plain
+             (file (lambda ()
+                     (my/create-date-org-file my/daily-journal-dir)))
              "%?\nSource: [[%:link][%:description]]\nCaptured On: %U\n"
-           :empty-lines 1
-           :unnrrowed t
-           :kill-buffer t)))
-)
+             :empty-lines 1
+             :unnrrowed t
+             :kill-buffer t)) org-capture-templates)))
 #+end_src
 
 *** Google Chrome Extention: Org Capture
@@ -1118,6 +1149,9 @@ Org-modeで書いたブログ記事をHugoにあったMarkdown形式に変換す
   :config
   ;; なんか.dir-locals.elに書いても反映してくれないな. ココに書いとく.
   (setq org-export-with-author nil))
+
+;; org-roamのexportで多様するのでC-c rのprefixをつけておく.
+(global-set-key (kbd "C-c r e") 'org-hugo-export-to-md)
 #+end_src
 
 このox-hugoで出力されるMarkdownはどうもリスト表示でスペースが4つ入ってしまう. GitHub Favorite Markdownのようにリストでのスペース２であって欲しいものの解決方法が見つからない.
@@ -1167,46 +1201,9 @@ https://github.com/mbork/org-toggl
   (org-toggl-integration-mode))
 #+end_src
 
-** org-journal
-https://github.com/bastibe/org-journal
-
-#+begin_src emacs-lisp :tangle yes
-(use-package! org-journal
-  :after org
-  :bind
-  ("C-c r d n" . org-journal-new-entry)
-  ("C-c r d d" . org-journal-open-current-journal-file)
-  :custom
-  (org-journal-date-prefix "#+TITLE: ✍")
-  (org-journal-file-format "%Y-%m-%d.org")
-  (org-journal-dir (file-truename "~/keido/notes/journals/daily"))
-  (org-journal-date-format "%Y-%m-%d")
-  :config
-  (setq org-journal-enable-agenda-integration t)
-  (defun org-journal-file-header-func (time)
-     "Custom function to create journal header."
-     (concat
-      (pcase org-journal-file-type
-        (`daily "#+STARTUP: showeverything"))))
-  ;;     ;; (`weekly "#+TITLE: Weekly Journal\n#+STARTUP: folded")
-  ;;     ;;(`monthly "#+TITLE: Monthly Journal\n#+STARTUP: folded")
-  ;;     ;; (`yearly "#+TITLE: Yearly Journal\n#+STARTUP: folded"))))
-  (setq org-journal-file-header 'org-journal-file-header-func)
-
-  ;; org-roamに対応させるためにorg-idを生成
-  (defun org-create-new-id-journal ()
-    (goto-char (point-min))
-    (org-id-get-create)
-    (goto-char (point-max)))
-  (add-hook 'org-journal-after-header-create-hook 'org-create-new-id-journal)
-)
-#+end_src
-
 ** Org-roam
 
 Zettelkasten MethodのOrg-roam実装.
-
-org-roam-dialiesよりもorg-journalを利用する(org-agendaの都合).
 
 #+begin_src emacs-lisp :tangle yes
 ;; org-roam
@@ -1231,6 +1228,7 @@ org-roam-dialiesよりもorg-journalを利用する(org-agendaの都合).
         "R" #'org-roam-ref-remove
         "o" #'org-id-get-create
         "u" #'my/org-roam-update
+        "D" #'org-roam-dailies-goto-today
         )
   :custom
   ;;ファイル名を ID にする.
@@ -1243,9 +1241,13 @@ org-roam-dialiesよりもorg-journalを利用する(org-agendaの都合).
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:📝${title}\n#+filetags: :WIKI:\n")
       :unnarrowed t)
-     ("t" "🏷 Tag" plain "%?"
+     ("t" "🔖 Tag" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:🔖${title}\n#+filetags: :TAG:\n")
+      :unnarrowed t)
+     ("p" "👨 Person" plain "%?"
+      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                         "#+title:👨${title}\n#+filetags: :PERSON:TAG:\n")
       :unnarrowed t)
      ("i" "📂 TOC" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
@@ -1264,7 +1266,7 @@ org-roam-dialiesよりもorg-journalを利用する(org-agendaの都合).
                          "#+title:🗒${title}\n#+filetags: :DOC:\n")
       :unnarrowrd t)
      ("f" "🦊 Darkfox" plain "%?"
-      :target (file+head "darkfox/%<%Y%m%d%H%M%S>.org"
+      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:🦊${title}\n#+filetags: :DARKFOX:\n")
       :unnarrowed t)
      ("b" "📚 Book" plain
@@ -1311,38 +1313,6 @@ org-roam-dialiesよりもorg-journalを利用する(org-agendaの都合).
 
   (setq +org-roam-open-buffer-on-find-file nil)
   (org-roam-db-autosync-mode))
-
-
-(use-package! websocket
-    :after org-roam)
-(use-package! org-roam-ui
-    :after org-roam ;; or :after org
-;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
-;;         a hookable mode anymore, you're advised to pick something yourself
-;;         if you don't care about startup time, use
-    ;; :hook (after-init . org-roam-ui-mode)
-    :config
-    (setq org-roam-ui-sync-theme t
-          org-roam-ui-follow t
-          org-roam-ui-update-on-save t
-          org-roam-ui-open-on-start t))
-
-(use-package! org-roam-timestamps
-   :after org-roam
-   :config
-   (org-roam-timestamps-mode)
-   (setq org-roam-timestamps-remember-timestamps nil)
-   (setq org-roam-timestamps-remember-timestamps nil))
-
-
-;; 今どきのアウトライナー的な線を出す.
-;; Terminal Mode ではつかえないので一旦無効化する.
-;; (require 'org-bars)
-;; (add-hook! 'org-mode-hook #'org-bars-mode)
-
-;; 空白が保存時に削除されると bullet 表示がおかしくなる.
-;; なお wl-bulter は doom emacs のデフォルトで組み込まれている.
-(add-hook! 'org-mode-hook (ws-butler-mode -1))
 #+end_src
 
 *** Org-roam管理下のノートの全文検索
@@ -1361,6 +1331,8 @@ consult-ripgrepを [[https://jblevins.org/projects/deft/][deft]] の代わりに
 
 *** org-publish(Org-roamのノートをサイトへ公開)
 
+使ってないかな...
+
 #+begin_src emacs-lisp :tangle yes
 (setq org-publish-project-alist
       (list
@@ -1371,6 +1343,116 @@ consult-ripgrepを [[https://jblevins.org/projects/deft/][deft]] の代わりに
              :publishing-function 'org-hugo-export-wim-to-md)))
 #+end_src
 
+*** org-roam-dailies
+
+Org-roamに組み込まれた劣化版org-journal. 現状使用するのをやめた.
+
+org-roam-dialiesよりもorg-journalを利用する(org-agendaの都合).
+
+ref. [[https://org-roam.discourse.group/t/org-journal-vs-org-roam-dailies/384][Org-journal vs org-roam-dailies - Troubleshooting - Org-roam]]
+
+週単位で日記のようなページを外部公開用に使う.
+
+ツイッターのようなマイクロブログの利用を想定している.
+
+#+begin_src emacs-lisp :tangle yes
+(after! org-roam
+  (setq org-roam-dailies-directory "zk")
+
+  (setq org-roam-dailies-capture-templates
+        '(("d" "default" entry "** %?" :if-new
+           (file+head+olp "%<%G-w%V>.org" "#+title: 📓%<%G-w%V>\n"
+                          ("🖊Journals"))))))
+#+end_src
+
+#+begin_src emacs-lisp :tangle yes
+(defun my/create-weekly-org-file (path)
+  (expand-file-name (format "%s.org" (format-time-string "%Y-w%W")) path))
+(defconst my/weekly-journal-dir "~/keido/notes/zk")
+
+(after! org-capture
+  (add-to-list 'org-capture-templates
+        '("w" "💭 Thought(weekly)" entry
+          (file+headline (lambda ()
+                     (my/create-weekly-org-file my/weekly-journal-dir))
+                         "🖊Journals")
+              "* 💭%?\n%T\n\n" 
+              :empty-lines 1 
+              :unnarrowed nil ;; ほかのエントリは見えないように.
+              :klll-buffer t)))
+#+end_src
+
+** org-journal
+
+https://github.com/bastibe/org-journal
+
+#+begin_src emacs-lisp :tangle yes
+(use-package! org-journal
+  :after org
+  :bind
+  ("C-c r d n" . org-journal-new-entry)
+  ("C-c r d d" . org-journal-open-current-journal-file)
+  :custom
+  (org-journal-date-prefix "#+TITLE: ✍")
+  (org-journal-file-format "%Y-%m-%d.org")
+  (org-journal-dir (file-truename "~/keido/notes/journals/daily"))
+  (org-journal-date-format "%Y-%m-%d")
+  :config
+  (setq org-journal-enable-agenda-integration t)
+  (defun org-journal-file-header-func (time)
+     "Custom function to create journal header."
+     (concat
+      (pcase org-journal-file-type
+        (`daily "#+STARTUP: showeverything"))))
+  ;;     ;; (`weekly "#+TITLE: Weekly Journal\n#+STARTUP: folded")
+  ;;     ;;(`monthly "#+TITLE: Monthly Journal\n#+STARTUP: folded")
+  ;;     ;; (`yearly "#+TITLE: Yearly Journal\n#+STARTUP: folded"))))
+  (setq org-journal-file-header 'org-journal-file-header-func)
+
+  ;; org-roamに対応させるためにorg-idを生成
+  (defun org-create-new-id-journal ()
+    (goto-char (point-min))
+    (org-id-get-create)
+    (goto-char (point-max)))
+  (add-hook 'org-journal-after-header-create-hook 'org-create-new-id-journal)
+)
+#+end_src
+
+** org-roam-ui
+
+Web UI.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package! websocket
+    :after org-roam)
+(use-package! org-roam-ui
+    :after org-roam ;; or :after org
+;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+;;         a hookable mode anymore, you're advised to pick something yourself
+;;         if you don't care about startup time, use
+    ;; :hook (after-init . org-roam-ui-mode)
+    :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))
+
+
+#+end_src
+
+*** org-roam-timestamps(disabled)
+
+org-roam-uiでつかうメタ情報を付与することが目的だが現状使っていないのでいったん封印.
+
+#+begin_src emacs-lisp :tangle no
+(use-package! org-roam-timestamps
+   :after org-roam
+   :config
+   (org-roam-timestamps-mode)
+   (setq org-roam-timestamps-remember-timestamps nil)
+   (setq org-roam-timestamps-remember-timestamps nil))
+#+end_src
+
 ** bibtex関連(Org-ref)
 
 文献管理. Zoteroと連携して，論文というよりは書籍やYoutube動画やWeb記事のメモに利用.
@@ -1379,6 +1461,8 @@ consult-ripgrepを [[https://jblevins.org/projects/deft/][deft]] の代わりに
 - ivy-bibtex
   - ivyのactionは ivy-bibtexでC-SPCで選択-> C-M-oでaction選択候補を出し，pとかeとか押す.
 - org-roam-bibtex
+
+なんかzoteroからデータエクスポートできなくなって動かなくなった.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package! org-ref
@@ -1468,6 +1552,18 @@ https://github.com/eyeinsky/org-anki
 #+end_src
 
 URLの挿入はorg-link形式でできる. これは便利.
+
+** org-bars
+
+今どきのアウトライナー的な線を出す.
+
+- Terminal Mode ではつかえない.
+- リストの折返しでのインデントは崩れる.
+
+#+begin_src emacs-lisp :tangle yes
+(require 'org-bars)
+(add-hook! 'org-mode-hook #'org-bars-mode)
+#+end_src
 
 ** Org-noter(disabled)
 

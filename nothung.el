@@ -528,12 +528,12 @@
     )
   (map! :map org-mode-map "C-c C-." #'my/insert-timestamp))
 
-(after! org
-  (defun my/create-timestamped-org-file (path)
-    (expand-file-name (format "%s.org" (format-time-string "%Y%m%d%H%M%S")) path))
-  (defun my/create-date-org-file (path)
-    (expand-file-name (format "%s.org" (format-time-string "%Y-%m-%d")) path))
+;;
+;; 空白が保存時に削除されると bullet 表示がおかしくなる.
+;; なお wl-bulter は doom emacs のデフォルトで組み込まれている.
+(add-hook! 'org-mode-hook (ws-butler-mode -1))
 
+(after! org
   (defconst my/captured-notes-file "~/keido/inbox/inbox.org")
 
   (setq org-capture-templates
@@ -547,60 +547,87 @@
           ("q" "📥+🌐 Inbox+Browser(quote)" entry
            (file "~/keido/inbox/inbox.org")
            "* %?\nSource: [[%:link][%:description]]\nCaptured On: %U\n%i\n"
-           :klll-buffer t)
-          ("c" "☑ Planning" plain
-           (file+headline (lambda () (my/create-date-org-file "~/keido/notes/journals/daily"))
-                          "Planning")
-           "%?"
-           :unnarrowed t
-           :kill-buffer t)
-          ("t" "🤔 Thought" entry
-           (file+headline (lambda () (my/create-date-org-file "~/keido/notes/journals/daily"))
-                          "Thoughts")
-           "* 🤔 %?\n%T"
-           :empty-lines 1
-           :unnarrowed t
-           :kill-buffer t)
-          ("T" "🤔+📃 Thought+Ref" entry
-           (file+headline (lambda () (my/create-date-org-file "~/keido/notes/journals/daily"))
-                          "Thoughts")
-           "* 🤔 %?\n%T from %a\n"
-           :empty-lines 1
-           :unnarrowed t
-           :kill-buffer t)
-          ("l" "🤔+🌐 Thought+Browser" entry
-           (file+headline (lambda () (my/create-date-org-file "~/keido/notes/journals/daily"))
-                          "Thoughts")
+           :klll-buffer t))))
+
+(defun my/create-date-org-file (path)
+  (expand-file-name (format "%s.org" (format-time-string "%Y-%m-%d")) path))
+
+;; 現状つかってないのでマスク
+;; (defun my/create-timestamped-org-file (path)
+;;   (expand-file-name (format "%s.org" (format-time-string "%Y%m%d%H%M%S")) path))
+
+(after! org
+  (defconst my/daily-journal-dir "~/keido/notes/journals/daily")
+  (setq org-capture-templates
+        (append 
+          '(("c" "☑ Planning" plain
+             (file+headline
+              (lambda () (my/create-date-org-file my/daily-journal-dir))
+              "Planning")
+             "%?"
+             :unnarrowed t
+             :kill-buffer t)
+            ("t" "🤔 Thought" entry
+             (file+headline
+              (lambda () (my/create-date-org-file my/daily-journal-dir))
+              "Thoughts")
+             "* 🤔 %?\n%T"
+             :empty-lines 1
+             :unnarrowed t
+             :kill-buffer t)
+            ("T" "🤔+📃 Thought+Ref" entry
+             (file+headline
+              (lambda () (my/create-date-org-file my/daily-journal-dir))
+              "Thoughts")
+             "* 🤔 %?\n%T from %a\n"
+             :empty-lines 1
+             :unnarrowed t
+             :kill-buffer t)
+            ("l" "🤔+🌐 Thought+Browser" entry
+             (file+headline
+              (lambda () (my/create-date-org-file my/daily-journal-dir))
+              "Thoughts")
              "* 🤔 %?\n%T from [[%:link][%:description]]\n"
-           :empty-lines 1
-           :unnarrowed t
-           :kill-buffer t)
-          ("p" "🍅 Pomodoro" entry
-           (file+headline (lambda () (my/create-date-org-file "~/keido/notes/journals/daily"))
-                          "DeepWork")
-           "* 🍅 %?\n%T"
-           :empty-lines 1
-           :unnarrowed t
-           :kill-buffer t)
-          ("j" "🖊 Journal" plain
-           (file (lambda () (my/create-date-org-file "~/keido/notes/journals/daily")))
-           "%?"
-           :empty-lines 1
-           :unnarrowed t
-           :kill-buffer t)
-          ("J" "🖊+📃 Journal+Ref" plain
-           (file (lambda () (my/create-date-org-file "~/keido/notes/journals/daily")))
-           "%?\n%a"
-           :empty-lines 1
-           :unnarrowed t
-           :kill-buffer t)
-          ("L" "🖊+🌐 Journal+Browser" plain
-           (file (lambda () (my/create-date-org-file "~/keido/notes/journals/daily")))
+             :empty-lines 1
+             :unnarrowed t
+             :kill-buffer t)
+            ("p" "🍅 Pomodoro" entry
+             (file+headline
+              (lambda () (my/create-date-org-file my/daily-journal-dir))
+              "DeepWork")
+             "* 🍅 %?\n%T"
+             :empty-lines 1
+             :unnarrowed t
+             :kill-buffer t)
+            ("r" "🧘 Recovery" entry
+             (file+headline
+              (lambda () (my/create-date-org-file my/daily-journal-dir))
+              "Recovery")
+             "* 🧘 %?\n%T"
+             :empty-lines 1
+             :unnarrowed t
+             :kill-buffer t)
+            ("j" "🖊 Journal" plain
+             (file (lambda ()
+                     (my/create-date-org-file my/daily-journal-dir)))
+             "%?"
+             :empty-lines 1
+             :unnarrowed t
+             :kill-buffer t)
+            ("J" "🖊+📃 Journal+Ref" plain
+             (file (lambda ()
+                     (my/create-date-org-file my/daily-journal-dir)))
+             "%?\n%a"
+             :empty-lines 1
+             :unnarrowed t
+             :kill-buffer t)
+            ("L" "🖊+🌐 Journal+Browser" plain
+             (file (lambda ()
+                     (my/create-date-org-file my/daily-journal-dir)))
              "%?\nSource: [[%:link][%:description]]\nCaptured On: %U\n"
-           :empty-lines 1
-           :unnrrowed t
-           :kill-buffer t)))
-)
+             :empty-lines 1
+             :unnrrowed t
+             :kill-buffer t)) org-capture-templates)))
 
 (after! org
   ;; https://stackoverflow.com/questions/53469017/org-mode-source-editing-indents-code-after-exiting-source-code-block-editor
@@ -648,6 +675,9 @@
   ;; なんか.dir-locals.elに書いても反映してくれないな. ココに書いとく.
   (setq org-export-with-author nil))
 
+;; org-roamのexportで多様するのでC-c rのprefixをつけておく.
+(global-set-key (kbd "C-c r e") 'org-hugo-export-to-md)
+
 (use-package! ox-rst
   :after 'ox)
 
@@ -672,36 +702,6 @@
   (setq toggl-default-project "GTD")
   (org-toggl-integration-mode))
 
-(use-package! org-journal
-  :after org
-  :bind
-  ("C-c r d n" . org-journal-new-entry)
-  ("C-c r d d" . org-journal-open-current-journal-file)
-  :custom
-  (org-journal-date-prefix "#+TITLE: ✍")
-  (org-journal-file-format "%Y-%m-%d.org")
-  (org-journal-dir (file-truename "~/keido/notes/journals/daily"))
-  (org-journal-date-format "%Y-%m-%d")
-  :config
-  (setq org-journal-enable-agenda-integration t)
-  (defun org-journal-file-header-func (time)
-     "Custom function to create journal header."
-     (concat
-      (pcase org-journal-file-type
-        (`daily "#+STARTUP: showeverything"))))
-  ;;     ;; (`weekly "#+TITLE: Weekly Journal\n#+STARTUP: folded")
-  ;;     ;;(`monthly "#+TITLE: Monthly Journal\n#+STARTUP: folded")
-  ;;     ;; (`yearly "#+TITLE: Yearly Journal\n#+STARTUP: folded"))))
-  (setq org-journal-file-header 'org-journal-file-header-func)
-
-  ;; org-roamに対応させるためにorg-idを生成
-  (defun org-create-new-id-journal ()
-    (goto-char (point-min))
-    (org-id-get-create)
-    (goto-char (point-max)))
-  (add-hook 'org-journal-after-header-create-hook 'org-create-new-id-journal)
-)
-
 ;; org-roam
 (setq org-roam-directory (file-truename "~/keido/notes"))
 (setq org-roam-db-location (file-truename "~/keido/db/org-roam.db"))
@@ -724,6 +724,7 @@
         "R" #'org-roam-ref-remove
         "o" #'org-id-get-create
         "u" #'my/org-roam-update
+        "D" #'org-roam-dailies-goto-today
         )
   :custom
   ;;ファイル名を ID にする.
@@ -736,9 +737,13 @@
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:📝${title}\n#+filetags: :WIKI:\n")
       :unnarrowed t)
-     ("t" "🏷 Tag" plain "%?"
+     ("t" "🔖 Tag" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:🔖${title}\n#+filetags: :TAG:\n")
+      :unnarrowed t)
+     ("p" "👨 Person" plain "%?"
+      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                         "#+title:👨${title}\n#+filetags: :PERSON:TAG:\n")
       :unnarrowed t)
      ("i" "📂 TOC" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
@@ -757,7 +762,7 @@
                          "#+title:🗒${title}\n#+filetags: :DOC:\n")
       :unnarrowrd t)
      ("f" "🦊 Darkfox" plain "%?"
-      :target (file+head "darkfox/%<%Y%m%d%H%M%S>.org"
+      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:🦊${title}\n#+filetags: :DARKFOX:\n")
       :unnarrowed t)
      ("b" "📚 Book" plain
@@ -805,6 +810,72 @@
   (setq +org-roam-open-buffer-on-find-file nil)
   (org-roam-db-autosync-mode))
 
+(defun my/org-roam-rg-search ()
+  "Search org-roam directory using consult-ripgrep. With live-preview."
+  (interactive)
+  (counsel-rg nil org-roam-directory))
+(global-set-key (kbd "C-c r s") 'my/org-roam-rg-search)
+
+(setq org-publish-project-alist
+      (list
+       (list "keido"
+             :recursive t
+             :base-directory (file-truename "~/keido/notes/wiki")
+             :publishing-directory "~/repo/keido-hugo/content/notes"
+             :publishing-function 'org-hugo-export-wim-to-md)))
+
+(after! org-roam
+  (setq org-roam-dailies-directory "zk")
+
+  (setq org-roam-dailies-capture-templates
+        '(("d" "default" entry "** %?" :if-new
+           (file+head+olp "%<%G-w%V>.org" "#+title: 📓%<%G-w%V>\n"
+                          ("🖊Journals"))))))
+
+(defun my/create-weekly-org-file (path)
+  (expand-file-name (format "%s.org" (format-time-string "%Y-w%W")) path))
+(defconst my/weekly-journal-dir "~/keido/notes/zk")
+
+(after! org-capture
+  (add-to-list 'org-capture-templates
+        '("w" "💭 Thought(weekly)" entry
+          (file+headline (lambda ()
+                     (my/create-weekly-org-file my/weekly-journal-dir))
+                         "🖊Journals")
+              "* 💭%?\n%T\n\n" 
+              :empty-lines 1 
+              :unnarrowed nil ;; ほかのエントリは見えないように.
+              :klll-buffer t)))
+
+(use-package! org-journal
+  :after org
+  :bind
+  ("C-c r d n" . org-journal-new-entry)
+  ("C-c r d d" . org-journal-open-current-journal-file)
+  :custom
+  (org-journal-date-prefix "#+TITLE: ✍")
+  (org-journal-file-format "%Y-%m-%d.org")
+  (org-journal-dir (file-truename "~/keido/notes/journals/daily"))
+  (org-journal-date-format "%Y-%m-%d")
+  :config
+  (setq org-journal-enable-agenda-integration t)
+  (defun org-journal-file-header-func (time)
+     "Custom function to create journal header."
+     (concat
+      (pcase org-journal-file-type
+        (`daily "#+STARTUP: showeverything"))))
+  ;;     ;; (`weekly "#+TITLE: Weekly Journal\n#+STARTUP: folded")
+  ;;     ;;(`monthly "#+TITLE: Monthly Journal\n#+STARTUP: folded")
+  ;;     ;; (`yearly "#+TITLE: Yearly Journal\n#+STARTUP: folded"))))
+  (setq org-journal-file-header 'org-journal-file-header-func)
+
+  ;; org-roamに対応させるためにorg-idを生成
+  (defun org-create-new-id-journal ()
+    (goto-char (point-min))
+    (org-id-get-create)
+    (goto-char (point-max)))
+  (add-hook 'org-journal-after-header-create-hook 'org-create-new-id-journal)
+)
 
 (use-package! websocket
     :after org-roam)
@@ -819,37 +890,6 @@
           org-roam-ui-follow t
           org-roam-ui-update-on-save t
           org-roam-ui-open-on-start t))
-
-(use-package! org-roam-timestamps
-   :after org-roam
-   :config
-   (org-roam-timestamps-mode)
-   (setq org-roam-timestamps-remember-timestamps nil)
-   (setq org-roam-timestamps-remember-timestamps nil))
-
-
-;; 今どきのアウトライナー的な線を出す.
-;; Terminal Mode ではつかえないので一旦無効化する.
-;; (require 'org-bars)
-;; (add-hook! 'org-mode-hook #'org-bars-mode)
-
-;; 空白が保存時に削除されると bullet 表示がおかしくなる.
-;; なお wl-bulter は doom emacs のデフォルトで組み込まれている.
-(add-hook! 'org-mode-hook (ws-butler-mode -1))
-
-(defun my/org-roam-rg-search ()
-  "Search org-roam directory using consult-ripgrep. With live-preview."
-  (interactive)
-  (counsel-rg nil org-roam-directory))
-(global-set-key (kbd "C-c r s") 'my/org-roam-rg-search)
-
-(setq org-publish-project-alist
-      (list
-       (list "keido"
-             :recursive t
-             :base-directory (file-truename "~/keido/notes/wiki")
-             :publishing-directory "~/repo/keido-hugo/content/notes"
-             :publishing-function 'org-hugo-export-wim-to-md)))
 
 (use-package! org-ref
   :config
@@ -926,6 +966,9 @@
   (define-key org-mode-map (kbd "C-c n A s") #'org-anki-sync-entry)
   (define-key org-mode-map (kbd "C-c n A u") #'org-anki-update-all)
   (define-key org-mode-map (kbd "C-c n A d") #'org-anki-delete-entry))
+
+(require 'org-bars)
+(add-hook! 'org-mode-hook #'org-bars-mode)
 
 ;; Term
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -21,8 +21,8 @@
 (package! org-anki)
 (package! csv-mode)
 
-;; (package! org-bars
-;;   :recipe (:host github :repo "tonyaldon/org-bars"))
+(package! org-bars
+  :recipe (:host github :repo "tonyaldon/org-bars"))
 ;; (package! monkeytype)
 ;; (package! zh-align :recipe (:host github :repo "chen-chao/zh-align.el"))
 
