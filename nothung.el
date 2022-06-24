@@ -205,6 +205,22 @@
 ;; default tではなぜか無視できないので:allを設定しておく.
 (setq enable-local-variables :all)
 
+;;; 右から左に読む言語に対応させないことで描画高速化
+(setq-default bidi-display-reordering nil)
+
+(setq recentf-max-saved-items 500)
+
+;; GCを減らして軽くする.
+(setq gc-cons-threshold (* gc-cons-threshold 10))
+;; GCの上限閾値をあえて下げる(低スペックPC)
+;; (setq gc-cons-threshold (/ gc-cons-threshold 10))
+
+;; どうもDoom だとデフォルトで大きな値が設定されている模様なので戻す. 
+;; (setq gc-cons-percentage 0.1)
+;; (setq gc-cons-threshold 800000)
+;; GC実行のメッセージを出す
+(setq garbage-collection-messages nil)
+
 ;; Email
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -270,6 +286,9 @@
   ;; cider-connectで固定portを選択候補に表示.
   ;; 固定port自体は tools.depsからのnrepl起動時optionで指定.
   (setq cider-known-endpoints '(("kotori" "0.0.0.0" "34331")))
+
+  ;; REPLに表示しまくりでハングを防ぐ
+  (setq cider-print-quota 1024)
 )
 
 (add-hook! clojure-mode

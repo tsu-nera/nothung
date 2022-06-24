@@ -27,6 +27,8 @@
 ;; (package! zh-align :recipe (:host github :repo "chen-chao/zh-align.el"))
 
 (package! ox-rst)
+(package! ox-qmd)
+
 (package! org-roam-ui)
 (package! org-roam-timestamps)
 (package! org-roam-bibtex

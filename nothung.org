@@ -204,6 +204,7 @@ https://github.com/iyefrat/all-the-icons-completion
 #+end_src
 
 * Config
+
 #+begin_src emacs-lisp :tangle yes
 ;; Config
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -226,6 +227,7 @@ https://github.com/iyefrat/all-the-icons-completion
   :custom
   (pdf-annot-activate-created-annotations t "automatically annotate highlights"))
 #+end_src
+
 * Editor
 #+begin_src emacs-lisp :tangle yes
 ;; Editor
@@ -383,6 +385,7 @@ Emacsの画面に1行80文字のところに線を薄く引く.
 #+end_src
 
 * Emacs
+
 #+begin_src emacs-lisp :tangle yes
 ;; Emacs
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -396,13 +399,39 @@ Emacsの画面に1行80文字のところに線を薄く引く.
 ;; Emacs起動時にいちいち質問されるのはうざい.
 ;; default tではなぜか無視できないので:allを設定しておく.
 (setq enable-local-variables :all)
+
+;;; 右から左に読む言語に対応させないことで描画高速化
+(setq-default bidi-display-reordering nil)
 #+end_src
 
+** recentf
+
+#+begin_src emacs-lisp :tangle yes
+(setq recentf-max-saved-items 500)
+#+end_src
+
+** Emacs ガーベジコレクション
+
+ガーベジコレクションでEmacsのつかうメモリを最適化する. 
+
+ガーベジコレクションが走る間隔が多ければ途中で重くなるが, 低スペックPCだとガーベジコレクションをこまめに走らせることで全体的に軽くすることも. 要調整. 
+
+#+begin_src emacs-lisp :tangle yes
+;; GCを減らして軽くする.
+(setq gc-cons-threshold (* gc-cons-threshold 10))
+;; GCの上限閾値をあえて下げる(低スペックPC)
+;; (setq gc-cons-threshold (/ gc-cons-threshold 10))
+
+;; どうもDoom だとデフォルトで大きな値が設定されている模様なので戻す. 
+;; (setq gc-cons-percentage 0.1)
+;; (setq gc-cons-threshold 800000)
+;; GC実行のメッセージを出す
+(setq garbage-collection-messages nil)
+#+end_src
 
 ** ace-window
 
-- 3つ以上のwindowの選択が番号でできる. defaultでC-x oを上書きしてる?
-- C-u C-x o だとwindowをswapできる(ace-swap-window).
+3つ以上のwindowの選択が番号でできる. defaultでC-x oを上書きしてる? C-u C-x o だとwindowをswapできる(ace-swap-window).
 
 * Email
 #+begin_src emacs-lisp :tangle yes
@@ -595,6 +624,9 @@ ref: [[https://github.com/hlissner/doom-emacs/blob/develop/modules/lang/clojure/
   ;; cider-connectで固定portを選択候補に表示.
   ;; 固定port自体は tools.depsからのnrepl起動時optionで指定.
   (setq cider-known-endpoints '(("kotori" "0.0.0.0" "34331")))
+
+  ;; REPLに表示しまくりでハングを防ぐ
+  (setq cider-print-quota 1024)
 )
 #+end_src
 
@@ -1040,52 +1072,10 @@ Google Chromeにを入れることでWeb Pageがorg-captureと連携([[https://c
 
 ChromeでCtrl + Shift + Lで起動.
 
-** org-babel
 
-Org-modeのなかでLiterature Programming.
+** org-export(ox)
 
-基本操作:
-
-- C-c C-, コードブロックの挿入テンプレート呼び出し(org-insert-structure-tempate)
-- C-c C-c コード実行(org-babel-execute-src-block)
-- C-c C-o コード実行結果を開く(org-babel-open-src-block-result)
-- C-c ' ソースコード編集(org-edit-src-code)
-  - どうもEoom Emacsだと keybindingが外れいてる.
-  - C-c l '(org-edit-special)で開く.
-
-#+begin_src emacs-lisp :tangle yes
-(after! org
-  ;; https://stackoverflow.com/questions/53469017/org-mode-source-editing-indents-code-after-exiting-source-code-block-editor
-  ;; インデント. default 2になっているとへんな隙間が先頭に入る.
-  (setq org-edit-src-content-indentation 0)
-  (setq org-src-preserve-indentation t)
-  ;; TABの挙動
-  (setq org-src-tab-acts-natively t)
-  ;; org-babel のソースをキレイに表示.
-  (setq org-src-fontify-natively t)
-  (setq org-fontify-whole-heading-line t)
-
-  ;; 評価でいちいち質問されないように.
-  (setq org-confirm-babel-evaluate nil)
-
-  ;; org-babel で 実行した言語を書く. デフォルトでは emacs-lisp だけ.
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((lisp . t)
-     (shell . t)
-     (clojure . t)))
-  (org-defkey org-mode-map "\C-u\C-x\C-e" 'cider-eval-last-sexp)
-)
-#+end_src
-
-refs:
-
-- [[https://orgmode.org/manual/Key-bindings-and-Useful-Functions.html][org-babel Key bindings and Useful Functions (The Org Manual)]]
-- [[https://misohena.jp/blog/2017-10-26-how-to-use-code-block-of-emacs-org-mode.html][org-modeのコードブロック(Babel)の使い方 | Misohena Blog]]
-
-** org-export
-
-Org-modeのファイルをエクスポートする機能.
+Org-modeのファイルをエクスポートする機能. ox package.
 
 サブパッケージが数多くあるが, ここでは共通情報まとめ.
 
@@ -1137,7 +1127,7 @@ The HTML export back-end transforms ‘<’ and ‘>’ to ‘&lt;’ and ‘&gt
    'org-export-filter-plain-text-functions 'my/hugo-filter-html-lt))
 #+end_src
 
-** ox-hugo
+*** ox-hugo
 
 Org-modeで書いたブログ記事をHugoにあったMarkdown形式に変換する.
 
@@ -1156,7 +1146,7 @@ Org-modeで書いたブログ記事をHugoにあったMarkdown形式に変換す
 
 このox-hugoで出力されるMarkdownはどうもリスト表示でスペースが4つ入ってしまう. GitHub Favorite Markdownのようにリストでのスペース２であって欲しいものの解決方法が見つからない.
 
-** ox-rst
+*** ox-rst
 
 Org-modeで書いたWiki用のページをSphinxで公開するためにreST形式に変換する.
 
@@ -1174,7 +1164,64 @@ Org-modeで書いたWiki用のページをSphinxで公開するためにreST形�
                'my/rst-to-sphinx-link-format))
 #+end_src
 
-** ob-html
+*** ox-qmd
+
+GitHub Flavored Markdown.
+
+標準のMarkdownの出力だと見た目が悪い. Bufferに書き出してGitHubとかにコピペするとき用にいれておく.
+
+ref. [[https://qiita.com/0x60df/items/3cde67967e3db30d9afe][Org-modeからQiita準拠のMarkdownをexportするパッケージを作ってみました - Qiita]]
+
+#+begin_src emacs-lisp :tangle yes
+(use-package! ox-qmd)
+#+end_src
+
+ox-gfmは2017からメンテされてないのでやめとくか([[https://github.com/larstvei/ox-gfm/issues/44][ref]]).
+
+** org-babel(ob)
+
+Org-modeのなかでLiterature Programming.
+
+基本操作:
+
+- C-c C-, コードブロックの挿入テンプレート呼び出し(org-insert-structure-tempate)
+- C-c C-c コード実行(org-babel-execute-src-block)
+- C-c C-o コード実行結果を開く(org-babel-open-src-block-result)
+- C-c ' ソースコード編集(org-edit-src-code)
+  - どうもEoom Emacsだと keybindingが外れいてる.
+  - C-c l '(org-edit-special)で開く.
+
+#+begin_src emacs-lisp :tangle yes
+(after! org
+  ;; https://stackoverflow.com/questions/53469017/org-mode-source-editing-indents-code-after-exiting-source-code-block-editor
+  ;; インデント. default 2になっているとへんな隙間が先頭に入る.
+  (setq org-edit-src-content-indentation 0)
+  (setq org-src-preserve-indentation t)
+  ;; TABの挙動
+  (setq org-src-tab-acts-natively t)
+  ;; org-babel のソースをキレイに表示.
+  (setq org-src-fontify-natively t)
+  (setq org-fontify-whole-heading-line t)
+
+  ;; 評価でいちいち質問されないように.
+  (setq org-confirm-babel-evaluate nil)
+
+  ;; org-babel で 実行した言語を書く. デフォルトでは emacs-lisp だけ.
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((lisp . t)
+     (shell . t)
+     (clojure . t)))
+  (org-defkey org-mode-map "\C-u\C-x\C-e" 'cider-eval-last-sexp)
+)
+#+end_src
+
+refs:
+
+- [[https://orgmode.org/manual/Key-bindings-and-Useful-Functions.html][org-babel Key bindings and Useful Functions (The Org Manual)]]
+- [[https://misohena.jp/blog/2017-10-26-how-to-use-code-block-of-emacs-org-mode.html][org-modeのコードブロック(Babel)の使い方 | Misohena Blog]]
+
+*** ob-html
 
 [[https://misohena.jp/blog/2021-08-03-execute-html-in-org-mode-code-blocks.html][org-modeのコードブロックでHTMLを「実行」する | Misohena Blog]]
 
@@ -1184,21 +1231,6 @@ Org-modeで書いたWiki用のページをSphinxで公開するためにreST形�
   :config
   ;; C-c C-o でブラウザで開く.
   (org-babel-html-enable-open-src-block-result-temporary))
-#+end_src
-
-** org-toggl
-
-org-modeをTogglと連携させる.
-https://github.com/mbork/org-toggl
-
-#+begin_src emacs-lisp :tangle yes
-(use-package! org-toggl
-  :after org
-  :config
-  (setq org-toggl-inherit-toggl-properties t)
-  (toggl-get-projects)
-  (setq toggl-default-project "GTD")
-  (org-toggl-integration-mode))
 #+end_src
 
 ** Org-roam
@@ -1381,6 +1413,55 @@ ref. [[https://org-roam.discourse.group/t/org-journal-vs-org-roam-dailies/384][O
               :unnarrowed nil ;; ほかのエントリは見えないように.
               :klll-buffer t)))
 #+end_src
+*** org-roam-ui
+
+Web UI.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package! websocket
+    :after org-roam)
+(use-package! org-roam-ui
+    :after org-roam ;; or :after org
+;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+;;         a hookable mode anymore, you're advised to pick something yourself
+;;         if you don't care about startup time, use
+    ;; :hook (after-init . org-roam-ui-mode)
+    :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))
+
+
+#+end_src
+
+*** org-roam-timestamps(disabled)
+
+org-roam-uiでつかうメタ情報を付与することが目的だが現状使っていないのでいったん封印.
+
+#+begin_src emacs-lisp :tangle no
+(use-package! org-roam-timestamps
+   :after org-roam
+   :config
+   (org-roam-timestamps-mode)
+   (setq org-roam-timestamps-remember-timestamps nil)
+   (setq org-roam-timestamps-remember-timestamps nil))
+#+end_src
+
+** org-toggl
+
+org-modeをTogglと連携させる.
+https://github.com/mbork/org-toggl
+
+#+begin_src emacs-lisp :tangle yes
+(use-package! org-toggl
+  :after org
+  :config
+  (setq org-toggl-inherit-toggl-properties t)
+  (toggl-get-projects)
+  (setq toggl-default-project "GTD")
+  (org-toggl-integration-mode))
+#+end_src
 
 ** org-journal
 
@@ -1418,42 +1499,7 @@ https://github.com/bastibe/org-journal
 )
 #+end_src
 
-** org-roam-ui
-
-Web UI.
-
-#+begin_src emacs-lisp :tangle yes
-(use-package! websocket
-    :after org-roam)
-(use-package! org-roam-ui
-    :after org-roam ;; or :after org
-;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
-;;         a hookable mode anymore, you're advised to pick something yourself
-;;         if you don't care about startup time, use
-    ;; :hook (after-init . org-roam-ui-mode)
-    :config
-    (setq org-roam-ui-sync-theme t
-          org-roam-ui-follow t
-          org-roam-ui-update-on-save t
-          org-roam-ui-open-on-start t))
-
-
-#+end_src
-
-*** org-roam-timestamps(disabled)
-
-org-roam-uiでつかうメタ情報を付与することが目的だが現状使っていないのでいったん封印.
-
-#+begin_src emacs-lisp :tangle no
-(use-package! org-roam-timestamps
-   :after org-roam
-   :config
-   (org-roam-timestamps-mode)
-   (setq org-roam-timestamps-remember-timestamps nil)
-   (setq org-roam-timestamps-remember-timestamps nil))
-#+end_src
-
-** bibtex関連(Org-ref)
+** org-ref(bibtex)
 
 文献管理. Zoteroと連携して，論文というよりは書籍やYoutube動画やWeb記事のメモに利用.
 
@@ -1659,6 +1705,7 @@ ref: [[https://magit.vc/manual/forge/][Forge User and Developer Manual]]
   ;; org-journalへの貼り付けを想定しているのでこの設定にしておく.
   (setq git-link-use-commit t))
 #+end_src
+
 
 * UI
 
