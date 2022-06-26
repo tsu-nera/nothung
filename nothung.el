@@ -192,6 +192,10 @@
 (setq-default display-fill-column-indicator-column 74)
 (global-display-fill-column-indicator-mode)
 
+(use-package! iedit
+  :bind
+  ("C-;" . iedit-mode))
+
 ;; Emacs
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (pixel-scroll-precision-mode)
@@ -211,7 +215,7 @@
 (setq recentf-max-saved-items 500)
 
 ;; GCを減らして軽くする.
-(setq gc-cons-threshold (* gc-cons-threshold 10))
+;; (setq gc-cons-threshold (* gc-cons-threshold 10))
 ;; GCの上限閾値をあえて下げる(低スペックPC)
 ;; (setq gc-cons-threshold (/ gc-cons-threshold 10))
 
@@ -648,29 +652,6 @@
              :unnrrowed t
              :kill-buffer t)) org-capture-templates)))
 
-(after! org
-  ;; https://stackoverflow.com/questions/53469017/org-mode-source-editing-indents-code-after-exiting-source-code-block-editor
-  ;; インデント. default 2になっているとへんな隙間が先頭に入る.
-  (setq org-edit-src-content-indentation 0)
-  (setq org-src-preserve-indentation t)
-  ;; TABの挙動
-  (setq org-src-tab-acts-natively t)
-  ;; org-babel のソースをキレイに表示.
-  (setq org-src-fontify-natively t)
-  (setq org-fontify-whole-heading-line t)
-
-  ;; 評価でいちいち質問されないように.
-  (setq org-confirm-babel-evaluate nil)
-
-  ;; org-babel で 実行した言語を書く. デフォルトでは emacs-lisp だけ.
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((lisp . t)
-     (shell . t)
-     (clojure . t)))
-  (org-defkey org-mode-map "\C-u\C-x\C-e" 'cider-eval-last-sexp)
-)
-
 (after! ox
   (defun my/hugo-filter-html-amp (text backend info)
     (when (org-export-derived-backend-p backend 'hugo)
@@ -707,19 +688,36 @@
   (add-to-list 'org-export-filter-link-functions
                'my/rst-to-sphinx-link-format))
 
+(use-package! ox-qmd)
+
+(after! org
+  ;; https://stackoverflow.com/questions/53469017/org-mode-source-editing-indents-code-after-exiting-source-code-block-editor
+  ;; インデント. default 2になっているとへんな隙間が先頭に入る.
+  (setq org-edit-src-content-indentation 0)
+  (setq org-src-preserve-indentation t)
+  ;; TABの挙動
+  (setq org-src-tab-acts-natively t)
+  ;; org-babel のソースをキレイに表示.
+  (setq org-src-fontify-natively t)
+  (setq org-fontify-whole-heading-line t)
+
+  ;; 評価でいちいち質問されないように.
+  (setq org-confirm-babel-evaluate nil)
+
+  ;; org-babel で 実行した言語を書く. デフォルトでは emacs-lisp だけ.
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((lisp . t)
+     (shell . t)
+     (clojure . t)))
+  (org-defkey org-mode-map "\C-u\C-x\C-e" 'cider-eval-last-sexp)
+)
+
 (use-package! ob-html
   :after org
   :config
   ;; C-c C-o でブラウザで開く.
   (org-babel-html-enable-open-src-block-result-temporary))
-
-(use-package! org-toggl
-  :after org
-  :config
-  (setq org-toggl-inherit-toggl-properties t)
-  (toggl-get-projects)
-  (setq toggl-default-project "GTD")
-  (org-toggl-integration-mode))
 
 ;; org-roam
 (setq org-roam-directory (file-truename "~/keido/notes"))
@@ -866,6 +864,28 @@
               :unnarrowed nil ;; ほかのエントリは見えないように.
               :klll-buffer t)))
 
+(use-package! websocket
+    :after org-roam)
+(use-package! org-roam-ui
+    :after org-roam ;; or :after org
+;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+;;         a hookable mode anymore, you're advised to pick something yourself
+;;         if you don't care about startup time, use
+    ;; :hook (after-init . org-roam-ui-mode)
+    :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))
+
+(use-package! org-toggl
+  :after org
+  :config
+  (setq org-toggl-inherit-toggl-properties t)
+  (toggl-get-projects)
+  (setq toggl-default-project "GTD")
+  (org-toggl-integration-mode))
+
 (use-package! org-journal
   :after org
   :bind
@@ -895,20 +915,6 @@
     (goto-char (point-max)))
   (add-hook 'org-journal-after-header-create-hook 'org-create-new-id-journal)
 )
-
-(use-package! websocket
-    :after org-roam)
-(use-package! org-roam-ui
-    :after org-roam ;; or :after org
-;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
-;;         a hookable mode anymore, you're advised to pick something yourself
-;;         if you don't care about startup time, use
-    ;; :hook (after-init . org-roam-ui-mode)
-    :config
-    (setq org-roam-ui-sync-theme t
-          org-roam-ui-follow t
-          org-roam-ui-update-on-save t
-          org-roam-ui-open-on-start t))
 
 (use-package! org-ref
   :config
@@ -1078,3 +1084,7 @@
 
 ;; 実験, どうもマウス操作でEmacsの制御が効かなくなることがあるので.
 (setq make-pointer-invisible nil)
+
+(general-def
+  :keymaps 'override
+  "C-u" 'universal-argument)

@@ -226,6 +226,8 @@ https://github.com/iyefrat/all-the-icons-completion
   (setq-default pdf-view-display-size 'fit-width)
   :custom
   (pdf-annot-activate-created-annotations t "automatically annotate highlights"))
+
+
 #+end_src
 
 * Editor
@@ -384,6 +386,19 @@ Emacsの画面に1行80文字のところに線を薄く引く.
 (global-display-fill-column-indicator-mode)
 #+end_src
 
+
+** iedit
+
+複数同時編集. 
+
+なおDoom Emacsだと +company/completeとC-;のkeybind競合.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package! iedit
+  :bind
+  ("C-;" . iedit-mode))
+#+end_src
+
 * Emacs
 
 #+begin_src emacs-lisp :tangle yes
@@ -418,7 +433,7 @@ Emacsの画面に1行80文字のところに線を薄く引く.
 
 #+begin_src emacs-lisp :tangle yes
 ;; GCを減らして軽くする.
-(setq gc-cons-threshold (* gc-cons-threshold 10))
+;; (setq gc-cons-threshold (* gc-cons-threshold 10))
 ;; GCの上限閾値をあえて下げる(低スペックPC)
 ;; (setq gc-cons-threshold (/ gc-cons-threshold 10))
 
@@ -1706,7 +1721,6 @@ ref: [[https://magit.vc/manual/forge/][Forge User and Developer Manual]]
   (setq git-link-use-commit t))
 #+end_src
 
-
 * UI
 
 みため周りの設定.
@@ -1816,4 +1830,8 @@ TODOほかラベルを美しく.
 
 ;; 実験, どうもマウス操作でEmacsの制御が効かなくなることがあるので.
 (setq make-pointer-invisible nil)
+
+(general-def
+  :keymaps 'override
+  "C-u" 'universal-argument)
 #+end_src

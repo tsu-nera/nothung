@@ -12,6 +12,7 @@
 ;; どうも japanese module の migemo は動作しないので個別にいれる.
 (package! migemo)
 (package! avy-migemo)
+(package! iedit)
 
 (package! fcitx)
 (package! pangu-spacing)
