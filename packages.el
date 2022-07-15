@@ -31,7 +31,8 @@
 (package! ox-qmd)
 
 (package! org-roam-ui)
-(package! org-roam-timestamps)
+(package! consult-org-roam)
+;; (package! org-roam-timestamps)
 (package! org-roam-bibtex
   :recipe (:host github :repo "org-roam/org-roam-bibtex"))
 (package! org-toggl :recipe (:host github :repo "mbork/org-toggl"))
@@ -67,6 +68,7 @@
 
 (package! visual-fill-column)
 (package! svg-tag-mode)
+(package! org-preview-html)
 
 ;; To install a package directly from a remote git repo, you must specify a
 ;; `:recipe'. You'll find documentation on what `:recipe' accepts here:

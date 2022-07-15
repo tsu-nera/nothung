@@ -848,6 +848,8 @@ EmacsのWindow Manager.
   (setq org-hide-emphasis-markers t) ;; * を消して表示.
   (setq org-pretty-entities t)
 
+  (setq system-time-locale "C") ;; カレンダー表示を英語表記へ
+
   (setq org-footnote-section "Notes") ;; defaultではFootnotesなので変える.
   (setq org-footnote-auto-adjust t)
 
@@ -919,7 +921,10 @@ EmacsのWindow Manager.
 ;; (set-face-attribute 'org-level-1 nil :inherit 'org-level-8 :height 1.728) ;\LARGE
 ;; Only use the first 4 styles and do not cycle.
 (setq org-cycle-level-faces nil)
-(setq org-n-level-faces 4)
+
+;; orgの階層の色分けレベル.
+;; (setq org-n-level-faces 8)
+
 ;; Document Title, (\huge)
 ;; (set-face-attribute 'org-document-title nil
 ;;                    :height 2.074
@@ -973,6 +978,19 @@ org-mode で timestamp のみを挿入するカスタム関数. Doom Emacsのせ
 ;; 空白が保存時に削除されると bullet 表示がおかしくなる.
 ;; なお wl-bulter は doom emacs のデフォルトで組み込まれている.
 (add-hook! 'org-mode-hook (ws-butler-mode -1))
+#+end_src
+
+** TODOキーワード拡張
+
+TODOキーワードのカスタマイズ.
+
+ref. [[https://orgmode.org/manual/TODO-Extensions.html][TODO Extensions (The Org Manual)]]
+
+#+begin_src emacs-lisp :tangle yes
+(setq org-todo-keywords
+      '((sequence "TODO(t)" "NEXT(n)" "PROJ(p)" "WAIT(w)" "|" "DONE(d)")
+        (sequence "✅(c)" "💡(b)" "📍(r)" "🔍(s)" "📊(a)" "🔬(e)" "🗣(h)" "|")
+        (sequence "🎓(z)" "📝(m)" "|")))
 #+end_src
 
 ** org-capture
@@ -1081,12 +1099,29 @@ org-mode で timestamp のみを挿入するカスタム関数. Doom Emacsのせ
              :kill-buffer t)) org-capture-templates)))
 #+end_src
 
+*** capture to project journal
+
+#+begin_src emacs-lisp :tangle yes
+(after! org
+  (defconst my/bakuchi-journal-file-path
+        "~/keido/notes/zk/journal_bakuchi.org")
+  (setq org-capture-templates
+        (append 
+         org-capture-templates
+        '(("B" "🖊 bakuchi journal" entry
+           (file+olp+datetree my/bakuchi-journal-file-path)
+           "* %?\nCaptured On: %T\n"
+           :unnarrowed t
+           :empty-lines 1
+           :tree-type week
+           :klll-buffer t)))))
+#+end_src
+
 *** Google Chrome Extention: Org Capture
 
 Google Chromeにを入れることでWeb Pageがorg-captureと連携([[https://chrome.google.com/webstore/detail/org-capture/kkkjlfejijcjgjllecmnejhogpbcigdc?hl=ja][link]]).
 
 ChromeでCtrl + Shift + Lで起動.
-
 
 ** org-export(ox)
 
@@ -1142,6 +1177,16 @@ The HTML export back-end transforms ‘<’ and ‘>’ to ‘&lt;’ and ‘&gt
    'org-export-filter-plain-text-functions 'my/hugo-filter-html-lt))
 #+end_src
 
+*** org-preview-html
+
+今のEmacs, xwidget用にコンパイルしてなかったな...
+
+ewwでプレビューできる.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package! org-preview-html)
+#+end_src
+
 *** ox-hugo
 
 Org-modeで書いたブログ記事をHugoにあったMarkdown形式に変換する.
@@ -1157,6 +1202,15 @@ Org-modeで書いたブログ記事をHugoにあったMarkdown形式に変換す
 
 ;; org-roamのexportで多様するのでC-c rのprefixをつけておく.
 (global-set-key (kbd "C-c r e") 'org-hugo-export-to-md)
+
+;; org-hugo-get-idを使うように設定.
+(setq org-hugo-anchor-functions '(org-hugo-get-page-or-bundle-name
+                                  org-hugo-get-custom-id
+                                  org-hugo-get-id
+                                  org-hugo-get-md5
+                                  ;; 日本語に不向きな気がする
+                                  org-hugo-get-heading-slug
+                                  ))
 #+end_src
 
 このox-hugoで出力されるMarkdownはどうもリスト表示でスペースが4つ入ってしまう. GitHub Favorite Markdownのようにリストでのスペース２であって欲しいものの解決方法が見つからない.
@@ -1358,8 +1412,46 @@ Zettelkasten MethodのOrg-roam実装.
     (org-roam-update-org-id-locations)
     (org-roam-db-sync))
 
+  (setq org-roam-mode-sections
+        '((org-roam-backlinks-section :unique t)))
+
+
   (setq +org-roam-open-buffer-on-find-file nil)
   (org-roam-db-autosync-mode))
+#+end_src
+
+#+begin_src emacs-lisp :tangle yes
+(setq org-roam-db-node-include-function
+      (lambda ()
+        (not (member "" (org-get-tags)))))
+#+end_src
+
+*** consult-org-roam(Org-roam検索強化)
+
+以下の機能を提供.ファイル名は今は日付にしているからいらないかな.全文検索は動かない.バックリンク検索だけ使えそう.
+
+- ファイル名検索
+- バックリンク検索
+- 全文検索
+
+#+begin_src emacs-lisp :tangle yes
+(use-package! consult-org-roam
+   :ensure t
+   :init
+   (require 'consult-org-roam)
+   ;; Activate the minor-mode
+   (consult-org-roam-mode 1)
+   :custom
+   (consult-org-roam-grep-func #'consult-ripgrep)
+   :config
+   ;; Eventually suppress previewing for certain functions
+   (consult-customize
+    consult-org-roam-forward-links
+    :preview-key (kbd "M-."))
+   :bind
+   ("C-c r F" . consult-org-roam-file-find)
+   ("C-c r b" . consult-org-roam-backlinks)
+   ("C-c r S" . consult-org-roam-search))
 #+end_src
 
 *** Org-roam管理下のノートの全文検索
@@ -1675,6 +1767,12 @@ https://github.com/org-trello/org-trello/issues/418
     (org-trello-sync-buffer t)))
 #+end_src
 
+** org-table
+
+#+begin_src emacs-lisp :tangle yes
+(setq org-table-export-default-format "orgtbl-to-csv")
+#+end_src
+
 * Term
 #+begin_src emacs-lisp :tangle yes
 ;; Term
@@ -1744,9 +1842,9 @@ ref: [[https://magit.vc/manual/forge/][Forge User and Developer Manual]]
 ;; counselとdoom-modelineが相性悪いようなので
 ;; workspace name表示のためには追加で設定.
 ;; https://github.com/hlissner/doom-emacs/issues/314
-(after! doom-modeline
-  (setq doom-modeline-icon (display-graphic-p))
-  (setq doom-modeline-major-mode-icon t))
+;; (after! doom-modeline
+;;  (setq doom-modeline-icon (display-graphic-p))
+;;  (setq doom-modeline-major-mode-icon t))
 #+end_src
 
 https://github.com/seagle0128/doom-modeline
@@ -1831,7 +1929,7 @@ TODOほかラベルを美しく.
 ;; 実験, どうもマウス操作でEmacsの制御が効かなくなることがあるので.
 (setq make-pointer-invisible nil)
 
-(general-def
-  :keymaps 'override
-  "C-u" 'universal-argument)
+;; (general-def
+;;  :keymaps 'override
+;;   "C-u" 'universal-argument)
 #+end_src

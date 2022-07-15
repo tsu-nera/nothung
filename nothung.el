@@ -439,6 +439,8 @@
   (setq org-hide-emphasis-markers t) ;; * を消して表示.
   (setq org-pretty-entities t)
 
+  (setq system-time-locale "C") ;; カレンダー表示を英語表記へ
+
   (setq org-footnote-section "Notes") ;; defaultではFootnotesなので変える.
   (setq org-footnote-auto-adjust t)
 
@@ -510,7 +512,10 @@
 ;; (set-face-attribute 'org-level-1 nil :inherit 'org-level-8 :height 1.728) ;\LARGE
 ;; Only use the first 4 styles and do not cycle.
 (setq org-cycle-level-faces nil)
-(setq org-n-level-faces 4)
+
+;; orgの階層の色分けレベル.
+;; (setq org-n-level-faces 8)
+
 ;; Document Title, (\huge)
 ;; (set-face-attribute 'org-document-title nil
 ;;                    :height 2.074
@@ -555,6 +560,11 @@
 ;; 空白が保存時に削除されると bullet 表示がおかしくなる.
 ;; なお wl-bulter は doom emacs のデフォルトで組み込まれている.
 (add-hook! 'org-mode-hook (ws-butler-mode -1))
+
+(setq org-todo-keywords
+      '((sequence "TODO(t)" "NEXT(n)" "PROJ(p)" "WAIT(w)" "|" "DONE(d)")
+        (sequence "✅(c)" "💡(b)" "📍(r)" "🔍(s)" "📊(a)" "🔬(e)" "🗣(h)" "|")
+        (sequence "🎓(z)" "📝(m)" "|")))
 
 (after! org
   (defconst my/captured-notes-file "~/keido/inbox/inbox.org")
@@ -652,6 +662,20 @@
              :unnrrowed t
              :kill-buffer t)) org-capture-templates)))
 
+(after! org
+  (defconst my/bakuchi-journal-file-path
+        "~/keido/notes/zk/journal_bakuchi.org")
+  (setq org-capture-templates
+        (append 
+         org-capture-templates
+        '(("B" "🖊 bakuchi journal" entry
+           (file+olp+datetree my/bakuchi-journal-file-path)
+           "* %?\nCaptured On: %T\n"
+           :unnarrowed t
+           :empty-lines 1
+           :tree-type week
+           :klll-buffer t)))))
+
 (after! ox
   (defun my/hugo-filter-html-amp (text backend info)
     (when (org-export-derived-backend-p backend 'hugo)
@@ -669,6 +693,8 @@
   (add-to-list
    'org-export-filter-plain-text-functions 'my/hugo-filter-html-lt))
 
+(use-package! org-preview-html)
+
 (use-package! ox-hugo
   :after 'ox
   :config
@@ -677,6 +703,15 @@
 
 ;; org-roamのexportで多様するのでC-c rのprefixをつけておく.
 (global-set-key (kbd "C-c r e") 'org-hugo-export-to-md)
+
+;; org-hugo-get-idを使うように設定.
+(setq org-hugo-anchor-functions '(org-hugo-get-page-or-bundle-name
+                                  org-hugo-get-custom-id
+                                  org-hugo-get-id
+                                  org-hugo-get-md5
+                                  ;; 日本語に不向きな気がする
+                                  org-hugo-get-heading-slug
+                                  ))
 
 (use-package! ox-rst
   :after 'ox)
@@ -824,8 +859,34 @@
     (org-roam-update-org-id-locations)
     (org-roam-db-sync))
 
+  (setq org-roam-mode-sections
+        '((org-roam-backlinks-section :unique t)))
+
+
   (setq +org-roam-open-buffer-on-find-file nil)
   (org-roam-db-autosync-mode))
+
+(setq org-roam-db-node-include-function
+      (lambda ()
+        (not (member "" (org-get-tags)))))
+
+(use-package! consult-org-roam
+   :ensure t
+   :init
+   (require 'consult-org-roam)
+   ;; Activate the minor-mode
+   (consult-org-roam-mode 1)
+   :custom
+   (consult-org-roam-grep-func #'consult-ripgrep)
+   :config
+   ;; Eventually suppress previewing for certain functions
+   (consult-customize
+    consult-org-roam-forward-links
+    :preview-key (kbd "M-."))
+   :bind
+   ("C-c r F" . consult-org-roam-file-find)
+   ("C-c r b" . consult-org-roam-backlinks)
+   ("C-c r S" . consult-org-roam-search))
 
 (defun my/org-roam-rg-search ()
   "Search org-roam directory using consult-ripgrep. With live-preview."
@@ -995,6 +1056,8 @@
 (require 'org-bars)
 (add-hook! 'org-mode-hook #'org-bars-mode)
 
+(setq org-table-export-default-format "orgtbl-to-csv")
+
 ;; Term
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -1030,9 +1093,9 @@
 ;; counselとdoom-modelineが相性悪いようなので
 ;; workspace name表示のためには追加で設定.
 ;; https://github.com/hlissner/doom-emacs/issues/314
-(after! doom-modeline
-  (setq doom-modeline-icon (display-graphic-p))
-  (setq doom-modeline-major-mode-icon t))
+;; (after! doom-modeline
+;;  (setq doom-modeline-icon (display-graphic-p))
+;;  (setq doom-modeline-major-mode-icon t))
 
 (after! emojify
   (setq emojify-emoji-set "twemoji-v2-22"))
@@ -1085,6 +1148,6 @@
 ;; 実験, どうもマウス操作でEmacsの制御が効かなくなることがあるので.
 (setq make-pointer-invisible nil)
 
-(general-def
-  :keymaps 'override
-  "C-u" 'universal-argument)
+;; (general-def
+;;  :keymaps 'override
+;;   "C-u" 'universal-argument)
