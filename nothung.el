@@ -793,9 +793,10 @@
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:🔖${title}\n#+filetags: :TAG:\n")
       :unnarrowed t)
-     ("p" "👨 Person" plain "%?"
-      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:👨${title}\n#+filetags: :PERSON:TAG:\n")
+     ("h" "👨 Person" plain "%?"
+      :target (file+head 
+               "zk/%<%Y%m%d%H%M%S>.org"                 
+               "#+title:👨${title}\n#+filetags: :PERSON:\n")
       :unnarrowed t)
      ("i" "📂 TOC" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
@@ -805,17 +806,23 @@
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:🏛${title}\n#+filetags: :MOC:\n")
       :unnarrowed t)
-     ("i" "💡 Issue" plain "%?"
+     ("i" "✅ Issue" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:💡${title}\n#+filetags: :ISSUE:\n")
+                        "#+title:✅${title}\n#+filetags: :ISSUE:\n")
+      :unnarrowed t)
+     ("p" "⚙ Pattern" plain "%?"
+      :target (file+head 
+               "zk/%<%Y%m%d%H%M%S>.org"
+               "#+title:⚙${title}\n#+filetags: :PATTERN:\n")
       :unnarrowed t)
      ("d" "🗒 DOC" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:🗒${title}\n#+filetags: :DOC:\n")
       :unnarrowrd t)
      ("f" "🦊 Darkfox" plain "%?"
-      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:🦊${title}\n#+filetags: :DARKFOX:\n")
+      :target (file+head 
+               "zk/%<%Y%m%d%H%M%S>.org"
+               "#+title:🦊${title}\n#+filetags: :DARKFOX:\n")
       :unnarrowed t)
      ("b" "📚 Book" plain
       "%?
