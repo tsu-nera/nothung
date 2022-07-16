@@ -517,7 +517,7 @@
 (setq org-todo-keywords
       '((sequence "TODO(t)" "NEXT(n)" "PROJ(p)" "WAIT(w)" "|" "DONE(d)")
         (sequence "✅(c)" "💡(b)" "📍(r)" "🔍(s)" "📊(a)" "🔬(e)" "🗣(h)" "|")
-        (sequence "🎓(z)" "📝(m)" "|")))
+        (sequence "🎓(z)" "📝(m)" "🔗(l)" "|")))
 
 (after! org
   (setq org-capture-templates
@@ -626,13 +626,20 @@
   (setq org-capture-templates
         (append 
          org-capture-templates
-        '(("B" "🖊 bakuchi journal" entry
+        '(("b" "🖊 bakuchi entry" entry
            (file+olp+datetree my/project-journal-bakuchi)
            "* %?\nCaptured On: %T\n"
            :unnarrowed t
            :empty-lines 1
            :tree-type week
-           :klll-buffer t)))))
+           :klll-buffer t)
+          ("B" "🖊+✍ bakuchi append" plain
+           (file my/project-journal-bakuchi)
+           "%?"
+           :empty-lines 1
+           :unnarrowed t
+           :jump-to-captured t
+           :kill-buffer t)))))
 
 (after! ox
   (defun my/hugo-filter-html-amp (text backend info)

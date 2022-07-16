@@ -938,7 +938,7 @@ EmacsのWindow Manager.
 
 ** TODOキーワード拡張
 
-TODOキーワードのカスタマイズ.
+TODOキーワードのカスタマイズ. M-x C-c t.
 
 ref. [[https://orgmode.org/manual/TODO-Extensions.html][TODO Extensions (The Org Manual)]]
 
@@ -946,7 +946,7 @@ ref. [[https://orgmode.org/manual/TODO-Extensions.html][TODO Extensions (The Org
 (setq org-todo-keywords
       '((sequence "TODO(t)" "NEXT(n)" "PROJ(p)" "WAIT(w)" "|" "DONE(d)")
         (sequence "✅(c)" "💡(b)" "📍(r)" "🔍(s)" "📊(a)" "🔬(e)" "🗣(h)" "|")
-        (sequence "🎓(z)" "📝(m)" "|")))
+        (sequence "🎓(z)" "📝(m)" "🔗(l)" "|")))
 #+end_src
 
 ** org-capture
@@ -1069,13 +1069,20 @@ ref. [[https://orgmode.org/manual/TODO-Extensions.html][TODO Extensions (The Org
   (setq org-capture-templates
         (append 
          org-capture-templates
-        '(("B" "🖊 bakuchi journal" entry
+        '(("b" "🖊 bakuchi entry" entry
            (file+olp+datetree my/project-journal-bakuchi)
            "* %?\nCaptured On: %T\n"
            :unnarrowed t
            :empty-lines 1
            :tree-type week
-           :klll-buffer t)))))
+           :klll-buffer t)
+          ("B" "🖊+✍ bakuchi append" plain
+           (file my/project-journal-bakuchi)
+           "%?"
+           :empty-lines 1
+           :unnarrowed t
+           :jump-to-captured t
+           :kill-buffer t)))))
 #+end_src
 
 *** Google Chrome Extention: Org Capture
