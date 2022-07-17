@@ -1796,6 +1796,16 @@ https://github.com/org-trello/org-trello/issues/418
 (setq org-table-export-default-format "orgtbl-to-csv")
 #+end_src
 
+** org-sidebar
+
+https://github.com/alphapapa/org-sidebar
+
+org-sidebar-treeでサイドバーにアウトラインを表示.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package! org-sidebar)
+#+end_src
+
 ** 未分類(後で整理)
 
 org-mode で timestamp のみを挿入するカスタム関数. Doom EmacsのせいでC-u C-c .が動作しないので.

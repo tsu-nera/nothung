@@ -39,6 +39,7 @@
 ;; (package! org-trello :recipe (:build (:not native-compile)))
 
 (package! org-ref)
+(package! org-sidebar)
 
 (package! ace-link)
 (package! perfect-margin)

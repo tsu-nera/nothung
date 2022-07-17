@@ -1072,6 +1072,8 @@
 
 (setq org-table-export-default-format "orgtbl-to-csv")
 
+(use-package! org-sidebar)
+
 ;; 
 ;; (after! org
 ;;   (defun my/insert-timestamp ()
