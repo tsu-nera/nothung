@@ -72,7 +72,8 @@ notes:
 (use-package! ace-link
   :config
   (eval-after-load 'eww '(define-key eww-mode-map "f" 'ace-link-eww))
-  (ace-link-setup-default))
+  (ace-link-setup-default)
+  (define-key org-mode-map (kbd "M-o") 'ace-link-org))
 #+end_src
 
 ** org-web-tools
@@ -947,9 +948,9 @@ ref. [[https://orgmode.org/manual/TODO-Extensions.html][TODO Extensions (The Org
 
 #+begin_src emacs-lisp :tangle yes
 (setq org-todo-keywords
-      '((sequence "TODO(t)" "NEXT(n)" "PROJ(p)" "WAIT(w)" "|" "DONE(d)")
+      '((sequence "TODO(t)" "NEXT(n)" "WAIT(w)" "|" "DONE(d)")
         (sequence "✅(c)" "💡(b)" "📍(r)" "🔍(s)" "📊(a)" "🔬(e)" "🗣(h)" "|")
-        (sequence "🎓(z)" "📝(m)" "🔗(l)" "|")))
+        (sequence "🎓(z)" "📝(m)" "🔗(l)" "⚙(p)"  "|")))
 #+end_src
 
 ** org-capture
@@ -1071,7 +1072,6 @@ ref. [[https://orgmode.org/manual/TODO-Extensions.html][TODO Extensions (The Org
 (after! org
   (setq org-capture-templates
         (append 
-         org-capture-templates
         '(("b" "🖊 bakuchi entry" entry
            (file+olp+datetree my/project-journal-bakuchi)
            "* %?\nCaptured On: %T\n"
@@ -1092,8 +1092,11 @@ ref. [[https://orgmode.org/manual/TODO-Extensions.html][TODO Extensions (The Org
            :unnarrowed t
            :empty-lines 1
            :tree-type week
-           :klll-buffer t)))))
+           :klll-buffer t)) org-capture-templates)))
 #+end_src
+
+#+RESULTS:
+| b | 🖊 bakuchi entry | entry | (file+olp+datetree my/project-journal-bakuchi) | * %? |
 
 *** Google Chrome Extention: Org Capture
 
@@ -1175,20 +1178,20 @@ Org-modeで書いたブログ記事をHugoにあったMarkdown形式に変換す
 (use-package! ox-hugo
   :after 'ox
   :config
+  (setq org-hugo-auto-set-lastmod t)
   ;; なんか.dir-locals.elに書いても反映してくれないな. ココに書いとく.
-  (setq org-export-with-author nil))
-
-;; org-roamのexportで多様するのでC-c rのprefixをつけておく.
-(global-set-key (kbd "C-c r e") 'org-hugo-export-to-md)
-
-;; org-hugo-get-idを使うように設定.
-(setq org-hugo-anchor-functions '(org-hugo-get-page-or-bundle-name
-                                  org-hugo-get-custom-id
-                                  org-hugo-get-id
-                                  org-hugo-get-md5
-                                  ;; 日本語に不向きな気がする
-                                  org-hugo-get-heading-slug
-                                  ))
+  (setq org-export-with-author nil)
+  ;; org-hugo-get-idを使うように設定.
+  (setq org-hugo-anchor-functions '(org-hugo-get-page-or-bundle-name
+                                    org-hugo-get-custom-id
+                                    org-hugo-get-id
+                                    org-hugo-get-md5
+                                    ;; 日本語に不向きな気がする
+                                    org-hugo-get-heading-slug
+                                    ))
+  :bind
+  ;; org-roamのexportで多様するのでC-c rのprefixをつけておく.
+  ("C-c r e" . org-hugo-export-to-md))
 #+end_src
 
 このox-hugoで出力されるMarkdownはどうもリスト表示でスペースが4つ入ってしまう. GitHub Favorite Markdownのようにリストでのスペース２であって欲しいものの解決方法が見つからない.

@@ -19,7 +19,8 @@
 (use-package! ace-link
   :config
   (eval-after-load 'eww '(define-key eww-mode-map "f" 'ace-link-eww))
-  (ace-link-setup-default))
+  (ace-link-setup-default)
+  (define-key org-mode-map (kbd "M-o") 'ace-link-org))
 
 (use-package! org-web-tools
   :bind
@@ -436,6 +437,8 @@
   (defconst my/daily-journal-dir "~/keido/notes/journals/daily")
   (defconst my/project-journal-bakuchi
     "~/keido/notes/zk/journal_bakuchi.org")
+  (defconst my/project-journal-deepwork
+    "~/keido/notes/zk/journal_deepwork.org")
 
   ;; org-captureのtargetは詳しくいろいろ設定するのでdefaultは不要.
   ;; (setq org-default-notes-file "gtd/gtd_projects.org")
@@ -444,7 +447,8 @@
   ;; org-journalの機能でこのほかに今日のjournal fileが追加される.
   (setq org-agenda-files
         '(my/gtd-projects-file 
-          my/project-journal-bakuchi))
+          my/project-journal-bakuchi
+          my/project-journal-deepwork))
   )
 
 ;; Org mode
@@ -515,9 +519,9 @@
   (setq org-agenda-use-tag-inheritance nil))
 
 (setq org-todo-keywords
-      '((sequence "TODO(t)" "NEXT(n)" "PROJ(p)" "WAIT(w)" "|" "DONE(d)")
+      '((sequence "TODO(t)" "NEXT(n)" "WAIT(w)" "|" "DONE(d)")
         (sequence "✅(c)" "💡(b)" "📍(r)" "🔍(s)" "📊(a)" "🔬(e)" "🗣(h)" "|")
-        (sequence "🎓(z)" "📝(m)" "🔗(l)" "|")))
+        (sequence "🎓(z)" "📝(m)" "🔗(l)" "⚙(p)"  "|")))
 
 (after! org
   (setq org-capture-templates
@@ -625,7 +629,6 @@
 (after! org
   (setq org-capture-templates
         (append 
-         org-capture-templates
         '(("b" "🖊 bakuchi entry" entry
            (file+olp+datetree my/project-journal-bakuchi)
            "* %?\nCaptured On: %T\n"
@@ -639,7 +642,14 @@
            :empty-lines 1
            :unnarrowed t
            :jump-to-captured t
-           :kill-buffer t)))))
+           :kill-buffer t)
+          ("d" "🖊 DeepWork entry" entry
+           (file+olp+datetree my/project-journal-deepwork)
+           "* %?\nCaptured On: %T\n"
+           :unnarrowed t
+           :empty-lines 1
+           :tree-type week
+           :klll-buffer t)) org-capture-templates)))
 
 (after! ox
   (defun my/hugo-filter-html-amp (text backend info)
@@ -663,20 +673,20 @@
 (use-package! ox-hugo
   :after 'ox
   :config
+  (setq org-hugo-auto-set-lastmod t)
   ;; なんか.dir-locals.elに書いても反映してくれないな. ココに書いとく.
-  (setq org-export-with-author nil))
-
-;; org-roamのexportで多様するのでC-c rのprefixをつけておく.
-(global-set-key (kbd "C-c r e") 'org-hugo-export-to-md)
-
-;; org-hugo-get-idを使うように設定.
-(setq org-hugo-anchor-functions '(org-hugo-get-page-or-bundle-name
-                                  org-hugo-get-custom-id
-                                  org-hugo-get-id
-                                  org-hugo-get-md5
-                                  ;; 日本語に不向きな気がする
-                                  org-hugo-get-heading-slug
-                                  ))
+  (setq org-export-with-author nil)
+  ;; org-hugo-get-idを使うように設定.
+  (setq org-hugo-anchor-functions '(org-hugo-get-page-or-bundle-name
+                                    org-hugo-get-custom-id
+                                    org-hugo-get-id
+                                    org-hugo-get-md5
+                                    ;; 日本語に不向きな気がする
+                                    org-hugo-get-heading-slug
+                                    ))
+  :bind
+  ;; org-roamのexportで多様するのでC-c rのprefixをつけておく.
+  ("C-c r e" . org-hugo-export-to-md))
 
 (use-package! ox-rst
   :after 'ox)
