@@ -436,7 +436,7 @@
   (defconst my/inbox-file "~/keido/inbox/inbox.org")
   (defconst my/daily-journal-dir "~/keido/notes/journals/daily")
   (defconst my/project-journal-bakuchi
-    "~/keido/notes/zk/journal_bakuchi.org")
+    "~/repo/bakuchi-doc/notes/journal.org")
   (defconst my/project-journal-deepwork
     "~/keido/notes/zk/journal_deepwork.org")
 
@@ -446,10 +446,11 @@
   ;; 何でもかんでも agenda すると思いので厳選.
   ;; org-journalの機能でこのほかに今日のjournal fileが追加される.
   (setq org-agenda-files
-        '(my/gtd-projects-file 
-          my/project-journal-bakuchi
-          my/project-journal-deepwork))
-  )
+        (list
+         my/gtd-projects-file
+         my/project-journal-bakuchi
+         my/project-journal-deepwork))
+)
 
 ;; Org mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -671,25 +672,26 @@
 (use-package! org-preview-html)
 
 (use-package! ox-hugo
-  :after 'ox
-  :config
-  (setq org-hugo-auto-set-lastmod t)
-  ;; なんか.dir-locals.elに書いても反映してくれないな. ココに書いとく.
-  (setq org-export-with-author nil)
-  ;; org-hugo-get-idを使うように設定.
-  (setq org-hugo-anchor-functions '(org-hugo-get-page-or-bundle-name
-                                    org-hugo-get-custom-id
-                                    org-hugo-get-id
-                                    org-hugo-get-md5
-                                    ;; 日本語に不向きな気がする
-                                    org-hugo-get-heading-slug
-                                    ))
+  :after ox
   :bind
   ;; org-roamのexportで多様するのでC-c rのprefixをつけておく.
-  ("C-c r e" . org-hugo-export-to-md))
+  ("C-c r e" . org-hugo-export-to-md)
+  :config
+  (setq org-hugo-auto-set-lastmod t)
+  ;; なんか.dir-locals.elに書いても反映してくれないな. 
+  (setq org-export-with-author nil)
+  ;; org-hugo-get-idを使うように設定.
+  (setq org-hugo-anchor-functions 
+        '(org-hugo-get-page-or-bundle-name
+          org-hugo-get-custom-id
+          org-hugo-get-id
+          org-hugo-get-md5
+          ;; 日本語に不向きな気がする
+          ;; org-hugo-get-heading-slug
+          )))
 
 (use-package! ox-rst
-  :after 'ox)
+  :after ox)
 
 (after! ox
   (defun my/rst-to-sphinx-link-format (text backend info)
@@ -815,7 +817,7 @@
                "zk/%<%Y%m%d%H%M%S>.org"                 
                "#+title:👨${title}\n#+filetags: :PERSON:\n")
       :unnarrowed t)
-     ("i" "📂 TOC" plain "%?"
+     ("f" "📂 TOC" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:📂${title}\n#+filetags: :TOC:\n")
       :unnarrowed t)
@@ -836,7 +838,7 @@
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:🗒${title}\n#+filetags: :DOC:\n")
       :unnarrowrd t)
-     ("f" "🦊 Darkfox" plain "%?"
+     ("k" "🦊 Darkfox" plain "%?"
       :target (file+head 
                "zk/%<%Y%m%d%H%M%S>.org"
                "#+title:🦊${title}\n#+filetags: :DARKFOX:\n")
@@ -857,8 +859,6 @@
       "%?
 
 - title: %^{title}
-- editor: %^{editor}
-- date: %^{date}
 - url: %^{url}
 "
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
@@ -1084,15 +1084,14 @@
 
 (use-package! org-sidebar)
 
-;; 
-;; (after! org
-;;   (defun my/insert-timestamp ()
-;;     "Insert time stamp."
-;;     (interactive)
-;;     (org-insert-time-stamp (current-time) t)
-;;     ;; (insert (format-time-string "%H:%M"))
-;;     )
-;;   (map! :map org-mode-map "C-c C-." #'my/insert-timestamp))
+(after! org
+  (defun my/insert-timestamp ()
+    "Insert time stamp."
+    (interactive)
+    (org-insert-time-stamp (current-time) t)
+    ;; (insert (format-time-string "%H:%M"))
+    )
+  (map! :map org-mode-map "C-c C-." #'my/insert-timestamp))
 
 (add-hook! 'org-mode-hook (ws-butler-mode -1))
 
