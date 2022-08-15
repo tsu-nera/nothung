@@ -161,6 +161,7 @@ ewwとorgを便利にするツール群(https://github.com/alphapapa/org-web-too
   ("C-c g c" . avy-goto-char) ;; doom の keybind 上書き.
   ("C-c g l" . avy-goto-line) ;; doom の keybind 上書き.
   ("C-c g g". avy-goto-word-1))
+(global-set-key (kbd "C-c g L") 'consult-goto-line)
 
 ;; うまく動かないので封印 doom との相性が悪いのかも.
 ;; ひとまず migemo したいときは isearch で対応.
@@ -1894,8 +1895,7 @@ ref: [[https://magit.vc/manual/forge/][Forge User and Developer Manual]]
 [[https://github.com/sshaw/git-link][sshaw/git-link]]
 
 #+begin_src emacs-lisp :tangle yes
-;; つかってないのでキーバインド外す.
-;; (global-set-key (kbd "C-c g u") 'git-link)
+(global-set-key (kbd "C-c s g") 'git-link)
 (use-package! git-link
   :config
   ;; urlにbranchではなくcommit番号をつかう.

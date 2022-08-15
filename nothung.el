@@ -1111,8 +1111,7 @@
   ;; (setq magit-diff-refine-hunk 'all)
 )
 
-;; つかってないのでキーバインド外す.
-;; (global-set-key (kbd "C-c g u") 'git-link)
+(global-set-key (kbd "C-c s g") 'git-link)
 (use-package! git-link
   :config
   ;; urlにbranchではなくcommit番号をつかう.
