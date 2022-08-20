@@ -1989,7 +1989,8 @@ TODOほかラベルを美しく.
 ** Others
 
 #+begin_src emacs-lisp :tangle yes
-(setq display-line-numbers-type t) ; 行番号表示
+;; これがスクロールを遅くする可能性があるので実験的に抑止.
+(setq display-line-numbers-type nil) ; 行番号表示
 
 ;; less でのファイル閲覧に操作性を似せる mode.
 ;; view-mode は emacs 内蔵. C-x C-r で read-only-mode でファイルオープン

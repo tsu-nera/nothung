@@ -75,6 +75,7 @@
   ("C-c g c" . avy-goto-char) ;; doom の keybind 上書き.
   ("C-c g l" . avy-goto-line) ;; doom の keybind 上書き.
   ("C-c g g". avy-goto-word-1))
+(global-set-key (kbd "C-c g L") 'consult-goto-line)
 
 ;; うまく動かないので封印 doom との相性が悪いのかも.
 ;; ひとまず migemo したいときは isearch で対応.
@@ -1165,7 +1166,8 @@
                                        (svg-tag-make tag :beg 2 :end -1))))
           )))
 
-(setq display-line-numbers-type t) ; 行番号表示
+;; これがスクロールを遅くする可能性があるので実験的に抑止.
+(setq display-line-numbers-type nil) ; 行番号表示
 
 ;; less でのファイル閲覧に操作性を似せる mode.
 ;; view-mode は emacs 内蔵. C-x C-r で read-only-mode でファイルオープン
