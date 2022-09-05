@@ -51,6 +51,7 @@ ref. 過去の設定は[[https://github.com/tsu-nera/dotfiles/tree/master/.emacs
 #+end_src
 
 ** eww
+
 Emacsのテキストブラウザ([[https://www.gnu.org/software/emacs/manual/html_mono/eww.html][Manual]])
 
 notes:
@@ -392,7 +393,7 @@ Emacsの画面に1行80文字のところに線を薄く引く.
 今つかっているモニタで縦に３分割すると74がちょうどいいことがわかった. (先頭に行番号表示4char+1charのmarginあり). 
 
 #+begin_src emacs-lisp :tangle yes
-(setq-default display-fill-column-indicator-column 74)
+(setq-default display-fill-column-indicator-column 78)
 (global-display-fill-column-indicator-mode)
 #+end_src
 
@@ -959,8 +960,8 @@ ref. [[https://orgmode.org/manual/TODO-Extensions.html][TODO Extensions (The Org
 #+begin_src emacs-lisp :tangle yes
 (setq org-todo-keywords
       '((sequence "TODO(t)" "NEXT(n)" "WAIT(w)" "|" "DONE(d)")
-        (sequence "✅(c)" "💡(b)" "📍(r)" "🔍(s)" "📊(a)" "🔬(e)" "🗣(h)" "|")
-        (sequence "🎓(z)" "📝(m)" "🔗(l)" "⚙(p)"  "|")))
+        (sequence "✅(c)" "💡(b)" "📍(r)" "🔍(s)" "📊(a)" "🔬(e)" "🗣(h)" "⚖(k)" "|")
+        (sequence "🎓(z)" "📝(m)" "🔗(l)" "⚙(p)" "📜(q)" "|")))
 #+end_src
 
 ** org-capture
@@ -1302,6 +1303,8 @@ refs:
 ** org-superstar
 
 org-superstar-mode(+pretty option)関連.
+
+bulletをおしゃれにかえる. ただそれと引き換えにパフォーマンスはちょっと落ちるかも.
 
 #+begin_src emacs-lisp :tangle yes
 (after! org

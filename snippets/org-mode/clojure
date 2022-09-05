@@ -2,6 +2,6 @@
 # name: clojure
 # key: clojure
 # --
-#+begin_src clojure :results pp
+#+begin_src clojure
 $1
 #+end_src

@@ -191,7 +191,7 @@
   (setq whitespace-space-regexp "\\(\u3000+\\)")
   (global-whitespace-mode 1))
 
-(setq-default display-fill-column-indicator-column 74)
+(setq-default display-fill-column-indicator-column 78)
 (global-display-fill-column-indicator-mode)
 
 (use-package! iedit
@@ -522,8 +522,8 @@
 
 (setq org-todo-keywords
       '((sequence "TODO(t)" "NEXT(n)" "WAIT(w)" "|" "DONE(d)")
-        (sequence "✅(c)" "💡(b)" "📍(r)" "🔍(s)" "📊(a)" "🔬(e)" "🗣(h)" "|")
-        (sequence "🎓(z)" "📝(m)" "🔗(l)" "⚙(p)"  "|")))
+        (sequence "✅(c)" "💡(b)" "📍(r)" "🔍(s)" "📊(a)" "🔬(e)" "🗣(h)" "⚖(k)" "|")
+        (sequence "🎓(z)" "📝(m)" "🔗(l)" "⚙(p)" "📜(q)" "|")))
 
 (after! org
   (setq org-capture-templates
