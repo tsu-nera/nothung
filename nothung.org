@@ -397,7 +397,6 @@ Emacsの画面に1行80文字のところに線を薄く引く.
 (global-display-fill-column-indicator-mode)
 #+end_src
 
-
 ** iedit
 
 複数同時編集. 
@@ -408,6 +407,26 @@ Emacsの画面に1行80文字のところに線を薄く引く.
 (use-package! iedit
   :bind
   ("C-;" . iedit-mode))
+#+end_src
+
+
+** bm
+
+現在行のブックマークライブラリ. 
+
+[[https://github.com/joodland/bm][GitHub - joodland/bm: bm.el -- Visual Bookmarks for GNU Emacs]]
+
+しかし別用途とした現在行をハイライトしてログ解析とかでつかう. 
+
+#+begin_src emacs-lisp
+(use-package! bm
+  :bind   (("<f5>" . bm-toggle))
+  :config
+  (setq temporary-bookmark-p t)
+  (setq bm-face '((t (:background "steel blue" :foreground "#272822")))))
+;;(setq bm-face '((t (:background "#525252" :foreground ""))))
+;;	   ("<C-f5>"  . bm-next)
+;;	   ("<S-f5>" . bm-previous))
 #+end_src
 
 * Emacs
