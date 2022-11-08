@@ -122,7 +122,7 @@ ewwとorgを便利にするツール群(https://github.com/alphapapa/org-web-too
 
 ** Habitica
 
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle no
 (use-package! habitica
   :commands habitica-tasks
   :init
@@ -409,7 +409,6 @@ Emacsの画面に1行80文字のところに線を薄く引く.
   ("C-;" . iedit-mode))
 #+end_src
 
-
 ** bm
 
 現在行のブックマークライブラリ. 
@@ -418,7 +417,7 @@ Emacsの画面に1行80文字のところに線を薄く引く.
 
 しかし別用途とした現在行をハイライトしてログ解析とかでつかう. 
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle yes
 (use-package! bm
   :bind   (("<f5>" . bm-toggle))
   :config
@@ -434,6 +433,8 @@ Emacsの画面に1行80文字のところに線を薄く引く.
 #+begin_src emacs-lisp :tangle yes
 ;; Emacs
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Emacs29
 (pixel-scroll-precision-mode)
 
 ;; doomだとhelpが割り当てられていたがdoomのhelpはF1をつかう.
@@ -452,7 +453,8 @@ Emacsの画面に1行80文字のところに線を薄く引く.
 ** recentf
 
 #+begin_src emacs-lisp :tangle yes
-(setq recentf-max-saved-items 500)
+;; recentfに保存する数. 
+(setq recentf-max-saved-items 3000)
 #+end_src
 
 ** Emacs ガーベジコレクション
@@ -765,6 +767,8 @@ EmacsのWindow Manager.
 
 もはやこれをつかうと世界がEmacsになりEmacs 引きこもり生活が完成する.
 
+counsel-linux-appだと起動時にハングしてPC再起動になることが多い. Shift+Alt+&によるアプリケーション起動がいいかも. 
+
 #+begin_src emacs-lisp :tangle yes
 (use-package! exwm
   :after counsel
@@ -858,6 +862,7 @@ EmacsのWindow Manager.
 #+end_src
 
 * Org-mode
+
 
 ご存知！
 
@@ -980,7 +985,7 @@ ref. [[https://orgmode.org/manual/TODO-Extensions.html][TODO Extensions (The Org
 (setq org-todo-keywords
       '((sequence "TODO(t)" "NEXT(n)" "WAIT(w)" "|" "DONE(d)")
         (sequence "✅(c)" "💡(b)" "📍(r)" "🔍(s)" "📊(a)" "🔬(e)" "🗣(h)" "⚖(k)" "|")
-        (sequence "🎓(z)" "📝(m)" "🔗(l)" "⚙(p)" "📜(q)" "|")))
+        (sequence "🎓(z)" "📝(m)" "🔗(l)" "⚙(p)" "📜(q)" "⛓(i)" "|")))
 #+end_src
 
 ** org-capture
@@ -1402,7 +1407,7 @@ Zettelkasten MethodのOrg-roam実装.
   (org-roam-capture-templates
    '(("z" "🎓 Zettelkasten" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:🎓${title}\n#+filetags: :CONCEPT:\n")
+                         "\n#+date: %T\n#+title:🎓${title}\n#+filetags: :CONCEPT:\n")
       :unnarrowed t)
      ("w" "📝 Wiki" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
@@ -1486,6 +1491,7 @@ Zettelkasten MethodのOrg-roam実装.
   (setq org-roam-mode-sections
         '((org-roam-backlinks-section :unique t)))
 
+  (setq org-roam-db-gc-threshold most-positive-fixnum)
 
   (setq +org-roam-open-buffer-on-find-file nil)
   (org-roam-db-autosync-mode))
@@ -1499,6 +1505,8 @@ Zettelkasten MethodのOrg-roam実装.
 
 *** consult-org-roam(Org-roam検索強化)
 
+ref. https://github.com/jgru/consult-org-roam
+
 以下の機能を提供.ファイル名は今は日付にしているからいらないかな.全文検索は動かない.バックリンク検索だけ使えそう.
 
 - ファイル名検索
@@ -1507,7 +1515,6 @@ Zettelkasten MethodのOrg-roam実装.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package! consult-org-roam
-   :ensure t
    :init
    (require 'consult-org-roam)
    ;; Activate the minor-mode
@@ -1688,7 +1695,9 @@ https://github.com/bastibe/org-journal
 
 なんかzoteroからデータエクスポートできなくなって動かなくなった.
 
-#+begin_src emacs-lisp :tangle yes
+なんかorg-mode開くたびにreloadが走るのでmaskした.
+
+#+begin_src emacs-lisp :tangle no
 (use-package! org-ref
   :config
   (setq bibtex-completion-bibliography (list (file-truename "~/keido/references/zotLib.bib")))
@@ -1852,7 +1861,10 @@ https://github.com/alphapapa/org-sidebar
 org-sidebar-treeでサイドバーにアウトラインを表示.
 
 #+begin_src emacs-lisp :tangle yes
-(use-package! org-sidebar)
+(use-package! org-sidebar
+  :config
+  ;; cider-modeに合わせて C-c C-zにbindしてみた.
+  (define-key org-mode-map (kbd "C-c C-z") #'org-sidebar-tree-toggle))
 #+end_src
 
 ** 未分類(後で整理)

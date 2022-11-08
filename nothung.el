@@ -51,14 +51,6 @@
     (format-time-string "%Y-%m-%d %H:%M" (seconds-to-time date)))
   )
 
-(use-package! habitica
-  :commands habitica-tasks
-  :init
-  (bind-key "C-x t g" 'habitica-tasks)
-  :config
-  (setq habitica-show-streak t)
-  (setq habitica-turn-on-highlighting nil))
-
 ;; Checkers
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -198,8 +190,19 @@
   :bind
   ("C-;" . iedit-mode))
 
+(use-package! bm
+  :bind   (("<f5>" . bm-toggle))
+  :config
+  (setq temporary-bookmark-p t)
+  (setq bm-face '((t (:background "steel blue" :foreground "#272822")))))
+;;(setq bm-face '((t (:background "#525252" :foreground ""))))
+;;	   ("<C-f5>"  . bm-next)
+;;	   ("<S-f5>" . bm-previous))
+
 ;; Emacs
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Emacs29
 (pixel-scroll-precision-mode)
 
 ;; doomだとhelpが割り当てられていたがdoomのhelpはF1をつかう.
@@ -214,7 +217,8 @@
 ;;; 右から左に読む言語に対応させないことで描画高速化
 (setq-default bidi-display-reordering nil)
 
-(setq recentf-max-saved-items 500)
+;; recentfに保存する数. 
+(setq recentf-max-saved-items 3000)
 
 ;; GCを減らして軽くする.
 ;; (setq gc-cons-threshold (* gc-cons-threshold 10))
@@ -523,7 +527,7 @@
 (setq org-todo-keywords
       '((sequence "TODO(t)" "NEXT(n)" "WAIT(w)" "|" "DONE(d)")
         (sequence "✅(c)" "💡(b)" "📍(r)" "🔍(s)" "📊(a)" "🔬(e)" "🗣(h)" "⚖(k)" "|")
-        (sequence "🎓(z)" "📝(m)" "🔗(l)" "⚙(p)" "📜(q)" "|")))
+        (sequence "🎓(z)" "📝(m)" "🔗(l)" "⚙(p)" "📜(q)" "⛓(i)" "|")))
 
 (after! org
   (setq org-capture-templates
@@ -807,7 +811,7 @@
   (org-roam-capture-templates
    '(("z" "🎓 Zettelkasten" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:🎓${title}\n#+filetags: :CONCEPT:\n")
+                         "\n#+date: %T\n#+title:🎓${title}\n#+filetags: :CONCEPT:\n")
       :unnarrowed t)
      ("w" "📝 Wiki" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
@@ -891,6 +895,7 @@
   (setq org-roam-mode-sections
         '((org-roam-backlinks-section :unique t)))
 
+  (setq org-roam-db-gc-threshold most-positive-fixnum)
 
   (setq +org-roam-open-buffer-on-find-file nil)
   (org-roam-db-autosync-mode))
@@ -900,7 +905,6 @@
         (not (member "" (org-get-tags)))))
 
 (use-package! consult-org-roam
-   :ensure t
    :init
    (require 'consult-org-roam)
    ;; Activate the minor-mode
@@ -1006,71 +1010,6 @@
   (add-hook 'org-journal-after-header-create-hook 'org-create-new-id-journal)
 )
 
-(use-package! org-ref
-  :config
-  (setq bibtex-completion-bibliography (list (file-truename "~/keido/references/zotLib.bib")))
-
-  (setq bibtex-completion-additional-search-fields '(keywords))
-  (setq bibtex-completion-display-formats
-    '((online       . "${=has-pdf=:1}${=has-note=:1} ${=type=:6} ${year:4} ${author:24} ${title:*}")
-      (book         . "${=has-pdf=:1}${=has-note=:1} ${=type=:6} ${year:4} ${author:24} ${title:*}")
-      (video        . "${=has-pdf=:1}${=has-note=:1} ${=type=:6} ${year:4} ${editor:24} ${title:*}")
-      (paper        . "${=has-pdf=:1}${=has-note=:1} ${=type=:6} ${year:4} ${author:24} ${title:*}")
-      (t            . "${=has-pdf=:1}${=has-note=:1} ${=type=:6} ${year:4} ${author:24} ${title:*}")))
-  (setq bibtex-completion-pdf-symbol "📓")
-  (setq bibtex-completion-notes-symbol "📝")
-
-  (setq bibtex-completion-pdf-field "file")
-  ;; (setq bibtex-completion-pdf-open-function
-  ;;	(lambda (fpath)
-  ;;	  (call-process "open" nil 0 nil fpath)))
-
-  ;; Create fields for Film type
-  (add-to-list 'bibtex-biblatex-field-alist
-               '(("video" "Video or Audio(like YouTube)")))
-
-  (add-to-list 'bibtex-biblatex-entry-alist
-               '("video" "A Video"
-                 ("video", "title" "editor" "date" "url" "urldate" "abstract" "editortype")
-                 nil
-                 "keywords"))
-  (bibtex-set-dialect 'biblatex))
-
-(use-package! ivy-bibtex
-  :after org-ref
-  :init
-  (map!
-   :leader
-   :prefix ("b" . "org-ref")
-     "b" #'org-ref-bibtex-hydra/body
-     "v" #'ivy-bibtex
-     "c" #'org-ref-insert-cite-link
-     "a" #'orb-note-actions
-     "i" #'orb-insert-link)
-  :config
-  (setq ivy-re-builders-alist
-        '((ivy-bibtex . ivy--regex-ignore-order)
-          (t . ivy--regex-plus)))
-  (setq ivy-bibtex-default-action #'ivy-bibtex-open-url-or-doi)
-  (ivy-set-actions
-   'ivy-bibtex
-   '(("p" ivy-bibtex-open-any "Open PDF, URL, or DOI" ivy-bibtex-open-any)
-     ("e" ivy-bibtex-edit-notes "Edit notes" ivy-bibtex-edit-notes)))
-  )
-
-(use-package! org-roam-protocol
-  :after org-protocol)
-
-(use-package! org-roam-bibtex
-  :after org-roam ivy-bibtex
-  :hook (org-mode . org-roam-bibtex-mode)
-  :custom
-  (orb-insert-interface 'ivy-bibtex)
-  :config
-    (setq orb-preformat-keywords '("author" "date" "url" "title" "isbn" "publisher" "urldate" "editor" "file"))
-    (setq orb-process-file-keyword t)
-    (setq orb-attached-file-extensions '("pdf")))
-
 (use-package! org-anki
   :after org
   :custom
@@ -1087,7 +1026,10 @@
 
 (setq org-table-export-default-format "orgtbl-to-csv")
 
-(use-package! org-sidebar)
+(use-package! org-sidebar
+  :config
+  ;; cider-modeに合わせて C-c C-zにbindしてみた.
+  (define-key org-mode-map (kbd "C-c C-z") #'org-sidebar-tree-toggle))
 
 (after! org
   (defun my/insert-timestamp ()
