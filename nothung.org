@@ -78,6 +78,7 @@ notes:
 #+end_src
 
 ** org-web-tools
+
 ewwとorgを便利にするツール群(https://github.com/alphapapa/org-web-tools).
 
 #+begin_src emacs-lisp :tangle yes
@@ -87,6 +88,7 @@ ewwとorgを便利にするツール群(https://github.com/alphapapa/org-web-too
 #+end_src
 
 ** Pocket
+
 あとで読むサービス.
 
 #+begin_src emacs-lisp :tangle yes
@@ -345,7 +347,10 @@ Doomだといらないかもだけど.
 #+begin_src emacs-lisp :tangle yes
 (use-package! perfect-margin
   :config
-  (perfect-margin-mode 1))
+  (perfect-margin-mode t)
+  (setq perfect-margin-ignore-regexps nil)  ;; disable special window
+  (setq perfect-margin-ignore-filters nil)  ;; disable minibuffer
+)
 #+end_src
 
 ** ターミナルの縦分割線をUTF-8できれいに描く
@@ -740,6 +745,14 @@ ref. https://github.com/djblue/portal
   (cider-nrepl-sync-request:eval "(portal.api/close)"))
 #+end_src
 
+*** vega-view
+
+#+begin_src emacs-lisp :tangle yes
+(use-package! vega-view
+ :config
+ (define-key clojure-mode-map (kbd "C-c M-n v") 'vega-view))
+#+end_src
+
 ** rest
 
 #+begin_src emacs-lisp :tangle yes
@@ -972,7 +985,17 @@ counsel-linux-appだと起動時にハングしてPC再起動になることが�
   ;; Inhibit agenda files startup options:
   (setq org-agenda-inhibit-startup nil)
   ;; Disable tag inheritance in agenda:
-  (setq org-agenda-use-tag-inheritance nil))
+  (setq org-agenda-use-tag-inheritance nil)
+
+  ;; https://emacs.stackexchange.com/questions/13237/in-org-mode-how-to-view-todo-items-for-current-buffer-only
+  (defun org-todo-list-current-file (&optional arg)
+    "Like `org-todo-list', but using only the current buffer's file."
+    (interactive "P")
+    (let ((org-agenda-files (list (buffer-file-name (current-buffer)))))
+      (if (null (car org-agenda-files))
+        (error "%s is not visiting a file" (buffer-name (current-buffer)))
+        (org-todo-list arg))))
+)
 #+end_src
 
 ** TODOキーワード拡張

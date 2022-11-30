@@ -159,7 +159,10 @@
 
 (use-package! perfect-margin
   :config
-  (perfect-margin-mode 1))
+  (perfect-margin-mode t)
+  (setq perfect-margin-ignore-regexps nil)  ;; disable special window
+  (setq perfect-margin-ignore-filters nil)  ;; disable minibuffer
+)
 
 (unless (display-graphic-p)
   ;; ターミナルの縦分割線をUTF-8できれいに描く
@@ -328,6 +331,10 @@
 (defun portal.api/close ()
   (interactive)
   (cider-nrepl-sync-request:eval "(portal.api/close)"))
+
+(use-package! vega-view
+ :config
+ (define-key clojure-mode-map (kbd "C-c M-n v") 'vega-view))
 
 (use-package! restclient
   :mode (("\\.rest\\'" . restclient-mode)
@@ -522,7 +529,17 @@
   ;; Inhibit agenda files startup options:
   (setq org-agenda-inhibit-startup nil)
   ;; Disable tag inheritance in agenda:
-  (setq org-agenda-use-tag-inheritance nil))
+  (setq org-agenda-use-tag-inheritance nil)
+
+  ;; https://emacs.stackexchange.com/questions/13237/in-org-mode-how-to-view-todo-items-for-current-buffer-only
+  (defun org-todo-list-current-file (&optional arg)
+    "Like `org-todo-list', but using only the current buffer's file."
+    (interactive "P")
+    (let ((org-agenda-files (list (buffer-file-name (current-buffer)))))
+      (if (null (car org-agenda-files))
+        (error "%s is not visiting a file" (buffer-name (current-buffer)))
+        (org-todo-list arg))))
+)
 
 (setq org-todo-keywords
       '((sequence "TODO(t)" "NEXT(n)" "WAIT(w)" "|" "DONE(d)")
