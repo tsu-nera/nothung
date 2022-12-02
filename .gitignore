@@ -3,3 +3,4 @@ custom.el
 private
 tmp*
 ~*
+flycheck_*.el

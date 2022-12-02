@@ -160,7 +160,8 @@
 (use-package! perfect-margin
   :config
   (perfect-margin-mode t)
-  (setq perfect-margin-ignore-regexps nil)  ;; disable special window
+  ;; disable special window
+  (setq perfect-margin-ignore-regexps '("*vterm*"))
   (setq perfect-margin-ignore-filters nil)  ;; disable minibuffer
 )
 
@@ -749,8 +750,14 @@
    '((lisp . t)
      (shell . t)
      (clojure . t)))
-  (org-defkey org-mode-map "\C-u\C-x\C-e" 'cider-eval-last-sexp)
-)
+
+  ;; org-modeからclojure codeを評価.
+  (define-key org-mode-map (kbd "C-c C-v e") 'cider-eval-last-sexp)
+  ;; (org-defkey org-mode-map "\C-u\C-x\C-e" 'cider-eval-last-sexp)
+
+  ;; Clojure Modeの特別対応. keybindingが上書きされるので.
+  (define-key clojure-mode-map (kbd "C-c C-x k") 'org-edit-src-exit)
+  (define-key clojure-mode-map (kbd "C-c C-x q") 'org-edit-src-abort))
 
 (use-package! ob-html
   :after org
