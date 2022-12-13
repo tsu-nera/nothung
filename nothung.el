@@ -283,7 +283,10 @@
   ;; connectとともにREPL bufferを表示.
   (setq  cider-repl-pop-to-buffer-on-connect t)
   ;; replに 出力しすぎてEmacsがハングするのを防ぐ.
-  (setq  cider-repl-buffer-size-limit 100)
+  ;; 基本的にREPLへのprintは非効率なので cider inspect推奨. 
+  ;; https://github.com/practicalli/spacemacs.d/issues/4
+  (setq  cider-repl-buffer-size-limit 50)
+
 
   ;; companyでのあいまい補完.
   (add-hook 'cider-repl-mode-hook #'cider-company-enable-fuzzy-completion)
@@ -300,9 +303,6 @@
   ;; cider-connectで固定portを選択候補に表示.
   ;; 固定port自体は tools.depsからのnrepl起動時optionで指定.
   (setq cider-known-endpoints '(("kotori" "0.0.0.0" "34331")))
-
-  ;; REPLに表示しまくりでハングを防ぐ
-  (setq cider-print-quota 1024)
 )
 
 (add-hook! clojure-mode
@@ -441,17 +441,18 @@
   (exwm-enable))
 
 (after! org
-  (setq org-directory "~/keido")
+  (setq org-directory (file-truename "~/repo/keido"))
 
-
-  (defconst my/gtd-projects-file 
-    "~/keido/notes/gtd/gtd_projects.org")
-  (defconst my/inbox-file "~/keido/inbox/inbox.org")
-  (defconst my/daily-journal-dir "~/keido/notes/journals/daily")
+  (defconst my/gtd-projects-file
+    (concat org-directory "/notes/gtd/gtd_projects.org"))
+  (defconst my/inbox-file
+    (concat org-directory "inbox/inbox.org"))
+  (defconst my/daily-journal-dir
+    (concat org-directory "/notes/journals/daily"))
   (defconst my/project-journal-bakuchi
-    "~/repo/bakuchi-doc/notes/journal.org")
+    (file-truename "~/repo/bakuchi-doc/notes/journal.org"))
   (defconst my/project-journal-deepwork
-    "~/keido/notes/zk/journal_deepwork.org")
+    (concat org-directory "/notes/zk/journal_deepwork.org"))
 
   ;; org-captureのtargetは詳しくいろいろ設定するのでdefaultは不要.
   ;; (setq org-default-notes-file "gtd/gtd_projects.org")
@@ -543,9 +544,8 @@
 )
 
 (setq org-todo-keywords
-      '((sequence "TODO(t)" "NEXT(n)" "WAIT(w)" "|" "DONE(d)")
-        (sequence "✅(c)" "💡(b)" "📍(r)" "🔍(s)" "📊(a)" "🔬(e)" "🗣(h)" "⚖(k)" "|")
-        (sequence "🎓(z)" "📝(m)" "🔗(l)" "⚙(p)" "📜(q)" "⛓(i)" "|")))
+      '((sequence "✅(c)" "💡(b)" "📍(r)" "🔍(s)" "📊(a)" "🔬(e)" "⚖(k)" "|")
+        (sequence "🎓(z)" "📝(m)" "🔗(l)" "⚙(p)" "📜(q)" "👉(h)" "✨(i)" "|")))
 
 (after! org
   (setq org-capture-templates
@@ -807,8 +807,9 @@
 (setq inhibit-compacting-font-caches t))
 
 ;; org-roam
-(setq org-roam-directory (file-truename "~/keido/notes"))
-(setq org-roam-db-location (file-truename "~/keido/db/org-roam.db"))
+(setq org-roam-directory (file-truename "~/repo/keido/notes"))
+(setq org-roam-zk-dir (concat org-roam-directory "/zk"))
+(setq org-roam-db-location (file-truename "~/repo/keido/db/org-roam.db"))
 
 (use-package! org-roam
   :after org
@@ -951,14 +952,6 @@
   (counsel-rg nil org-roam-directory))
 (global-set-key (kbd "C-c r s") 'my/org-roam-rg-search)
 
-(setq org-publish-project-alist
-      (list
-       (list "keido"
-             :recursive t
-             :base-directory (file-truename "~/keido/notes/wiki")
-             :publishing-directory "~/repo/keido-hugo/content/notes"
-             :publishing-function 'org-hugo-export-wim-to-md)))
-
 (after! org-roam
   (setq org-roam-dailies-directory "zk")
 
@@ -969,7 +962,7 @@
 
 (defun my/create-weekly-org-file (path)
   (expand-file-name (format "%s.org" (format-time-string "%Y-w%W")) path))
-(defconst my/weekly-journal-dir "~/keido/notes/zk")
+(defconst my/weekly-journal-dir "~/repo/keido/notes/zk")
 
 (after! org-capture
   (add-to-list 'org-capture-templates
@@ -1012,7 +1005,7 @@
   :custom
   (org-journal-date-prefix "#+TITLE: ✍")
   (org-journal-file-format "%Y-%m-%d.org")
-  (org-journal-dir (file-truename "~/keido/notes/journals/daily"))
+  (org-journal-dir (file-truename "~/repo/keido/notes/journals/daily"))
   (org-journal-date-format "%Y-%m-%d")
   :config
   (setq org-journal-enable-agenda-integration t)
@@ -1092,8 +1085,10 @@
 ;; terminal だと大丈夫な模様.そもそも Terminal はこの設定ではなくて 
 ;; Terminal Emulator の設定がきく.
 
+;; Twitterで拾った設定だけど若干org-table表示がマシになったので採用.
+(set-face-attribute 'fixed-pitch nil :font "Ricty Diminished" :height 160)
 ;; (setq doom-font (font-spec :family "Source Han Code JP" :size 12 ))
-(setq doom-font (font-spec :family "Ricty Diminished" :size 15))
+;; (setq doom-font (font-spec :family "Ricty Diminished" :size 15))
 ;; doom-molokaiやdoom-monokai-classicだとewwの表示がいまいち.
 (setq doom-theme 'doom-molokai)
 (doom-themes-org-config)

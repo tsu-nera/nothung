@@ -31,7 +31,7 @@
 (package! ox-qmd)
 
 (package! org-roam-ui)
-(package! consult-org-roam)
+(unpin! consult-org-roam)
 ;; (package! org-roam-timestamps)
 (package! org-roam-bibtex
   :recipe (:host github :repo "org-roam/org-roam-bibtex"))

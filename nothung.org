@@ -486,6 +486,12 @@ Emacsの画面に1行80文字のところに線を薄く引く.
 
 3つ以上のwindowの選択が番号でできる. defaultでC-x oを上書きしてる? C-u C-x o だとwindowをswapできる(ace-swap-window).
 
+** undo-tree
+
+ビジュアライズされたundoを提供. 
+
+C-x uでvisualizerのバッファを開く. qで終了. 
+
 * Email
 #+begin_src emacs-lisp :tangle yes
 ;; Email
@@ -660,7 +666,10 @@ ref: [[https://github.com/hlissner/doom-emacs/blob/develop/modules/lang/clojure/
   ;; connectとともにREPL bufferを表示.
   (setq  cider-repl-pop-to-buffer-on-connect t)
   ;; replに 出力しすぎてEmacsがハングするのを防ぐ.
-  (setq  cider-repl-buffer-size-limit 100)
+  ;; 基本的にREPLへのprintは非効率なので cider inspect推奨. 
+  ;; https://github.com/practicalli/spacemacs.d/issues/4
+  (setq  cider-repl-buffer-size-limit 50)
+
 
   ;; companyでのあいまい補完.
   (add-hook 'cider-repl-mode-hook #'cider-company-enable-fuzzy-completion)
@@ -677,9 +686,6 @@ ref: [[https://github.com/hlissner/doom-emacs/blob/develop/modules/lang/clojure/
   ;; cider-connectで固定portを選択候補に表示.
   ;; 固定port自体は tools.depsからのnrepl起動時optionで指定.
   (setq cider-known-endpoints '(("kotori" "0.0.0.0" "34331")))
-
-  ;; REPLに表示しまくりでハングを防ぐ
-  (setq cider-print-quota 1024)
 )
 #+end_src
 
@@ -889,17 +895,18 @@ counsel-linux-appだと起動時にハングしてPC再起動になることが�
 
 #+begin_src emacs-lisp :tangle yes
 (after! org
-  (setq org-directory "~/keido")
+  (setq org-directory (file-truename "~/repo/keido"))
 
-
-  (defconst my/gtd-projects-file 
-    "~/keido/notes/gtd/gtd_projects.org")
-  (defconst my/inbox-file "~/keido/inbox/inbox.org")
-  (defconst my/daily-journal-dir "~/keido/notes/journals/daily")
+  (defconst my/gtd-projects-file
+    (concat org-directory "/notes/gtd/gtd_projects.org"))
+  (defconst my/inbox-file
+    (concat org-directory "inbox/inbox.org"))
+  (defconst my/daily-journal-dir
+    (concat org-directory "/notes/journals/daily"))
   (defconst my/project-journal-bakuchi
-    "~/repo/bakuchi-doc/notes/journal.org")
+    (file-truename "~/repo/bakuchi-doc/notes/journal.org"))
   (defconst my/project-journal-deepwork
-    "~/keido/notes/zk/journal_deepwork.org")
+    (concat org-directory "/notes/zk/journal_deepwork.org"))
 
   ;; org-captureのtargetは詳しくいろいろ設定するのでdefaultは不要.
   ;; (setq org-default-notes-file "gtd/gtd_projects.org")
@@ -1007,9 +1014,8 @@ ref. [[https://orgmode.org/manual/TODO-Extensions.html][TODO Extensions (The Org
 
 #+begin_src emacs-lisp :tangle yes
 (setq org-todo-keywords
-      '((sequence "TODO(t)" "NEXT(n)" "WAIT(w)" "|" "DONE(d)")
-        (sequence "✅(c)" "💡(b)" "📍(r)" "🔍(s)" "📊(a)" "🔬(e)" "🗣(h)" "⚖(k)" "|")
-        (sequence "🎓(z)" "📝(m)" "🔗(l)" "⚙(p)" "📜(q)" "⛓(i)" "|")))
+      '((sequence "✅(c)" "💡(b)" "📍(r)" "🔍(s)" "📊(a)" "🔬(e)" "⚖(k)" "|")
+        (sequence "🎓(z)" "📝(m)" "🔗(l)" "⚙(p)" "📜(q)" "👉(h)" "✨(i)" "|")))
 #+end_src
 
 ** org-capture
@@ -1153,9 +1159,6 @@ ref. [[https://orgmode.org/manual/TODO-Extensions.html][TODO Extensions (The Org
            :tree-type week
            :klll-buffer t)) org-capture-templates)))
 #+end_src
-
-#+RESULTS:
-| b | 🖊 bakuchi entry | entry | (file+olp+datetree my/project-journal-bakuchi) | * %? |
 
 *** Google Chrome Extention: Org Capture
 
@@ -1403,14 +1406,15 @@ bulletをおしゃれにかえる. ただそれと引き換えにパフォーマ
 (setq inhibit-compacting-font-caches t))
 #+end_src
 
-** Org-roam
+** org-roam
 
 Zettelkasten MethodのOrg-roam実装.
 
 #+begin_src emacs-lisp :tangle yes
 ;; org-roam
-(setq org-roam-directory (file-truename "~/keido/notes"))
-(setq org-roam-db-location (file-truename "~/keido/db/org-roam.db"))
+(setq org-roam-directory (file-truename "~/repo/keido/notes"))
+(setq org-roam-zk-dir (concat org-roam-directory "/zk"))
+(setq org-roam-db-location (file-truename "~/repo/keido/db/org-roam.db"))
 
 (use-package! org-roam
   :after org
@@ -1568,6 +1572,8 @@ ref. https://github.com/jgru/consult-org-roam
 
 consult-ripgrepを [[https://jblevins.org/projects/deft/][deft]] の代わりに使う. より高速.
 
+検索対象が多すぎるとハングするので改善したい.
+
 #+begin_src emacs-lisp :tangle yes
 (defun my/org-roam-rg-search ()
   "Search org-roam directory using consult-ripgrep. With live-preview."
@@ -1578,16 +1584,72 @@ consult-ripgrepを [[https://jblevins.org/projects/deft/][deft]] の代わりに
 
 *** org-publish(Org-roamのノートをサイトへ公開)
 
-使ってないかな...
+hugo用. 現状exit abnormally で動かないので調べる.
 
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle no
 (setq org-publish-project-alist
       (list
-       (list "keido"
-             :recursive t
-             :base-directory (file-truename "~/keido/notes/wiki")
-             :publishing-directory "~/repo/keido-hugo/content/notes"
-             :publishing-function 'org-hugo-export-wim-to-md)))
+       (list "keido-hugo"
+             :recursive nil
+             :base-directory org-roam-zk-dir
+             :publishing-directory "~/repo/keido-hugo/content"
+             :exclude ".*gitignore|.*/private/.*" 
+             :publishing-function 'org-hugo-export-wim-to-md
+             :with-author nil           ;; 作成者除外
+             :with-creator nil          ;; EmacsとOrg version表記除外
+             :with-toc nil                ;; Table of Contents出力
+             :section-numbers nil       ;; ナンバリング禁止
+             :time-stamp-file nil       ;; タイムスタンプを除外
+             )))
+
+;; (require 'org-roam-export)
+#+end_src
+
+html用.
+
+#+begin_src emacs-lisp :tangle no
+(setq org-publish-project-alist
+      (list
+       (list "keido-org"
+             :recursive nil
+             :base-directory org-roam-zk-dir
+             :publishing-directory "~/repo/keido-org/public/notes"
+             :exclude ".*gitignore|.*/private/.*" 
+             ;; :auto-sitemap t
+             ;; :sitemap-function 'roam-sitemap
+             ;; :sitemap-title "Keido notes"
+             :publishing-function 'org-html-publish-to-html
+             :with-author nil           ;; 作成者除外
+             :with-creator nil          ;; EmacsとOrg version表記除外
+             :with-toc t                ;; Table of Contents出力
+             :section-numbers nil       ;; ナンバリング禁止
+             :time-stamp-file nil       ;; タイムスタンプを除外
+             )))
+
+(defun my/setup-org-theme (backend)
+  (goto-char (point-max))
+  (insert "\n#+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup\n")
+  (insert "\n#+HTML_HEAD: <style>pre.src{background:#343131;color:white;} </style>\n"))
+
+(defun my/collect-backlinks-string (backend)
+  "Insert backlinks into the end of the org file before parsing it."
+  (when (org-roam-node-at-point)
+    (goto-char (point-max))
+    ;; Add a new header for the references
+    (insert "\n\n* 🔗Backlinks\n")
+    (let* ((backlinks (org-roam-backlinks-get (org-roam-node-at-point))))
+      (dolist (backlink backlinks)
+        (let* ((source-node (org-roam-backlink-source-node backlink))
+               (node-file (org-roam-node-file source-node))
+               (file-name (file-name-nondirectory node-file))
+               (title (org-roam-node-title source-node)))
+          (insert
+           (format "- [[./%s][%s]]\n" file-name title)))))))
+
+(add-hook 'org-export-before-parsing-functions 'my/setup-org-theme)
+(add-hook 'org-export-before-processing-functions 'my/collect-backlinks-string)
+
+;; (require 'org-roam-export)
 #+end_src
 
 *** org-roam-dailies
@@ -1615,7 +1677,7 @@ ref. [[https://org-roam.discourse.group/t/org-journal-vs-org-roam-dailies/384][O
 #+begin_src emacs-lisp :tangle yes
 (defun my/create-weekly-org-file (path)
   (expand-file-name (format "%s.org" (format-time-string "%Y-w%W")) path))
-(defconst my/weekly-journal-dir "~/keido/notes/zk")
+(defconst my/weekly-journal-dir "~/repo/keido/notes/zk")
 
 (after! org-capture
   (add-to-list 'org-capture-templates
@@ -1628,6 +1690,7 @@ ref. [[https://org-roam.discourse.group/t/org-journal-vs-org-roam-dailies/384][O
               :unnarrowed nil ;; ほかのエントリは見えないように.
               :klll-buffer t)))
 #+end_src
+
 *** org-roam-ui
 
 Web UI.
@@ -1691,7 +1754,7 @@ https://github.com/bastibe/org-journal
   :custom
   (org-journal-date-prefix "#+TITLE: ✍")
   (org-journal-file-format "%Y-%m-%d.org")
-  (org-journal-dir (file-truename "~/keido/notes/journals/daily"))
+  (org-journal-dir (file-truename "~/repo/keido/notes/journals/daily"))
   (org-journal-date-format "%Y-%m-%d")
   :config
   (setq org-journal-enable-agenda-integration t)
@@ -1730,7 +1793,7 @@ https://github.com/bastibe/org-journal
 #+begin_src emacs-lisp :tangle no
 (use-package! org-ref
   :config
-  (setq bibtex-completion-bibliography (list (file-truename "~/keido/references/zotLib.bib")))
+  (setq bibtex-completion-bibliography (list (file-truename "~/repo/keido/references/zotLib.bib")))
 
   (setq bibtex-completion-additional-search-fields '(keywords))
   (setq bibtex-completion-display-formats
@@ -1847,7 +1910,7 @@ M-x org-noter-create-skeltonという関数がヤばい. [[https://youtu.be/lCc3
    ;; I want to see the whole file
    org-noter-hide-other nil
    ;; Everything is relative to the main notes file
-   org-noter-notes-search-path (list (file-truename "~/keido/notes/wiki"))))
+   org-noter-notes-search-path (list (file-truename "~/repo/keido/notes/wiki"))))
 #+end_src
 
 ** org-trello(disabled)
@@ -1981,8 +2044,10 @@ ref: [[https://magit.vc/manual/forge/][Forge User and Developer Manual]]
 ;; terminal だと大丈夫な模様.そもそも Terminal はこの設定ではなくて 
 ;; Terminal Emulator の設定がきく.
 
+;; Twitterで拾った設定だけど若干org-table表示がマシになったので採用.
+(set-face-attribute 'fixed-pitch nil :font "Ricty Diminished" :height 160)
 ;; (setq doom-font (font-spec :family "Source Han Code JP" :size 12 ))
-(setq doom-font (font-spec :family "Ricty Diminished" :size 15))
+;; (setq doom-font (font-spec :family "Ricty Diminished" :size 15))
 ;; doom-molokaiやdoom-monokai-classicだとewwの表示がいまいち.
 (setq doom-theme 'doom-molokai)
 (doom-themes-org-config)
