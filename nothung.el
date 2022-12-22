@@ -255,6 +255,13 @@
   (setq migemo-coding-system 'utf-8-unix)
   (migemo-init))
 
+(use-package! fcitx
+  :config
+  (setq fcitx-remote-command "fcitx5-remote")
+  (fcitx-aggressive-setup)
+  ;; Linux なら t が推奨されるものの、fcitx5 には未対応なためここは nil
+  (setq fcitx-use-dbus nil))
+
 (use-package! smartparens-config
   :bind
   ("C-<right>" . sp-forward-slurp-sexp)
@@ -1008,24 +1015,7 @@
   (org-journal-dir (file-truename "~/repo/keido/notes/journals/daily"))
   (org-journal-date-format "%Y-%m-%d")
   :config
-  (setq org-journal-enable-agenda-integration t)
-  (defun org-journal-file-header-func (time)
-     "Custom function to create journal header."
-     (concat
-      (pcase org-journal-file-type
-        (`daily "#+STARTUP: showeverything"))))
-  ;;     ;; (`weekly "#+TITLE: Weekly Journal\n#+STARTUP: folded")
-  ;;     ;;(`monthly "#+TITLE: Monthly Journal\n#+STARTUP: folded")
-  ;;     ;; (`yearly "#+TITLE: Yearly Journal\n#+STARTUP: folded"))))
-  (setq org-journal-file-header 'org-journal-file-header-func)
-
-  ;; org-roamに対応させるためにorg-idを生成
-  (defun org-create-new-id-journal ()
-    (goto-char (point-min))
-    (org-id-get-create)
-    (goto-char (point-max)))
-  (add-hook 'org-journal-after-header-create-hook 'org-create-new-id-journal)
-)
+  (setq org-journal-enable-agenda-integration t))
 
 (use-package! org-anki
   :after org
