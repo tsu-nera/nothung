@@ -683,6 +683,8 @@
            :klll-buffer t)) org-capture-templates)))
 
 (after! ox
+;; (setq org-export-async-init-file "/home/tsu-nera/.doom.d/async-init.el")
+
   (defun my/hugo-filter-html-amp (text backend info)
     (when (org-export-derived-backend-p backend 'hugo)
       (replace-regexp-in-string "&amp;" "&" text)))
@@ -921,13 +923,18 @@
   :config
   (defun my/org-roam-update ()
     (interactive)
-    (org-roam-update-org-id-locations)
-    (org-roam-db-sync))
+    (org-id-update-id-locations)
+    (org-roam-db-sync)
+    (org-roam-update-org-id-locations))
 
   (setq org-roam-mode-sections
         '((org-roam-backlinks-section :unique t)))
 
   (setq org-roam-db-gc-threshold most-positive-fixnum)
+
+  ;; for speed
+  (setq org-roam-node-default-sort nil)
+
 
   (setq +org-roam-open-buffer-on-find-file nil)
   (org-roam-db-autosync-mode))
@@ -1040,11 +1047,12 @@
 
 (after! org
   (defun my/insert-timestamp ()
-    "Insert time stamp."
     (interactive)
-    (org-insert-time-stamp (current-time) t)
-    ;; (insert (format-time-string "%H:%M"))
-    )
+    (org-insert-time-stamp (current-time) t))
+  (defun my/insert-timestamp-inactive ()
+    (interactive)
+    (org-time-stamp-inactive (current-time)))
+  (map! :map org-mode-map "C-u C-c C-." #'my/insert-timestamp-inactive)
   (map! :map org-mode-map "C-c C-." #'my/insert-timestamp))
 
 (add-hook! 'org-mode-hook (ws-butler-mode -1))

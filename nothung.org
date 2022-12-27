@@ -492,6 +492,18 @@ Emacsの画面に1行80文字のところに線を薄く引く.
 
 C-x uでvisualizerのバッファを開く. qで終了. 
 
+** Helpful
+
+Emacsの*Help Bufferを強化する. 
+
+https://github.com/Wilfred/helpful
+
+#+begin_src emacs-lisp :tangle yes
+(use-package! helpful
+  :config
+  (global-set-key (kbd "C-c C-d") #'helpful-at-point))
+#+end_src
+
 * Email
 #+begin_src emacs-lisp :tangle yes
 ;; Email
@@ -1205,6 +1217,8 @@ The HTML export back-end transforms ‘<’ and ‘>’ to ‘&lt;’ and ‘&gt
 
 #+begin_src emacs-lisp :tangle yes
 (after! ox
+;; (setq org-export-async-init-file "/home/tsu-nera/.doom.d/async-init.el")
+
   (defun my/hugo-filter-html-amp (text backend info)
     (when (org-export-derived-backend-p backend 'hugo)
       (replace-regexp-in-string "&amp;" "&" text)))
@@ -1521,13 +1535,18 @@ Zettelkasten MethodのOrg-roam実装.
   :config
   (defun my/org-roam-update ()
     (interactive)
-    (org-roam-update-org-id-locations)
-    (org-roam-db-sync))
+    (org-id-update-id-locations)
+    (org-roam-db-sync)
+    (org-roam-update-org-id-locations))
 
   (setq org-roam-mode-sections
         '((org-roam-backlinks-section :unique t)))
 
   (setq org-roam-db-gc-threshold most-positive-fixnum)
+
+  ;; for speed
+  (setq org-roam-node-default-sort nil)
+
 
   (setq +org-roam-open-buffer-on-find-file nil)
   (org-roam-db-autosync-mode))
@@ -1944,18 +1963,19 @@ org-sidebar-treeでサイドバーにアウトラインを表示.
   (define-key org-mode-map (kbd "C-c C-z") #'org-sidebar-tree-toggle))
 #+end_src
 
-** 未分類(後で整理)
+** Org timestamps
 
 org-mode で timestamp のみを挿入するカスタム関数. Doom EmacsのせいでC-u C-c .が動作しないので.
 
 #+begin_src emacs-lisp :tangle yes
 (after! org
   (defun my/insert-timestamp ()
-    "Insert time stamp."
     (interactive)
-    (org-insert-time-stamp (current-time) t)
-    ;; (insert (format-time-string "%H:%M"))
-    )
+    (org-insert-time-stamp (current-time) t))
+  (defun my/insert-timestamp-inactive ()
+    (interactive)
+    (org-time-stamp-inactive (current-time)))
+  (map! :map org-mode-map "C-u C-c C-." #'my/insert-timestamp-inactive)
   (map! :map org-mode-map "C-c C-." #'my/insert-timestamp))
 #+end_src
 
