@@ -235,6 +235,10 @@
 ;; GC実行のメッセージを出す
 (setq garbage-collection-messages nil)
 
+(use-package! helpful
+  :config
+  (global-set-key (kbd "C-c C-d") #'helpful-at-point))
+
 ;; Email
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -458,8 +462,6 @@
     (concat org-directory "/notes/journals/daily"))
   (defconst my/project-journal-bakuchi
     (file-truename "~/repo/bakuchi-doc/notes/journal.org"))
-  (defconst my/project-journal-deepwork
-    (concat org-directory "/notes/zk/journal_deepwork.org"))
 
   ;; org-captureのtargetは詳しくいろいろ設定するのでdefaultは不要.
   ;; (setq org-default-notes-file "gtd/gtd_projects.org")
@@ -469,9 +471,7 @@
   (setq org-agenda-files
         (list
          my/gtd-projects-file
-         my/project-journal-bakuchi
-         my/project-journal-deepwork))
-)
+         my/project-journal-bakuchi)))
 
 ;; Org mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -522,8 +522,8 @@
   (setq org-agenda-skip-deadline-if-done nil)
   (setq org-agenda-skip-scheduled-if-done nil)
 
-  ;; default で logbook を表示
-  (setq org-agenda-include-inactive-timestamps t)
+  ;; inactive timestamp [] を非表示.
+  (setq org-agenda-include-inactive-timestamps nil)
   ;; default で 時間を表示
   (setq org-agenda-start-with-log-mode t) 
 
@@ -532,10 +532,10 @@
 
 
   ;; 期間を限定
-  (setq org-agenda-span 7)
+  (setq org-agenda-span 14)
   ;; Inhibit the dimming of blocked tasks:
   (setq org-agenda-dim-blocked-tasks nil)
-  ;; Inhibit agenda files startup options:
+  ;; Inhibit agenda files startup options:memo
   (setq org-agenda-inhibit-startup nil)
   ;; Disable tag inheritance in agenda:
   (setq org-agenda-use-tag-inheritance nil)
@@ -989,19 +989,23 @@
               :unnarrowed nil ;; ほかのエントリは見えないように.
               :klll-buffer t)))
 
-(use-package! websocket
-    :after org-roam)
-(use-package! org-roam-ui
-    :after org-roam ;; or :after org
-;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
-;;         a hookable mode anymore, you're advised to pick something yourself
-;;         if you don't care about startup time, use
-    ;; :hook (after-init . org-roam-ui-mode)
-    :config
-    (setq org-roam-ui-sync-theme t
-          org-roam-ui-follow t
-          org-roam-ui-update-on-save t
-          org-roam-ui-open-on-start t))
+;; 2. Memoize the function that costs the most.
+(load-file "~/.doom.d/private/memoize.el")
+(require 'memoize)
+
+;; (memoize 'org-roam-node-read--completions "10 minute")
+(defun memoize-force-update (func &optional timeout)
+  (when (get func :memoize-original-function)
+    (progn (memoize-restore func)
+           (memoize func timeout))))
+(defun my/force-update-org-roam-node-read-if-memoized (&optional timeout)
+  (interactive)
+  (memoize-force-update 'org-roam-node-read--completions
+                        (if timeout timeout memoize-default-timeout)))
+(run-with-idle-timer 60 t #'my/force-update-org-roam-node-read-if-memoized)
+;; Note: it might be better to hack org-roam to make it use
+;; hash-tables instead of lists. Have a way to quickly detect
+;; which node is to be updated.
 
 (use-package! org-toggl
   :after org

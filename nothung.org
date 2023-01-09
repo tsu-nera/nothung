@@ -919,8 +919,6 @@ counsel-linux-appだと起動時にハングしてPC再起動になることが�
     (concat org-directory "/notes/journals/daily"))
   (defconst my/project-journal-bakuchi
     (file-truename "~/repo/bakuchi-doc/notes/journal.org"))
-  (defconst my/project-journal-deepwork
-    (concat org-directory "/notes/zk/journal_deepwork.org"))
 
   ;; org-captureのtargetは詳しくいろいろ設定するのでdefaultは不要.
   ;; (setq org-default-notes-file "gtd/gtd_projects.org")
@@ -930,9 +928,7 @@ counsel-linux-appだと起動時にハングしてPC再起動になることが�
   (setq org-agenda-files
         (list
          my/gtd-projects-file
-         my/project-journal-bakuchi
-         my/project-journal-deepwork))
-)
+         my/project-journal-bakuchi)))
 #+end_src
 
 ** Basics
@@ -991,8 +987,8 @@ counsel-linux-appだと起動時にハングしてPC再起動になることが�
   (setq org-agenda-skip-deadline-if-done nil)
   (setq org-agenda-skip-scheduled-if-done nil)
 
-  ;; default で logbook を表示
-  (setq org-agenda-include-inactive-timestamps t)
+  ;; inactive timestamp [] を非表示.
+  (setq org-agenda-include-inactive-timestamps nil)
   ;; default で 時間を表示
   (setq org-agenda-start-with-log-mode t) 
 
@@ -1001,10 +997,10 @@ counsel-linux-appだと起動時にハングしてPC再起動になることが�
 
 
   ;; 期間を限定
-  (setq org-agenda-span 7)
+  (setq org-agenda-span 14)
   ;; Inhibit the dimming of blocked tasks:
   (setq org-agenda-dim-blocked-tasks nil)
-  ;; Inhibit agenda files startup options:
+  ;; Inhibit agenda files startup options:memo
   (setq org-agenda-inhibit-startup nil)
   ;; Disable tag inheritance in agenda:
   (setq org-agenda-use-tag-inheritance nil)
@@ -1712,11 +1708,11 @@ ref. [[https://org-roam.discourse.group/t/org-journal-vs-org-roam-dailies/384][O
               :klll-buffer t)))
 #+end_src
 
-*** org-roam-ui
+*** org-roam-ui(disabled)
 
 Web UI.
 
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle no
 (use-package! websocket
     :after org-roam)
 (use-package! org-roam-ui
@@ -1745,6 +1741,30 @@ org-roam-uiでつかうメタ情報を付与することが目的だが現状使
    (org-roam-timestamps-mode)
    (setq org-roam-timestamps-remember-timestamps nil)
    (setq org-roam-timestamps-remember-timestamps nil))
+#+end_src
+
+*** org-roamのslowdownを回避するTip
+
+https://www.reddit.com/r/orgmode/comments/s8xv5j/orgroam_slows_down_as_nodes_increase_solution/
+
+#+begin_src emacs-lisp :tangle yes
+;; 2. Memoize the function that costs the most.
+(load-file "~/.doom.d/private/memoize.el")
+(require 'memoize)
+
+(memoize 'org-roam-node-read--completions "10 minute")
+(defun memoize-force-update (func &optional timeout)
+  (when (get func :memoize-original-function)
+    (progn (memoize-restore func)
+           (memoize func timeout))))
+(defun my/force-update-org-roam-node-read-if-memoized (&optional timeout)
+  (interactive)
+  (memoize-force-update 'org-roam-node-read--completions
+                        (if timeout timeout memoize-default-timeout)))
+(run-with-idle-timer 60 t #'my/force-update-org-roam-node-read-if-memoized)
+;; Note: it might be better to hack org-roam to make it use
+;; hash-tables instead of lists. Have a way to quickly detect
+;; which node is to be updated.
 #+end_src
 
 ** org-toggl
