@@ -470,8 +470,10 @@
   ;; org-journalの機能でこのほかに今日のjournal fileが追加される.
   (setq org-agenda-files
         (list
+         my/project-journal-bakuchi
+         my/daily-journal-dir
          my/gtd-projects-file
-         my/project-journal-bakuchi)))
+         )))
 
 ;; Org mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -530,6 +532,7 @@
   ;; org-agenda speedup tips
   ;; https://orgmode.org/worg/agenda-optimization.html
 
+  (setq org-agenda-file-regexp "\\`\\\([^.].*\\.org\\\|[0-9]\\\{8\\\}\\\(\\.gpg\\\)?\\\)\\'")
 
   ;; 期間を限定
   (setq org-agenda-span 14)
@@ -989,24 +992,6 @@
               :unnarrowed nil ;; ほかのエントリは見えないように.
               :klll-buffer t)))
 
-;; 2. Memoize the function that costs the most.
-(load-file "~/.doom.d/private/memoize.el")
-(require 'memoize)
-
-;; (memoize 'org-roam-node-read--completions "10 minute")
-(defun memoize-force-update (func &optional timeout)
-  (when (get func :memoize-original-function)
-    (progn (memoize-restore func)
-           (memoize func timeout))))
-(defun my/force-update-org-roam-node-read-if-memoized (&optional timeout)
-  (interactive)
-  (memoize-force-update 'org-roam-node-read--completions
-                        (if timeout timeout memoize-default-timeout)))
-(run-with-idle-timer 60 t #'my/force-update-org-roam-node-read-if-memoized)
-;; Note: it might be better to hack org-roam to make it use
-;; hash-tables instead of lists. Have a way to quickly detect
-;; which node is to be updated.
-
 (use-package! org-toggl
   :after org
   :config
@@ -1023,9 +1008,9 @@
   :custom
   (org-journal-date-prefix "#+TITLE: ✍")
   (org-journal-file-format "%Y-%m-%d.org")
-  (org-journal-dir (file-truename "~/repo/keido/notes/journals/daily"))
-  (org-journal-date-format "%Y-%m-%d")
+    (org-journal-date-format "%Y-%m-%d")
   :config
+  (setq org-journal-dir my/daily-journal-dir)
   (setq org-journal-enable-agenda-integration t))
 
 (use-package! org-anki

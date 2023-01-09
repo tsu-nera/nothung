@@ -927,8 +927,10 @@ counsel-linux-appだと起動時にハングしてPC再起動になることが�
   ;; org-journalの機能でこのほかに今日のjournal fileが追加される.
   (setq org-agenda-files
         (list
+         my/project-journal-bakuchi
+         my/daily-journal-dir
          my/gtd-projects-file
-         my/project-journal-bakuchi)))
+         )))
 #+end_src
 
 ** Basics
@@ -995,6 +997,7 @@ counsel-linux-appだと起動時にハングしてPC再起動になることが�
   ;; org-agenda speedup tips
   ;; https://orgmode.org/worg/agenda-optimization.html
 
+  (setq org-agenda-file-regexp "\\`\\\([^.].*\\.org\\\|[0-9]\\\{8\\\}\\\(\\.gpg\\\)?\\\)\\'")
 
   ;; 期間を限定
   (setq org-agenda-span 14)
@@ -1747,7 +1750,9 @@ org-roam-uiでつかうメタ情報を付与することが目的だが現状使
 
 https://www.reddit.com/r/orgmode/comments/s8xv5j/orgroam_slows_down_as_nodes_increase_solution/
 
-#+begin_src emacs-lisp :tangle yes
+どうもdoom syncをするとここでエラーする.
+
+#+begin_src emacs-lisp :tangle no
 ;; 2. Memoize the function that costs the most.
 (load-file "~/.doom.d/private/memoize.el")
 (require 'memoize)
@@ -1795,9 +1800,9 @@ https://github.com/bastibe/org-journal
   :custom
   (org-journal-date-prefix "#+TITLE: ✍")
   (org-journal-file-format "%Y-%m-%d.org")
-  (org-journal-dir (file-truename "~/repo/keido/notes/journals/daily"))
-  (org-journal-date-format "%Y-%m-%d")
+    (org-journal-date-format "%Y-%m-%d")
   :config
+  (setq org-journal-dir my/daily-journal-dir)
   (setq org-journal-enable-agenda-integration t))
 #+end_src
 
