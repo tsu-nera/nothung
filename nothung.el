@@ -462,6 +462,8 @@
     (concat org-directory "/notes/journals/daily"))
   (defconst my/project-journal-bakuchi
     (file-truename "~/repo/bakuchi-doc/notes/journal.org"))
+  (defconst my/project-journal-deepwork
+    (file-truename "~/repo/keido/notes/zk/journal_deepwork.org"))
 
   ;; org-captureのtargetは詳しくいろいろ設定するのでdefaultは不要.
   ;; (setq org-default-notes-file "gtd/gtd_projects.org")
@@ -471,9 +473,15 @@
   (setq org-agenda-files
         (list
          my/project-journal-bakuchi
+         my/project-journal-deepwork
          my/daily-journal-dir
          my/gtd-projects-file
          )))
+
+(defun my/create-weekly-org-file (path)
+  (expand-file-name (format "%s.org" (format-time-string "%Y-w%W")) path))
+(defconst my/weekly-journal-dir "~/repo/keido/notes/zk")
+(defconst my/weekly-private-dir "~/repo/keido/notes/journals/weekly")
 
 ;; Org mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -554,8 +562,9 @@
 )
 
 (setq org-todo-keywords
-      '((sequence "✅(c)" "💡(b)" "📍(r)" "🔍(s)" "📊(a)" "🔬(e)" "⚖(k)" "|")
-        (sequence "🎓(z)" "📝(m)" "🔗(l)" "⚙(p)" "📜(q)" "👉(h)" "✨(i)" "|")))
+      '((sequence "✅(c)" "💡(b)" "📍(r)" "🔍(s)" "📊(a)" "🔬(e)" "|")
+        (sequence "⚖(k)" "✨(i)" "🔧(w)" "|")
+        (sequence "🎓(z)" "📝(m)" "🔗(l)" "⚙(p)" "📜(q)" "👉(h)" "|")))
 
 (after! org
   (setq org-capture-templates
@@ -585,7 +594,7 @@
           '(("c" "☑ Planning" plain
              (file+headline
               (lambda () 
-                (my/create-date-org-file my/daily-journal-dir))
+                (my/create-weekly-org-file my/weekly-private-dir))
               "Planning")
              "%?"
              :unnarrowed t
@@ -593,7 +602,7 @@
             ("t" "🤔 Thought" entry
              (file+headline
               (lambda () 
-                (my/create-date-org-file my/daily-journal-dir))
+                (my/create-weekly-org-file my/weekly-private-dir))
               "Thoughts")
              "* 🤔 %?\n%T"
              :empty-lines 1
@@ -602,7 +611,7 @@
             ("T" "🤔+📃 Thought+Ref" entry
              (file+headline
               (lambda () 
-                (my/create-date-org-file my/daily-journal-dir))
+                (my/create-weekly-org-file my/weekly-private-dir))
               "Thoughts")
              "* 🤔 %?\n%T from %a\n"
              :empty-lines 1
@@ -611,7 +620,7 @@
             ("l" "🤔+🌐 Thought+Browser" entry
              (file+headline
               (lambda () 
-                (my/create-date-org-file my/daily-journal-dir))
+                (my/create-weekly-org-file my/weekly-private-dir))
               "Thoughts")
              "* 🤔 %?\n%T from [[%:link][%:description]]\n"
              :empty-lines 1
@@ -620,7 +629,7 @@
             ("p" "🍅 Pomodoro" entry
              (file+headline
               (lambda () 
-                (my/create-date-org-file my/daily-journal-dir))
+                (my/create-weekly-org-file my/weekly-private-dir))
               "DeepWork")
              "* 🍅 %?\n%T"
              :empty-lines 1
@@ -629,7 +638,7 @@
             ("r" "🧘 Recovery" entry
              (file+headline
               (lambda () 
-                (my/create-date-org-file my/daily-journal-dir))
+                (my/create-weekly-org-file my/weekly-private-dir))
               "Recovery")
              "* 🧘 %?\n%T"
              :empty-lines 1
@@ -638,7 +647,7 @@
             ("j" "🖊 Journal" plain
              (file 
               (lambda ()
-                (my/create-date-org-file my/daily-journal-dir)))
+                (my/create-weekly-org-file my/weekly-private-dir)))
              "%?"
              :empty-lines 1
              :unnarrowed t
@@ -646,7 +655,7 @@
             ("J" "🖊+📃 Journal+Ref" plain
              (file 
               (lambda ()
-                (my/create-date-org-file my/daily-journal-dir)))
+                (my/create-weekly-org-file my/weekly-private-dir)))
              "%?\n%a"
              :empty-lines 1
              :unnarrowed t
@@ -654,7 +663,7 @@
             ("L" "🖊+🌐 Journal+Browser" plain
              (file 
               (lambda ()
-                (my/create-date-org-file my/daily-journal-dir)))
+                (my/create-weekly-org-file my/weekly-private-dir)))
              "%?\nSource: [[%:link][%:description]]\nCaptured On: %U\n"
              :empty-lines 1
              :unnrrowed t
@@ -875,6 +884,10 @@
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                         "#+title:✅${title}\n#+filetags: :ISSUE:\n")
       :unnarrowed t)
+     ("d" "💡 Idea" plain "%?"
+      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                         "#+title:💡${title}\n#+filetags: :IDEA:\n")
+      :unnarrowed t)
      ("p" "⚙ Pattern" plain "%?"
       :target (file+head 
                "zk/%<%Y%m%d%H%M%S>.org"
@@ -977,10 +990,6 @@
            (file+head+olp "%<%G-w%V>.org" "#+title: 📓%<%G-w%V>\n"
                           ("🖊Journals"))))))
 
-(defun my/create-weekly-org-file (path)
-  (expand-file-name (format "%s.org" (format-time-string "%Y-w%W")) path))
-(defconst my/weekly-journal-dir "~/repo/keido/notes/zk")
-
 (after! org-capture
   (add-to-list 'org-capture-templates
         '("w" "💭 Thought(weekly)" entry
@@ -991,6 +1000,25 @@
               :empty-lines 1 
               :unnarrowed nil ;; ほかのエントリは見えないように.
               :klll-buffer t)))
+
+;; 2. Memoize the function that costs the most.
+(load-file "~/.doom.d/private/memoize.el")
+(require 'memoize)
+
+(memoize 'org-roam-node-read--completions "10 minute")
+
+(defun memoize-force-update (func &optional timeout)
+  (when (get func :memoize-original-function)
+    (progn (memoize-restore func)
+           (memoize func timeout))))
+(defun my/force-update-org-roam-node-read-if-memoized (&optional timeout)
+  (interactive)
+  (memoize-force-update 'org-roam-node-read--completions
+                        (if timeout timeout memoize-default-timeout)))
+(run-with-idle-timer 60 t #'my/force-update-org-roam-node-read-if-memoized)
+;; Note: it might be better to hack org-roam to make it use
+;; hash-tables instead of lists. Have a way to quickly detect
+;; which node is to be updated.
 
 (use-package! org-toggl
   :after org
@@ -1005,12 +1033,12 @@
   :bind
   ("C-c r d n" . org-journal-new-entry)
   ("C-c r d d" . org-journal-open-current-journal-file)
-  :custom
-  (org-journal-date-prefix "#+TITLE: ✍")
-  (org-journal-file-format "%Y-%m-%d.org")
-    (org-journal-date-format "%Y-%m-%d")
   :config
-  (setq org-journal-dir my/daily-journal-dir)
+  (setq org-journal-date-prefix "#+TITLE: ✍")
+  (setq org-journal-file-format "%Y-w%W.org")
+  (setq org-journal-date-format "%Y-w%W")
+  (setq org-journal-file-type `weekly)
+  (setq org-journal-dir my/weekly-private-dir)
   (setq org-journal-enable-agenda-integration t))
 
 (use-package! org-anki
@@ -1045,6 +1073,8 @@
   (map! :map org-mode-map "C-c C-." #'my/insert-timestamp))
 
 (add-hook! 'org-mode-hook (ws-butler-mode -1))
+
+(use-package! org-pomodoro)
 
 ;; Term
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
