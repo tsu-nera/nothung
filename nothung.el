@@ -22,10 +22,6 @@
   (ace-link-setup-default)
   (define-key org-mode-map (kbd "M-o") 'ace-link-org))
 
-(use-package! org-web-tools
-  :bind
-  ("C-c i l" . org-web-tools-insert-link-for-url))
-
 (global-set-key (kbd "C-x w p") 'pocket-reader)
 (use-package! pocket-reader
   :bind
@@ -50,6 +46,8 @@
   (defun elfeed-search-format-date (date)
     (format-time-string "%Y-%m-%d %H:%M" (seconds-to-time date)))
   )
+
+(load-file "~/.doom.d/private/doctor-chatgpt.el")
 
 ;; Checkers
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -562,9 +560,10 @@
 )
 
 (setq org-todo-keywords
-      '((sequence "✅(c)" "💡(b)" "📍(r)" "🔍(s)" "📊(a)" "🔬(e)" "|")
-        (sequence "⚖(k)" "✨(i)" "🔧(w)" "|")
-        (sequence "🎓(z)" "📝(m)" "🔗(l)" "⚙(p)" "📜(q)" "👉(h)" "|")))
+      '((sequence "📊(a)" "💡(b)" "✅(c)" "👨(d)" "🔬(e)" "👩(f)" "|")
+        (sequence "📂(h)" "✨(i)" "⚖(k)" "🔗(l)" "📝(m)" "|")
+        (sequence "🪨(o)" "↔(p)" "📜(q)" "📍(r)" "🔍(s)" "🔨(t)" "|")
+        (sequence "🔧(w)" "🎓(z)" "|")))
 
 (after! org
   (setq org-capture-templates
@@ -872,9 +871,9 @@
                "zk/%<%Y%m%d%H%M%S>.org"                 
                "#+title:👨${title}\n#+filetags: :PERSON:\n")
       :unnarrowed t)
-     ("f" "📂 TOC" plain "%?"
+     ("f" "📂 Type" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:📂${title}\n#+filetags: :TOC:\n")
+                         "#+title:📂${title}\n#+filetags: :TYPE:\n")
       :unnarrowed t)
      ("m" "🏛 MOC" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
@@ -888,7 +887,7 @@
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:💡${title}\n#+filetags: :IDEA:\n")
       :unnarrowed t)
-     ("p" "⚙ Pattern" plain "%?"
+     ("p" "🎨 Pattern" plain "%?"
       :target (file+head 
                "zk/%<%Y%m%d%H%M%S>.org"
                "#+title:⚙${title}\n#+filetags: :PATTERN:\n")
@@ -1074,7 +1073,9 @@
 
 (add-hook! 'org-mode-hook (ws-butler-mode -1))
 
-(use-package! org-pomodoro)
+(use-package! org-web-tools
+  :bind
+  ("C-c i l" . org-web-tools-insert-link-for-url))
 
 ;; Term
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
