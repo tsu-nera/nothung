@@ -47,8 +47,6 @@
     (format-time-string "%Y-%m-%d %H:%M" (seconds-to-time date)))
   )
 
-(load-file "~/.doom.d/private/doctor-chatgpt.el")
-
 ;; Checkers
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -62,9 +60,9 @@
 
 (use-package! avy
   :bind
-  ("C-c g c" . avy-goto-char) ;; doom の keybind 上書き.
+  ("C-c s c" . avy-goto-char) ;; doom の keybind 上書き.
   ("C-c g l" . avy-goto-line) ;; doom の keybind 上書き.
-  ("C-c g g". avy-goto-word-1))
+  ("C-c s C". avy-goto-word-1))
 (global-set-key (kbd "C-c g L") 'consult-goto-line)
 
 ;; うまく動かないので封印 doom との相性が悪いのかも.
@@ -97,6 +95,22 @@
     (cons input (lambda (str) (orderless--highlight input str))))
   (setq affe-regexp-compiler #'affe-orderless-regexp-compiler))
 
+;; accept completion from copilot and fallback to company
+(use-package! copilot
+  :hook 
+  (prog-mode . copilot-mode)
+  (org-mode . copilot-mode)
+  :bind (("C-TAB" . 'copilot-accept-completion-by-word)
+         ("C-<tab>" . 'copilot-accept-completion-by-word)
+         :map copilot-completion-map
+         ("<tab>" . 'copilot-accept-completion)
+         ("TAB" . 'copilot-accept-completion)))
+
+(use-package! chatgpt-shell
+  :commands chatgpt-shell
+  :init
+  (bind-key "C-c z b" 'chatgpt-shell))
+
 ;; Config
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -117,6 +131,9 @@
   (setq-default pdf-view-display-size 'fit-width)
   :custom
   (pdf-annot-activate-created-annotations t "automatically annotate highlights"))
+
+;; projectileの検索スピードを上げる
+(setq projectile-indexing-method 'alien)
 
 ;; Editor
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -220,7 +237,7 @@
 (setq-default bidi-display-reordering nil)
 
 ;; recentfに保存する数. 
-(setq recentf-max-saved-items 3000)
+(setq recentf-max-saved-items 300)
 
 ;; GCを減らして軽くする.
 ;; (setq gc-cons-threshold (* gc-cons-threshold 10))
@@ -345,6 +362,16 @@
 (use-package! vega-view
  :config
  (define-key clojure-mode-map (kbd "C-c M-n v") 'vega-view))
+
+(defun clerk-show ()
+  (interactive)
+  (when-let
+      ((filename
+        (buffer-file-name)))
+    (save-buffer)
+    (cider-interactive-eval
+     (concat "(nextjournal.clerk/show! \"" filename "\")"))))
+(define-key clojure-mode-map (kbd "<M-return>") 'clerk-show)
 
 (use-package! restclient
   :mode (("\\.rest\\'" . restclient-mode)
@@ -561,9 +588,9 @@
 
 (setq org-todo-keywords
       '((sequence "📊(a)" "💡(b)" "✅(c)" "👨(d)" "🔬(e)" "👩(f)" "|")
-        (sequence "📂(h)" "✨(i)" "⚖(k)" "🔗(l)" "📝(m)" "|")
-        (sequence "🪨(o)" "↔(p)" "📜(q)" "📍(r)" "🔍(s)" "🔨(t)" "|")
-        (sequence "🔧(w)" "🎓(z)" "|")))
+        (sequence "📂(h)" "✨(i)" "⚖(k)" "🔗(l)" "📝(m)" "🌳(n)" "|")
+        (sequence "🪨(o)" "📜(q)" "📍(r)" "🔍(s)" "🔨(t)" "|")
+        (sequence "🔧(w)" "🌱(z)" "|")))
 
 (after! org
   (setq org-capture-templates
@@ -854,9 +881,9 @@
   :custom
   ;;ファイル名を ID にする.
   (org-roam-capture-templates
-   '(("z" "🎓 Zettelkasten" plain "%?"
+   '(("z" "🌱 Zettel" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "\n#+date: %T\n#+title:🎓${title}\n#+filetags: :CONCEPT:\n")
+                         "\n#+date: %T\n#+title:🌱${title}\n#+filetags: :ZETTEL:\n")
       :unnarrowed t)
      ("w" "📝 Wiki" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
@@ -875,9 +902,9 @@
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:📂${title}\n#+filetags: :TYPE:\n")
       :unnarrowed t)
-     ("m" "🏛 MOC" plain "%?"
+     ("m" "🌳 MOC" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:🏛${title}\n#+filetags: :MOC:\n")
+                         "#+title:🌳${title}\n#+filetags: :MOC:\n")
       :unnarrowed t)
      ("i" "✅ Issue" plain "%?"
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
@@ -887,15 +914,11 @@
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:💡${title}\n#+filetags: :IDEA:\n")
       :unnarrowed t)
-     ("p" "🎨 Pattern" plain "%?"
+     ("c" "🎓 Concept" plain "%?"
       :target (file+head 
                "zk/%<%Y%m%d%H%M%S>.org"
-               "#+title:⚙${title}\n#+filetags: :PATTERN:\n")
+               "#+title:🎓${title}\n#+filetags: :CONCEPT:\n")
       :unnarrowed t)
-     ("d" "🗒 DOC" plain "%?"
-      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:🗒${title}\n#+filetags: :DOC:\n")
-      :unnarrowrd t)
      ("k" "🦊 Darkfox" plain "%?"
       :target (file+head 
                "zk/%<%Y%m%d%H%M%S>.org"
@@ -1076,6 +1099,17 @@
 (use-package! org-web-tools
   :bind
   ("C-c i l" . org-web-tools-insert-link-for-url))
+
+(use-package! org-ai
+  :load-path (lambda () "~/.emacs.d/.local/straight/repos/org-ai")
+  :commands (org-ai-mode)
+  ;; :custom
+  ;; (org-ai-openai-api-token "")
+  :init
+  (add-hook 'org-mode-hook #'org-ai-mode)
+  :config
+  ;; if you are using yasnippet and want `ai` snippets
+  (org-ai-install-yasnippets))
 
 ;; Term
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

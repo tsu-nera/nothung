@@ -38,6 +38,12 @@
 (package! org-toggl :recipe (:host github :repo "mbork/org-toggl"))
 ;; (package! org-trello :recipe (:build (:not native-compile)))
 
+(package! org-ai :recipe (:host github :repo "rksm/org-ai"))
+(package! copilot
+  :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
+(package! chatgpt-shell
+  :recipe (:host github :repo "xenodium/chatgpt-shell"))
+
 (package! org-ref)
 (package! org-sidebar)
 

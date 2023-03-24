@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: keido-def
+# key: keido-def
+# condition: t
+# --
+* 🪨$1とは
+
+$0

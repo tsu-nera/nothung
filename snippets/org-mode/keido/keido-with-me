@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: keido-with-me
+# group: keido
+# key: keido-with-me
+# --
+* 🦊なぜ$1がわたしにとって重要か?
+
+$0

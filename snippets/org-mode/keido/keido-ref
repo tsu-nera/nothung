@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: keido-reference
+# group: keido
+# key: keido-ref
+# condition: t
+# --
+* 🔗References
+
+$0
