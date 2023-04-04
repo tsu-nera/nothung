@@ -77,10 +77,13 @@
 ;;  (setq avy-timeout-seconds nil))
 
 (use-package! swiper
-  :bind
-;  ("C-s" . swiper) ;; migemo とうまく連携しないので isearch 置き換えを保留. C-c s s で swiper 起動.
+  ;; :bind
+  ;;  ("C-s" . swiper) ;; migemo とうまく連携しないので isearch 置き換えを保留. C-c s s で swiper 起動.
   :config
+  (require 'ivy-hydra)
   (ivy-mode 1))
+
+
   
 ;; avy-migemo-e.g.swiper だけバクる
 ;; https://github.com/abo-abo/swiper/issues/2249
@@ -249,10 +252,6 @@
 ;; (setq gc-cons-threshold 800000)
 ;; GC実行のメッセージを出す
 (setq garbage-collection-messages nil)
-
-(use-package! helpful
-  :config
-  (global-set-key (kbd "C-c C-d") #'helpful-at-point))
 
 ;; Email
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -970,33 +969,16 @@
 
   (setq org-roam-db-gc-threshold most-positive-fixnum)
 
-  ;; for speed
-  (setq org-roam-node-default-sort nil)
-
-
+  ;; for speed up
+  ;; (setq org-roam-node-default-sort 'file-mtime)
+ 
   (setq +org-roam-open-buffer-on-find-file nil)
-  (org-roam-db-autosync-mode))
+  ;; (org-roam-db-autosync-mode)
+)
 
 (setq org-roam-db-node-include-function
       (lambda ()
         (not (member "" (org-get-tags)))))
-
-(use-package! consult-org-roam
-   :init
-   (require 'consult-org-roam)
-   ;; Activate the minor-mode
-   (consult-org-roam-mode 1)
-   :custom
-   (consult-org-roam-grep-func #'consult-ripgrep)
-   :config
-   ;; Eventually suppress previewing for certain functions
-   (consult-customize
-    consult-org-roam-forward-links
-    :preview-key (kbd "M-."))
-   :bind
-   ("C-c r F" . consult-org-roam-file-find)
-   ("C-c r b" . consult-org-roam-backlinks)
-   ("C-c r S" . consult-org-roam-search))
 
 (defun my/org-roam-rg-search ()
   "Search org-roam directory using consult-ripgrep. With live-preview."
@@ -1078,11 +1060,6 @@
 (add-hook! 'org-mode-hook #'org-bars-mode)
 
 (setq org-table-export-default-format "orgtbl-to-csv")
-
-(use-package! org-sidebar
-  :config
-  ;; cider-modeに合わせて C-c C-zにbindしてみた.
-  (define-key org-mode-map (kbd "C-c C-z") #'org-sidebar-tree-toggle))
 
 (after! org
   (defun my/insert-timestamp ()

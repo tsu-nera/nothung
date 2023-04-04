@@ -169,10 +169,13 @@ notes:
 ;;  (setq avy-timeout-seconds nil))
 
 (use-package! swiper
-  :bind
-;  ("C-s" . swiper) ;; migemo とうまく連携しないので isearch 置き換えを保留. C-c s s で swiper 起動.
+  ;; :bind
+  ;;  ("C-s" . swiper) ;; migemo とうまく連携しないので isearch 置き換えを保留. C-c s s で swiper 起動.
   :config
+  (require 'ivy-hydra)
   (ivy-mode 1))
+
+
   
 ;; avy-migemo-e.g.swiper だけバクる
 ;; https://github.com/abo-abo/swiper/issues/2249
@@ -525,7 +528,7 @@ Emacsの*Help Bufferを強化する.
 
 https://github.com/Wilfred/helpful
 
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle no
 (use-package! helpful
   :config
   (global-set-key (kbd "C-c C-d") #'helpful-at-point))
@@ -1596,12 +1599,12 @@ Zettelkasten MethodのOrg-roam実装.
 
   (setq org-roam-db-gc-threshold most-positive-fixnum)
 
-  ;; for speed
-  (setq org-roam-node-default-sort nil)
-
-
+  ;; for speed up
+  ;; (setq org-roam-node-default-sort 'file-mtime)
+ 
   (setq +org-roam-open-buffer-on-find-file nil)
-  (org-roam-db-autosync-mode))
+  ;; (org-roam-db-autosync-mode)
+)
 #+end_src
 
 #+begin_src emacs-lisp :tangle yes
@@ -1620,7 +1623,7 @@ ref. https://github.com/jgru/consult-org-roam
 - バックリンク検索
 - 全文検索
 
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle no
 (use-package! consult-org-roam
    :init
    (require 'consult-org-roam)
@@ -1922,7 +1925,11 @@ https://github.com/bastibe/org-journal
 
 (use-package! org-roam-protocol
   :after org-protocol)
+#+end_src
 
+つかってないのでエラーたのでいったんマスク.
+
+#+begin_src emacs-lisp :tangle no
 (use-package! org-roam-bibtex
   :after org-roam ivy-bibtex
   :hook (org-mode . org-roam-bibtex-mode)
@@ -2029,7 +2036,7 @@ https://github.com/alphapapa/org-sidebar
 
 org-sidebar-treeでサイドバーにアウトラインを表示.
 
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle no
 (use-package! org-sidebar
   :config
   ;; cider-modeに合わせて C-c C-zにbindしてみた.

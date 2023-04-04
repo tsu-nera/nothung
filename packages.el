@@ -33,8 +33,8 @@
 (package! org-roam-ui)
 (unpin! consult-org-roam)
 ;; (package! org-roam-timestamps)
-(package! org-roam-bibtex
-  :recipe (:host github :repo "org-roam/org-roam-bibtex"))
+;; (package! org-roam-bibtex
+;;  :recipe (:host github :repo "org-roam/org-roam-bibtex"))
 (package! org-toggl :recipe (:host github :repo "mbork/org-toggl"))
 ;; (package! org-trello :recipe (:build (:not native-compile)))
 
@@ -122,16 +122,3 @@
 ;(unpin! pinned-package another-pinned-package)
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;(unpin! t)
-;
-;; workaround this, https://github.com/hlissner/doom-emacs/issues/5913
-(unpin! dired-git-info)
-
-;; for org-roam-bibtex
-(unpin! org-roam)
-(unpin! bibtex-completion ivy-bibtex)
-
-;; バグがあるのにdoomが古いversionしかつかわないので. 2022.01.08
-(unpin! vertico)
-
-;; 最新版を使いたい.
-;; (unpin! cider)
