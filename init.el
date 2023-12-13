@@ -41,7 +41,7 @@
        doom-dashboard    ; a nifty splash screen for Emacs
        doom-quit         ; DOOM quit-message prompts when yonu quit Emacs
        (emoji
-        +github
+        ;; +github
         +unicode)         ; 🙂
        hl-todo           ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
        ;;hydra
@@ -126,8 +126,8 @@
        ;;agda              ; types of types of types of types...
        ;;beancount         ; mind the GAAP
        ;;cc                ; C > C++ == 1
-       ;; (clojure +lsp)   ; java with a lisp
-       clojure
+       (clojure +lsp)   ; java with a lisp
+       ;; clojure
        common-lisp       ; if you've seen one lisp, you've seen them all
        ;;coq               ; proofs-as-programs
        ;;crystal           ; ruby at the speed of c
@@ -151,7 +151,7 @@
        ;;idris             ; a language you can depend on
        json              ; At least it ain't XML
        ;;(java +meghanada) ; the poster child for carpal tunnel syndrome
-       ;;javascript        ; all(hope(abandon(ye(who(enter(here))))))
+       javascript        ; all(hope(abandon(ye(who(enter(here))))))
        ;;julia             ; a better, faster MATLAB
        ;;kotlin            ; a better, slicker Java(Script)
        ;;latex             ; writing papers in Emacs has never been so fun
@@ -174,17 +174,18 @@
        ;;php               ; perl's insecure younger brother
        ;;plantuml          ; diagrams for confusing people more
        ;;purescript        ; javascript, but functional
+       ;; python
        (python            ; beautiful is better than ugly
-        +conda
-        +lsp
-        +pyright)
+         +conda
+         +lsp
+         +pyright)
        ;;qt                ; the 'cutest' gui framework ever
        ;;racket            ; a DSL for DSLs
        ;;raku              ; the artist formerly known as perl6
        rest              ; Emacs as a REST client
        rst               ; ReST in peace
        ;;(ruby +rails)     ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
-       ;;rust              ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
+       rust              ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
        ;;scala             ; java, but good
        ;;(scheme +guile)   ; a fully conniving family of lisps
        (sh +fish)          ; she sells {ba,z,fi}sh shells on the C xor

@@ -32,7 +32,7 @@ ref. 過去の設定は[[https://github.com/tsu-nera/dotfiles/tree/master/.emacs
 
 #+begin_src emacs-lisp :tangle yes
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
-(load-file "~/.doom.d/private/config.el")
+;; (load-file "~/.doom.d/private/config.el")
 #+end_src
 
 * App
@@ -152,8 +152,6 @@ notes:
   (setq twittering-allow-insecure-server-cert t))
 #+end_src
 
-
-
 * Checkers
 
 #+begin_src emacs-lisp :tangle yes
@@ -248,7 +246,7 @@ https://github.com/zerolfx/copilot.el
 
 Strongly recommend to enable childframe option in company module ((company +childframe)) to prevent overlay conflict.
 
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle no
 ;; accept completion from copilot and fallback to company
 (use-package! copilot
   :hook 
@@ -863,6 +861,12 @@ https://github.com/nextjournal/clerk
 (define-key clojure-mode-map (kbd "<M-return>") 'clerk-show)
 #+end_src
 
+** Rust
+
+#+begin_src emacs-lisp :tangle yes
+(setq exec-path (append exec-path '("~/.cargo/bin")))
+#+end_src
+
 ** rest
 
 #+begin_src emacs-lisp :tangle yes
@@ -1013,14 +1017,13 @@ counsel-linux-appだと起動時にハングしてPC再起動になることが�
 
 #+begin_src emacs-lisp :tangle yes
 (after! org
-  (setq org-directory (file-truename "~/repo/keido"))
+  (setq org-directory (file-truename "~/repo/gtd"))
 
-  (defconst my/gtd-projects-file
-    (concat org-directory "/notes/gtd/gtd_projects.org"))
+  (defconst my/gtd-projects-file (concat org-directory "/home.org"))
   (defconst my/inbox-file
-    (concat org-directory "inbox/inbox.org"))
+    (concat org-directory "/inbox/inbox.org"))
   (defconst my/daily-journal-dir
-    (concat org-directory "/notes/journals/daily"))
+    (concat org-directory "/journals/daily"))
   (defconst my/project-journal-bakuchi
     (file-truename "~/repo/bakuchi-doc/notes/journal.org"))
   (defconst my/project-journal-deepwork
@@ -1041,8 +1044,13 @@ counsel-linux-appだと起動時にハングしてPC再起動になることが�
 
 (defun my/create-weekly-org-file (path)
   (expand-file-name (format "%s.org" (format-time-string "%Y-w%W")) path))
+(defun my/create-daily-org-file (path)
+  (expand-file-name (format "%s.org" (format-time-string "%Y-%m-%d")) path))
+
 (defconst my/weekly-journal-dir "~/repo/keido/notes/zk")
-(defconst my/weekly-private-dir "~/repo/keido/notes/journals/weekly")
+
+(defconst my/weekly-private-dir "~/repo/gtd/journals/weekly")
+(defconst my/daily-private-dir "~/repo/gtd/journals/daily")
 #+end_src
 
 ** Basics
@@ -1171,9 +1179,6 @@ ref. [[https://orgmode.org/manual/TODO-Extensions.html][TODO Extensions (The Org
 *** capture to daily journal
 
 #+begin_src emacs-lisp :tangle yes
-(defun my/create-date-org-file (path)
-  (expand-file-name (format "%s.org" (format-time-string "%Y-%m-%d")) path))
-
 ;; 現状つかってないのでマスク
 ;; (defun my/create-timestamped-org-file (path)
 ;;   (expand-file-name (format "%s.org" (format-time-string "%Y%m%d%H%M%S")) path))
@@ -1184,7 +1189,7 @@ ref. [[https://orgmode.org/manual/TODO-Extensions.html][TODO Extensions (The Org
           '(("c" "☑ Planning" plain
              (file+headline
               (lambda () 
-                (my/create-weekly-org-file my/weekly-private-dir))
+                (my/create-daily-org-file my/daily-private-dir))
               "Planning")
              "%?"
              :unnarrowed t
@@ -1192,7 +1197,7 @@ ref. [[https://orgmode.org/manual/TODO-Extensions.html][TODO Extensions (The Org
             ("t" "🤔 Thought" entry
              (file+headline
               (lambda () 
-                (my/create-weekly-org-file my/weekly-private-dir))
+                (my/create-daily-org-file my/daily-private-dir))
               "Thoughts")
              "* 🤔 %?\n%T"
              :empty-lines 1
@@ -1201,7 +1206,7 @@ ref. [[https://orgmode.org/manual/TODO-Extensions.html][TODO Extensions (The Org
             ("T" "🤔+📃 Thought+Ref" entry
              (file+headline
               (lambda () 
-                (my/create-weekly-org-file my/weekly-private-dir))
+                (my/create-daily-org-file my/daily-private-dir))
               "Thoughts")
              "* 🤔 %?\n%T from %a\n"
              :empty-lines 1
@@ -1210,7 +1215,7 @@ ref. [[https://orgmode.org/manual/TODO-Extensions.html][TODO Extensions (The Org
             ("l" "🤔+🌐 Thought+Browser" entry
              (file+headline
               (lambda () 
-                (my/create-weekly-org-file my/weekly-private-dir))
+                (my/create-daily-org-file my/daily-private-dir))
               "Thoughts")
              "* 🤔 %?\n%T from [[%:link][%:description]]\n"
              :empty-lines 1
@@ -1219,7 +1224,7 @@ ref. [[https://orgmode.org/manual/TODO-Extensions.html][TODO Extensions (The Org
             ("p" "🍅 Pomodoro" entry
              (file+headline
               (lambda () 
-                (my/create-weekly-org-file my/weekly-private-dir))
+                (my/create-daily-org-file my/daily-private-dir))
               "DeepWork")
              "* 🍅 %?\n%T"
              :empty-lines 1
@@ -1228,7 +1233,7 @@ ref. [[https://orgmode.org/manual/TODO-Extensions.html][TODO Extensions (The Org
             ("r" "🧘 Recovery" entry
              (file+headline
               (lambda () 
-                (my/create-weekly-org-file my/weekly-private-dir))
+                (my/create-daily-org-file my/daily-private-dir))
               "Recovery")
              "* 🧘 %?\n%T"
              :empty-lines 1
@@ -1237,7 +1242,7 @@ ref. [[https://orgmode.org/manual/TODO-Extensions.html][TODO Extensions (The Org
             ("j" "🖊 Journal" plain
              (file 
               (lambda ()
-                (my/create-weekly-org-file my/weekly-private-dir)))
+                (my/create-daily-org-file my/daily-private-dir)))
              "%?"
              :empty-lines 1
              :unnarrowed t
@@ -1245,7 +1250,7 @@ ref. [[https://orgmode.org/manual/TODO-Extensions.html][TODO Extensions (The Org
             ("J" "🖊+📃 Journal+Ref" plain
              (file 
               (lambda ()
-                (my/create-weekly-org-file my/weekly-private-dir)))
+                (my/create-daily-org-file my/daily-private-dir)))
              "%?\n%a"
              :empty-lines 1
              :unnarrowed t
@@ -1253,7 +1258,7 @@ ref. [[https://orgmode.org/manual/TODO-Extensions.html][TODO Extensions (The Org
             ("L" "🖊+🌐 Journal+Browser" plain
              (file 
               (lambda ()
-                (my/create-weekly-org-file my/weekly-private-dir)))
+                (my/create-daily-org-file my/daily-private-dir)))
              "%?\nSource: [[%:link][%:description]]\nCaptured On: %U\n"
              :empty-lines 1
              :unnrrowed t
@@ -1603,7 +1608,7 @@ Zettelkasten MethodのOrg-roam実装.
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:💡${title}\n#+filetags: :IDEA:\n")
       :unnarrowed t)
-     ("c" "🎓 Concept" plain "%?"
+     ("c" "📑 Concept" plain "%?"
       :target (file+head 
                "zk/%<%Y%m%d%H%M%S>.org"
                "#+title:🎓${title}\n#+filetags: :CONCEPT:\n")
@@ -1906,14 +1911,19 @@ https://github.com/bastibe/org-journal
 (use-package! org-journal
   :after org
   :bind
+  ;; org-roamと揃えたいので C-c rまでをprefixにする.
   ("C-c r d n" . org-journal-new-entry)
   ("C-c r d d" . org-journal-open-current-journal-file)
   :config
   (setq org-journal-date-prefix "#+TITLE: ✍")
-  (setq org-journal-file-format "%Y-w%W.org")
-  (setq org-journal-date-format "%Y-w%W")
-  (setq org-journal-file-type `weekly)
-  (setq org-journal-dir my/weekly-private-dir)
+  (setq org-journal-file-format "%Y-%m-%d.org")
+  (setq org-journal-date-format "%Y-%m-%d")
+  (setq org-journal-file-type `daily)
+  ;; これはorg-journalの変数ではない.
+  (setq org-weekly-file-format "%Y-w%W.org")
+  (setq org-weekly-date-format "%Y-w%W")
+  ;; (setq org-journal-file-type `weekly)
+  (setq org-journal-dir my/daily-private-dir)
   (setq org-journal-enable-agenda-integration t))
 #+end_src
 
@@ -2225,9 +2235,9 @@ ref: [[https://magit.vc/manual/forge/][Forge User and Developer Manual]]
 ;; Terminal Emulator の設定がきく.
 
 ;; Twitterで拾った設定だけど若干org-table表示がマシになったので採用.
-(set-face-attribute 'fixed-pitch nil :font "Ricty Diminished" :height 160)
-;; (setq doom-font (font-spec :family "Source Han Code JP" :size 12 ))
-;; (setq doom-font (font-spec :family "Ricty Diminished" :size 15))
+;; (set-face-attribute 'fixed-pitch nil :font "Ricty Diminished" :height 160)
+(setq doom-font (font-spec :family "Source Han Code JP" :size 15 ))
+;; (setq doom-font (font-spec :family "Ricty Diminished" :size 16))
 ;; doom-molokaiやdoom-monokai-classicだとewwの表示がいまいち.
 (setq doom-theme 'doom-molokai)
 (doom-themes-org-config)
@@ -2253,7 +2263,9 @@ https://github.com/iqbalansari/emacs-emojify/blob/master/data/emoji-sets.json
 
 #+begin_src emacs-lisp :tangle yes
 (after! emojify
-  (setq emojify-emoji-set "twemoji-v2-22"))
+;;   (setq emojify-emoji-set "openmoji-v13-0")
+  ;; (setq emojify-emoji-set "emojione-v2.2.6.22")
+)
 #+end_src
 
 ただ，2022現在twemojiはv13なのでv2は古いな..というかでないやつもおおい.

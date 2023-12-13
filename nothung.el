@@ -1,5 +1,5 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
-(load-file "~/.doom.d/private/config.el")
+;; (load-file "~/.doom.d/private/config.el")
 
 (use-package! chatgpt-shell
   :commands chatgpt-shell
@@ -69,17 +69,6 @@
     (setq input (orderless-pattern-compiler input))
     (cons input (lambda (str) (orderless--highlight input str))))
   (setq affe-regexp-compiler #'affe-orderless-regexp-compiler))
-
-;; accept completion from copilot and fallback to company
-(use-package! copilot
-  :hook 
-  (prog-mode . copilot-mode)
-  (org-mode . copilot-mode)
-  :bind (("C-TAB" . 'copilot-accept-completion-by-word)
-         ("C-<tab>" . 'copilot-accept-completion-by-word)
-         :map copilot-completion-map
-         ("<tab>" . 'copilot-accept-completion)
-         ("TAB" . 'copilot-accept-completion)))
 
 ;; Config
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -356,6 +345,8 @@
      (concat "(nextjournal.clerk/show! \"" filename "\")"))))
 (define-key clojure-mode-map (kbd "<M-return>") 'clerk-show)
 
+(setq exec-path (append exec-path '("~/.cargo/bin")))
+
 (use-package! restclient
   :mode (("\\.rest\\'" . restclient-mode)
          ("\\.restclient\\'" . restclient-mode)))
@@ -462,14 +453,13 @@
   (exwm-enable))
 
 (after! org
-  (setq org-directory (file-truename "~/repo/keido"))
+  (setq org-directory (file-truename "~/repo/gtd"))
 
-  (defconst my/gtd-projects-file
-    (concat org-directory "/notes/gtd/gtd_projects.org"))
+  (defconst my/gtd-projects-file (concat org-directory "/home.org"))
   (defconst my/inbox-file
-    (concat org-directory "inbox/inbox.org"))
+    (concat org-directory "/inbox/inbox.org"))
   (defconst my/daily-journal-dir
-    (concat org-directory "/notes/journals/daily"))
+    (concat org-directory "/journals/daily"))
   (defconst my/project-journal-bakuchi
     (file-truename "~/repo/bakuchi-doc/notes/journal.org"))
   (defconst my/project-journal-deepwork
@@ -490,8 +480,13 @@
 
 (defun my/create-weekly-org-file (path)
   (expand-file-name (format "%s.org" (format-time-string "%Y-w%W")) path))
+(defun my/create-daily-org-file (path)
+  (expand-file-name (format "%s.org" (format-time-string "%Y-%m-%d")) path))
+
 (defconst my/weekly-journal-dir "~/repo/keido/notes/zk")
-(defconst my/weekly-private-dir "~/repo/keido/notes/journals/weekly")
+
+(defconst my/weekly-private-dir "~/repo/gtd/journals/weekly")
+(defconst my/daily-private-dir "~/repo/gtd/journals/daily")
 
 ;; Org mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -592,9 +587,6 @@
            "* %?\nSource: [[%:link][%:description]]\nCaptured On: %U\n%i\n"
            :klll-buffer t))))
 
-(defun my/create-date-org-file (path)
-  (expand-file-name (format "%s.org" (format-time-string "%Y-%m-%d")) path))
-
 ;; 現状つかってないのでマスク
 ;; (defun my/create-timestamped-org-file (path)
 ;;   (expand-file-name (format "%s.org" (format-time-string "%Y%m%d%H%M%S")) path))
@@ -605,7 +597,7 @@
           '(("c" "☑ Planning" plain
              (file+headline
               (lambda () 
-                (my/create-weekly-org-file my/weekly-private-dir))
+                (my/create-daily-org-file my/daily-private-dir))
               "Planning")
              "%?"
              :unnarrowed t
@@ -613,7 +605,7 @@
             ("t" "🤔 Thought" entry
              (file+headline
               (lambda () 
-                (my/create-weekly-org-file my/weekly-private-dir))
+                (my/create-daily-org-file my/daily-private-dir))
               "Thoughts")
              "* 🤔 %?\n%T"
              :empty-lines 1
@@ -622,7 +614,7 @@
             ("T" "🤔+📃 Thought+Ref" entry
              (file+headline
               (lambda () 
-                (my/create-weekly-org-file my/weekly-private-dir))
+                (my/create-daily-org-file my/daily-private-dir))
               "Thoughts")
              "* 🤔 %?\n%T from %a\n"
              :empty-lines 1
@@ -631,7 +623,7 @@
             ("l" "🤔+🌐 Thought+Browser" entry
              (file+headline
               (lambda () 
-                (my/create-weekly-org-file my/weekly-private-dir))
+                (my/create-daily-org-file my/daily-private-dir))
               "Thoughts")
              "* 🤔 %?\n%T from [[%:link][%:description]]\n"
              :empty-lines 1
@@ -640,7 +632,7 @@
             ("p" "🍅 Pomodoro" entry
              (file+headline
               (lambda () 
-                (my/create-weekly-org-file my/weekly-private-dir))
+                (my/create-daily-org-file my/daily-private-dir))
               "DeepWork")
              "* 🍅 %?\n%T"
              :empty-lines 1
@@ -649,7 +641,7 @@
             ("r" "🧘 Recovery" entry
              (file+headline
               (lambda () 
-                (my/create-weekly-org-file my/weekly-private-dir))
+                (my/create-daily-org-file my/daily-private-dir))
               "Recovery")
              "* 🧘 %?\n%T"
              :empty-lines 1
@@ -658,7 +650,7 @@
             ("j" "🖊 Journal" plain
              (file 
               (lambda ()
-                (my/create-weekly-org-file my/weekly-private-dir)))
+                (my/create-daily-org-file my/daily-private-dir)))
              "%?"
              :empty-lines 1
              :unnarrowed t
@@ -666,7 +658,7 @@
             ("J" "🖊+📃 Journal+Ref" plain
              (file 
               (lambda ()
-                (my/create-weekly-org-file my/weekly-private-dir)))
+                (my/create-daily-org-file my/daily-private-dir)))
              "%?\n%a"
              :empty-lines 1
              :unnarrowed t
@@ -674,7 +666,7 @@
             ("L" "🖊+🌐 Journal+Browser" plain
              (file 
               (lambda ()
-                (my/create-weekly-org-file my/weekly-private-dir)))
+                (my/create-daily-org-file my/daily-private-dir)))
              "%?\nSource: [[%:link][%:description]]\nCaptured On: %U\n"
              :empty-lines 1
              :unnrrowed t
@@ -899,7 +891,7 @@
       :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
                          "#+title:💡${title}\n#+filetags: :IDEA:\n")
       :unnarrowed t)
-     ("c" "🎓 Concept" plain "%?"
+     ("c" "📑 Concept" plain "%?"
       :target (file+head 
                "zk/%<%Y%m%d%H%M%S>.org"
                "#+title:🎓${title}\n#+filetags: :CONCEPT:\n")
@@ -1038,14 +1030,19 @@
 (use-package! org-journal
   :after org
   :bind
+  ;; org-roamと揃えたいので C-c rまでをprefixにする.
   ("C-c r d n" . org-journal-new-entry)
   ("C-c r d d" . org-journal-open-current-journal-file)
   :config
   (setq org-journal-date-prefix "#+TITLE: ✍")
-  (setq org-journal-file-format "%Y-w%W.org")
-  (setq org-journal-date-format "%Y-w%W")
-  (setq org-journal-file-type `weekly)
-  (setq org-journal-dir my/weekly-private-dir)
+  (setq org-journal-file-format "%Y-%m-%d.org")
+  (setq org-journal-date-format "%Y-%m-%d")
+  (setq org-journal-file-type `daily)
+  ;; これはorg-journalの変数ではない.
+  (setq org-weekly-file-format "%Y-w%W.org")
+  (setq org-weekly-date-format "%Y-w%W")
+  ;; (setq org-journal-file-type `weekly)
+  (setq org-journal-dir my/daily-private-dir)
   (setq org-journal-enable-agenda-integration t))
 
 (use-package! org-anki
@@ -1118,9 +1115,9 @@
 ;; Terminal Emulator の設定がきく.
 
 ;; Twitterで拾った設定だけど若干org-table表示がマシになったので採用.
-(set-face-attribute 'fixed-pitch nil :font "Ricty Diminished" :height 160)
-;; (setq doom-font (font-spec :family "Source Han Code JP" :size 12 ))
-;; (setq doom-font (font-spec :family "Ricty Diminished" :size 15))
+;; (set-face-attribute 'fixed-pitch nil :font "Ricty Diminished" :height 160)
+(setq doom-font (font-spec :family "Source Han Code JP" :size 15 ))
+;; (setq doom-font (font-spec :family "Ricty Diminished" :size 16))
 ;; doom-molokaiやdoom-monokai-classicだとewwの表示がいまいち.
 (setq doom-theme 'doom-molokai)
 (doom-themes-org-config)
@@ -1133,7 +1130,9 @@
 ;;  (setq doom-modeline-major-mode-icon t))
 
 (after! emojify
-  (setq emojify-emoji-set "twemoji-v2-22"))
+;;   (setq emojify-emoji-set "openmoji-v13-0")
+  ;; (setq emojify-emoji-set "emojione-v2.2.6.22")
+)
 
 ;; doomだと C-c i eでemojify-insert-emoji
 (global-set-key (kbd "C-c i E") 'emoji-search)

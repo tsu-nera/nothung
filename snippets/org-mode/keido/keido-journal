@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: keido-journal
+# key: keido-jar
+# group: keido
+# condition: t
+# --
+* 🖊Journals
+$0
