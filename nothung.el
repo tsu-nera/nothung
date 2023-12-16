@@ -1037,13 +1037,14 @@
   (setq org-journal-date-prefix "#+TITLE: ✍")
   (setq org-journal-file-format "%Y-%m-%d.org")
   (setq org-journal-date-format "%Y-%m-%d")
-  (setq org-journal-file-type `daily)
+  ;; (setq org-journal-file-type `daily)
   ;; これはorg-journalの変数ではない.
   (setq org-weekly-file-format "%Y-w%W.org")
   (setq org-weekly-date-format "%Y-w%W")
-  ;; (setq org-journal-file-type `weekly)
+  (setq org-journal-file-type `weekly)
   (setq org-journal-dir my/daily-private-dir)
-  (setq org-journal-enable-agenda-integration t))
+  ;; (setq org-journal-enable-agenda-integration t)
+)
 
 (use-package! org-anki
   :after org

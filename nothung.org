@@ -1024,6 +1024,8 @@ counsel-linux-appだと起動時にハングしてPC再起動になることが�
     (concat org-directory "/inbox/inbox.org"))
   (defconst my/daily-journal-dir
     (concat org-directory "/journals/daily"))
+  (defconst my/weekly-journal-dir
+    (concat org-directory "/journals/weekly"))
   (defconst my/project-journal-bakuchi
     (file-truename "~/repo/bakuchi-doc/notes/journal.org"))
   (defconst my/project-journal-deepwork
@@ -1038,7 +1040,7 @@ counsel-linux-appだと起動時にハングしてPC再起動になることが�
         (list
          ;; my/project-journal-bakuchi
          ;; my/project-journal-deepwork
-         my/daily-journal-dir
+         ;; my/daily-journal-dir
          my/gtd-projects-file
          )))
 
@@ -1916,15 +1918,16 @@ https://github.com/bastibe/org-journal
   ("C-c r d d" . org-journal-open-current-journal-file)
   :config
   (setq org-journal-date-prefix "#+TITLE: ✍")
-  (setq org-journal-file-format "%Y-%m-%d.org")
-  (setq org-journal-date-format "%Y-%m-%d")
-  (setq org-journal-file-type `daily)
+  ;; (setq org-journal-file-type `daily)
+  ;; (setq org-journal-file-format "%Y-%m-%d.org")
+  ;; (setq org-journal-date-format "%Y-%m-%d")
   ;; これはorg-journalの変数ではない.
-  (setq org-weekly-file-format "%Y-w%W.org")
-  (setq org-weekly-date-format "%Y-w%W")
-  ;; (setq org-journal-file-type `weekly)
-  (setq org-journal-dir my/daily-private-dir)
-  (setq org-journal-enable-agenda-integration t))
+  (setq org-journal-file-format "%Y-w%W.org")
+  (setq org-journal-date-format "%Y-w%W")
+  (setq org-journal-file-type `weekly)
+  (setq org-journal-dir my/weekly-private-dir)
+  ;; (setq org-journal-enable-agenda-integration t)
+)
 #+end_src
 
 ** org-ref(bibtex)
