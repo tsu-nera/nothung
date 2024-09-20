@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: keido-history
+# key: keido-his
+# group: keido
+# condition: t
+# --
+* 📜Histries
+$0

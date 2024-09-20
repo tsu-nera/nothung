@@ -1,5 +1,5 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
-;; (load-file "~/.doom.d/private/config.el")
+(load-file "~/.doom.d/private/config.el")
 
 (use-package! chatgpt-shell
   :commands chatgpt-shell
@@ -18,6 +18,11 @@
   (eval-after-load 'eww '(define-key eww-mode-map "f" 'ace-link-eww))
   (ace-link-setup-default)
   (define-key org-mode-map (kbd "M-o") 'ace-link-org))
+
+(use-package! tidal
+  ;; :init
+  ;; (setq tidal-boot-script-path "~/.cabal/share/x86_64-osx-ghc-8.8.4/tidal-1.7.4/BootTidal.hs")
+  )
 
 ;; Checkers
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -331,31 +336,7 @@
   (interactive)
   (cider-nrepl-sync-request:eval "(portal.api/close)"))
 
-(use-package! vega-view
- :config
- (define-key clojure-mode-map (kbd "C-c M-n v") 'vega-view))
-
-(defun clerk-show ()
-  (interactive)
-  (when-let
-      ((filename
-        (buffer-file-name)))
-    (save-buffer)
-    (cider-interactive-eval
-     (concat "(nextjournal.clerk/show! \"" filename "\")"))))
-(define-key clojure-mode-map (kbd "<M-return>") 'clerk-show)
-
 (setq exec-path (append exec-path '("~/.cargo/bin")))
-
-(use-package! restclient
-  :mode (("\\.rest\\'" . restclient-mode)
-         ("\\.restclient\\'" . restclient-mode)))
-(use-package! ob-restclient
-  :after org restclient
-  :init
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((restclient . t))))
 
 (use-package! mermaid-mode)
 
@@ -460,6 +441,8 @@
     (concat org-directory "/inbox/inbox.org"))
   (defconst my/daily-journal-dir
     (concat org-directory "/journals/daily"))
+  (defconst my/weekly-journal-dir
+    (concat org-directory "/journals/weekly"))
   (defconst my/project-journal-bakuchi
     (file-truename "~/repo/bakuchi-doc/notes/journal.org"))
   (defconst my/project-journal-deepwork
@@ -474,7 +457,7 @@
         (list
          ;; my/project-journal-bakuchi
          ;; my/project-journal-deepwork
-         my/daily-journal-dir
+         ;; my/daily-journal-dir
          my/gtd-projects-file
          )))
 
@@ -597,7 +580,7 @@
           '(("c" "☑ Planning" plain
              (file+headline
               (lambda () 
-                (my/create-daily-org-file my/daily-private-dir))
+                (my/create-weekly-org-file my/weekly-private-dir))
               "Planning")
              "%?"
              :unnarrowed t
@@ -605,7 +588,7 @@
             ("t" "🤔 Thought" entry
              (file+headline
               (lambda () 
-                (my/create-daily-org-file my/daily-private-dir))
+                (my/create-weekly-org-file my/weekly-private-dir))
               "Thoughts")
              "* 🤔 %?\n%T"
              :empty-lines 1
@@ -614,7 +597,7 @@
             ("T" "🤔+📃 Thought+Ref" entry
              (file+headline
               (lambda () 
-                (my/create-daily-org-file my/daily-private-dir))
+                (my/create-weekly-org-file my/weekly-private-dir))
               "Thoughts")
              "* 🤔 %?\n%T from %a\n"
              :empty-lines 1
@@ -623,7 +606,7 @@
             ("l" "🤔+🌐 Thought+Browser" entry
              (file+headline
               (lambda () 
-                (my/create-daily-org-file my/daily-private-dir))
+                (my/create-weekly-org-file my/weekly-private-dir))
               "Thoughts")
              "* 🤔 %?\n%T from [[%:link][%:description]]\n"
              :empty-lines 1
@@ -632,7 +615,7 @@
             ("p" "🍅 Pomodoro" entry
              (file+headline
               (lambda () 
-                (my/create-daily-org-file my/daily-private-dir))
+                (my/create-weekly-org-file my/weekly-private-dir))
               "DeepWork")
              "* 🍅 %?\n%T"
              :empty-lines 1
@@ -641,7 +624,7 @@
             ("r" "🧘 Recovery" entry
              (file+headline
               (lambda () 
-                (my/create-daily-org-file my/daily-private-dir))
+                (my/create-weekly-org-file my/weekly-private-dir))
               "Recovery")
              "* 🧘 %?\n%T"
              :empty-lines 1
@@ -650,7 +633,7 @@
             ("j" "🖊 Journal" plain
              (file 
               (lambda ()
-                (my/create-daily-org-file my/daily-private-dir)))
+                (my/create-weekly-org-file my/weekly-private-dir)))
              "%?"
              :empty-lines 1
              :unnarrowed t
@@ -658,7 +641,7 @@
             ("J" "🖊+📃 Journal+Ref" plain
              (file 
               (lambda ()
-                (my/create-daily-org-file my/daily-private-dir)))
+                (my/create-weekly-org-file my/weekly-private-dir)))
              "%?\n%a"
              :empty-lines 1
              :unnarrowed t
@@ -666,7 +649,7 @@
             ("L" "🖊+🌐 Journal+Browser" plain
              (file 
               (lambda ()
-                (my/create-daily-org-file my/daily-private-dir)))
+                (my/create-weekly-org-file my/weekly-private-dir)))
              "%?\nSource: [[%:link][%:description]]\nCaptured On: %U\n"
              :empty-lines 1
              :unnrrowed t
@@ -753,35 +736,36 @@
 
 (use-package! ox-qmd)
 
-(after! org
-  ;; https://stackoverflow.com/questions/53469017/org-mode-source-editing-indents-code-after-exiting-source-code-block-editor
-  ;; インデント. default 2になっているとへんな隙間が先頭に入る.
-  (setq org-edit-src-content-indentation 0)
-  (setq org-src-preserve-indentation t)
-  ;; TABの挙動
-  (setq org-src-tab-acts-natively t)
+  (after! org
+    ;; https://stackoverflow.com/questions/53469017/org-mode-source-editing-indents-code-after-exiting-source-code-block-editor
+    ;; インデント. default 2になっているとへんな隙間が先頭に入る.
+    (setq org-edit-src-content-indentation 0)
+    (setq org-src-preserve-indentation t)
+    ;; TABの挙動
+    (setq org-src-tab-acts-natively t)
 
-  ;; org-babel のソースをキレイに表示.
-  (setq org-src-fontify-natively t)
-  (setq org-fontify-whole-heading-line t)
+    ;; org-babel のソースをキレイに表示.
+    (setq org-src-fontify-natively t)
+    (setq org-fontify-whole-heading-line t)
 
-  ;; 評価でいちいち質問されないように.
-  (setq org-confirm-babel-evaluate nil)
+    ;; 評価でいちいち質問されないように.
+    (setq org-confirm-babel-evaluate nil)
 
-  ;; org-babel で 実行した言語を書く. デフォルトでは emacs-lisp だけ.
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((lisp . t)
-     (shell . t)
-     (clojure . t)))
+    ;; org-babel で 実行した言語を書く. デフォルトでは emacs-lisp だけ.
+    (org-babel-do-load-languages
+      'org-babel-load-languages
+      '((lisp . t)
+	(shell . t)
+	(clojure . t)))
 
-  ;; org-modeからclojure codeを評価.
-  (define-key org-mode-map (kbd "C-c C-v e") 'cider-eval-last-sexp)
-  ;; (org-defkey org-mode-map "\C-u\C-x\C-e" 'cider-eval-last-sexp)
+    ;; org-modeからclojure codeを評価.
+    (define-key org-mode-map (kbd "C-c C-v e") 'cider-eval-last-sexp)
+    ;; (org-defkey org-mode-map "\C-u\C-x\C-e" 'cider-eval-last-sexp)
 
-  ;; Clojure Modeの特別対応. keybindingが上書きされるので.
-  (define-key clojure-mode-map (kbd "C-c C-x k") 'org-edit-src-exit)
-  (define-key clojure-mode-map (kbd "C-c C-x q") 'org-edit-src-abort))
+    ;; Clojure Modeの特別対応. keybindingが上書きされるので.
+    ;; (define-key clojure-mode-map (kbd "C-c C-x k") 'org-edit-src-exit)
+    ;; (define-key clojure-mode-map (kbd "C-c C-x q") 'org-edit-src-abort)
+    )
 
 (use-package! ob-html
   :after org
@@ -952,6 +936,7 @@
  
   (setq +org-roam-open-buffer-on-find-file nil)
   ;; (org-roam-db-autosync-mode)
+  (org-roam-db-autosync-enable)
 )
 
 (setq org-roam-db-node-include-function
@@ -1035,14 +1020,14 @@
   ("C-c r d d" . org-journal-open-current-journal-file)
   :config
   (setq org-journal-date-prefix "#+TITLE: ✍")
-  (setq org-journal-file-format "%Y-%m-%d.org")
-  (setq org-journal-date-format "%Y-%m-%d")
   ;; (setq org-journal-file-type `daily)
+  ;; (setq org-journal-file-format "%Y-%m-%d.org")
+  ;; (setq org-journal-date-format "%Y-%m-%d")
   ;; これはorg-journalの変数ではない.
-  (setq org-weekly-file-format "%Y-w%W.org")
-  (setq org-weekly-date-format "%Y-w%W")
+  (setq org-journal-file-format "%Y-w%W.org")
+  (setq org-journal-date-format "%Y-w%W")
   (setq org-journal-file-type `weekly)
-  (setq org-journal-dir my/daily-private-dir)
+  (setq org-journal-dir my/weekly-private-dir)
   ;; (setq org-journal-enable-agenda-integration t)
 )
 

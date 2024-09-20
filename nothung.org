@@ -32,7 +32,7 @@ ref. 過去の設定は[[https://github.com/tsu-nera/dotfiles/tree/master/.emacs
 
 #+begin_src emacs-lisp :tangle yes
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
-;; (load-file "~/.doom.d/private/config.el")
+(load-file "~/.doom.d/private/config.el")
 #+end_src
 
 * App
@@ -152,6 +152,19 @@ notes:
   (setq twittering-allow-insecure-server-cert t))
 #+end_src
 
+** Tidalcycles
+
+音楽
+
+https://tidalcycles.org/docs/getting-started/editor/Emacs
+
+#+begin_src emacs-lisp :tangle yes
+(use-package! tidal
+  ;; :init
+  ;; (setq tidal-boot-script-path "~/.cabal/share/x86_64-osx-ghc-8.8.4/tidal-1.7.4/BootTidal.hs")
+  )
+#+end_src
+
 * Checkers
 
 #+begin_src emacs-lisp :tangle yes
@@ -239,24 +252,21 @@ https://github.com/iyefrat/all-the-icons-completion
 (add-hook! marginalia-mode-hook #'all-the-icons-completion-marginalia-setup)
 #+end_src
 
+** Copilot.el
 
-** copilot.el
-
-https://github.com/zerolfx/copilot.el
+https://github.com/copilot-emacs/copilot.el
 
 Strongly recommend to enable childframe option in company module ((company +childframe)) to prevent overlay conflict.
 
 #+begin_src emacs-lisp :tangle no
 ;; accept completion from copilot and fallback to company
 (use-package! copilot
-  :hook 
-  (prog-mode . copilot-mode)
-  (org-mode . copilot-mode)
-  :bind (("C-TAB" . 'copilot-accept-completion-by-word)
-         ("C-<tab>" . 'copilot-accept-completion-by-word)
-         :map copilot-completion-map
-         ("<tab>" . 'copilot-accept-completion)
-         ("TAB" . 'copilot-accept-completion)))
+  :hook (prog-mode . copilot-mode)
+  :bind (:map copilot-completion-map
+              ("<tab>" . 'copilot-accept-completion)
+              ("TAB" . 'copilot-accept-completion)
+              ("C-TAB" . 'copilot-accept-completion-by-word)
+              ("C-<tab>" . 'copilot-accept-completion-by-word)))
 #+end_src
 
 * Config
@@ -445,7 +455,7 @@ Emacsの画面に1行80文字のところに線を薄く引く.
 
 プログラミングの世界では昔から80 columns ruleがあり, Emacsで80文字目を表示する機能もいろいろあったものの, Emacs 27.0.90からdefault機能として提供されるようになった.
 
-(最も80charは昔の話で, 最近のディスプレイの大きさだと100charがいいという議論もある).
+(最も80(charは昔の話で, 最近のディスプレイの大きさだと100charがいいという議論もある).
 
 今つかっているモニタで縦に３分割すると74がちょうどいいことがわかった. (先頭に行番号表示4char+1charのmarginあり). 
 
@@ -839,7 +849,7 @@ ref. https://github.com/djblue/portal
 
 *** vega-view
 
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle no
 (use-package! vega-view
  :config
  (define-key clojure-mode-map (kbd "C-c M-n v") 'vega-view))
@@ -849,7 +859,7 @@ ref. https://github.com/djblue/portal
 
 https://github.com/nextjournal/clerk
 
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle no
 (defun clerk-show ()
   (interactive)
   (when-let
@@ -869,7 +879,7 @@ https://github.com/nextjournal/clerk
 
 ** rest
 
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle no
 (use-package! restclient
   :mode (("\\.rest\\'" . restclient-mode)
          ("\\.restclient\\'" . restclient-mode)))
@@ -1191,7 +1201,7 @@ ref. [[https://orgmode.org/manual/TODO-Extensions.html][TODO Extensions (The Org
           '(("c" "☑ Planning" plain
              (file+headline
               (lambda () 
-                (my/create-daily-org-file my/daily-private-dir))
+                (my/create-weekly-org-file my/weekly-private-dir))
               "Planning")
              "%?"
              :unnarrowed t
@@ -1199,7 +1209,7 @@ ref. [[https://orgmode.org/manual/TODO-Extensions.html][TODO Extensions (The Org
             ("t" "🤔 Thought" entry
              (file+headline
               (lambda () 
-                (my/create-daily-org-file my/daily-private-dir))
+                (my/create-weekly-org-file my/weekly-private-dir))
               "Thoughts")
              "* 🤔 %?\n%T"
              :empty-lines 1
@@ -1208,7 +1218,7 @@ ref. [[https://orgmode.org/manual/TODO-Extensions.html][TODO Extensions (The Org
             ("T" "🤔+📃 Thought+Ref" entry
              (file+headline
               (lambda () 
-                (my/create-daily-org-file my/daily-private-dir))
+                (my/create-weekly-org-file my/weekly-private-dir))
               "Thoughts")
              "* 🤔 %?\n%T from %a\n"
              :empty-lines 1
@@ -1217,7 +1227,7 @@ ref. [[https://orgmode.org/manual/TODO-Extensions.html][TODO Extensions (The Org
             ("l" "🤔+🌐 Thought+Browser" entry
              (file+headline
               (lambda () 
-                (my/create-daily-org-file my/daily-private-dir))
+                (my/create-weekly-org-file my/weekly-private-dir))
               "Thoughts")
              "* 🤔 %?\n%T from [[%:link][%:description]]\n"
              :empty-lines 1
@@ -1226,7 +1236,7 @@ ref. [[https://orgmode.org/manual/TODO-Extensions.html][TODO Extensions (The Org
             ("p" "🍅 Pomodoro" entry
              (file+headline
               (lambda () 
-                (my/create-daily-org-file my/daily-private-dir))
+                (my/create-weekly-org-file my/weekly-private-dir))
               "DeepWork")
              "* 🍅 %?\n%T"
              :empty-lines 1
@@ -1235,7 +1245,7 @@ ref. [[https://orgmode.org/manual/TODO-Extensions.html][TODO Extensions (The Org
             ("r" "🧘 Recovery" entry
              (file+headline
               (lambda () 
-                (my/create-daily-org-file my/daily-private-dir))
+                (my/create-weekly-org-file my/weekly-private-dir))
               "Recovery")
              "* 🧘 %?\n%T"
              :empty-lines 1
@@ -1244,7 +1254,7 @@ ref. [[https://orgmode.org/manual/TODO-Extensions.html][TODO Extensions (The Org
             ("j" "🖊 Journal" plain
              (file 
               (lambda ()
-                (my/create-daily-org-file my/daily-private-dir)))
+                (my/create-weekly-org-file my/weekly-private-dir)))
              "%?"
              :empty-lines 1
              :unnarrowed t
@@ -1252,7 +1262,7 @@ ref. [[https://orgmode.org/manual/TODO-Extensions.html][TODO Extensions (The Org
             ("J" "🖊+📃 Journal+Ref" plain
              (file 
               (lambda ()
-                (my/create-daily-org-file my/daily-private-dir)))
+                (my/create-weekly-org-file my/weekly-private-dir)))
              "%?\n%a"
              :empty-lines 1
              :unnarrowed t
@@ -1260,7 +1270,7 @@ ref. [[https://orgmode.org/manual/TODO-Extensions.html][TODO Extensions (The Org
             ("L" "🖊+🌐 Journal+Browser" plain
              (file 
               (lambda ()
-                (my/create-daily-org-file my/daily-private-dir)))
+                (my/create-weekly-org-file my/weekly-private-dir)))
              "%?\nSource: [[%:link][%:description]]\nCaptured On: %U\n"
              :empty-lines 1
              :unnrrowed t
@@ -1447,35 +1457,36 @@ Org-modeのなかでLiterature Programming.
   - C-c l '(org-edit-special)で開く.
 
 #+begin_src emacs-lisp :tangle yes
-(after! org
-  ;; https://stackoverflow.com/questions/53469017/org-mode-source-editing-indents-code-after-exiting-source-code-block-editor
-  ;; インデント. default 2になっているとへんな隙間が先頭に入る.
-  (setq org-edit-src-content-indentation 0)
-  (setq org-src-preserve-indentation t)
-  ;; TABの挙動
-  (setq org-src-tab-acts-natively t)
+  (after! org
+    ;; https://stackoverflow.com/questions/53469017/org-mode-source-editing-indents-code-after-exiting-source-code-block-editor
+    ;; インデント. default 2になっているとへんな隙間が先頭に入る.
+    (setq org-edit-src-content-indentation 0)
+    (setq org-src-preserve-indentation t)
+    ;; TABの挙動
+    (setq org-src-tab-acts-natively t)
 
-  ;; org-babel のソースをキレイに表示.
-  (setq org-src-fontify-natively t)
-  (setq org-fontify-whole-heading-line t)
+    ;; org-babel のソースをキレイに表示.
+    (setq org-src-fontify-natively t)
+    (setq org-fontify-whole-heading-line t)
 
-  ;; 評価でいちいち質問されないように.
-  (setq org-confirm-babel-evaluate nil)
+    ;; 評価でいちいち質問されないように.
+    (setq org-confirm-babel-evaluate nil)
 
-  ;; org-babel で 実行した言語を書く. デフォルトでは emacs-lisp だけ.
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((lisp . t)
-     (shell . t)
-     (clojure . t)))
+    ;; org-babel で 実行した言語を書く. デフォルトでは emacs-lisp だけ.
+    (org-babel-do-load-languages
+      'org-babel-load-languages
+      '((lisp . t)
+	(shell . t)
+	(clojure . t)))
 
-  ;; org-modeからclojure codeを評価.
-  (define-key org-mode-map (kbd "C-c C-v e") 'cider-eval-last-sexp)
-  ;; (org-defkey org-mode-map "\C-u\C-x\C-e" 'cider-eval-last-sexp)
+    ;; org-modeからclojure codeを評価.
+    (define-key org-mode-map (kbd "C-c C-v e") 'cider-eval-last-sexp)
+    ;; (org-defkey org-mode-map "\C-u\C-x\C-e" 'cider-eval-last-sexp)
 
-  ;; Clojure Modeの特別対応. keybindingが上書きされるので.
-  (define-key clojure-mode-map (kbd "C-c C-x k") 'org-edit-src-exit)
-  (define-key clojure-mode-map (kbd "C-c C-x q") 'org-edit-src-abort))
+    ;; Clojure Modeの特別対応. keybindingが上書きされるので.
+    ;; (define-key clojure-mode-map (kbd "C-c C-x k") 'org-edit-src-exit)
+    ;; (define-key clojure-mode-map (kbd "C-c C-x q") 'org-edit-src-abort)
+    )
 #+end_src
 
 refs:
@@ -1671,6 +1682,7 @@ Zettelkasten MethodのOrg-roam実装.
  
   (setq +org-roam-open-buffer-on-find-file nil)
   ;; (org-roam-db-autosync-mode)
+  (org-roam-db-autosync-enable)
 )
 #+end_src
 
@@ -1890,7 +1902,9 @@ https://www.reddit.com/r/orgmode/comments/s8xv5j/orgroam_slows_down_as_nodes_inc
 ;; which node is to be updated.
 #+end_src
 
+
 ** org-toggl
+
 
 org-modeをTogglと連携させる.
 https://github.com/mbork/org-toggl
