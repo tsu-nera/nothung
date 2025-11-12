@@ -33,34 +33,12 @@ ref. 過去の設定は[[https://github.com/tsu-nera/dotfiles/tree/master/.emacs
 #+begin_src emacs-lisp :tangle yes
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 (load-file "~/.doom.d/private/config.el")
+
+;; 自作関数
+(load-file "~/.doom.d/utils.el")
 #+end_src
 
 * App
-
-** ChatGPT
-
-いろいろあるので試すがつかうのは一つにしたいところ. 
-
-- https://github.com/karthink/gptel
-
-*** chatgpt
-
-https://github.com/emacs-openai/chatgpt
-
-*** chatgpt-shell
-
-chatgpt-shell-openai-keyはconfig.elに記載. 
-
-https://github.com/xenodium/chatgpt-shell
-
-#+begin_src emacs-lisp :tangle yes
-(use-package! chatgpt-shell
-  :commands chatgpt-shell
-  :init
-  (bind-key "C-c z b" 'chatgpt-shell)
-  :config
-  (setq chatgpt-shell-chatgpt-streaming t))
-#+end_src
 
 ** eww
 
@@ -158,7 +136,7 @@ notes:
 
 https://tidalcycles.org/docs/getting-started/editor/Emacs
 
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle no
 (use-package! tidal
   ;; :init
   ;; (setq tidal-boot-script-path "~/.cabal/share/x86_64-osx-ghc-8.8.4/tidal-1.7.4/BootTidal.hs")
@@ -210,12 +188,10 @@ https://tidalcycles.org/docs/getting-started/editor/Emacs
 ;;  (avy-migemo-mode 1)
 ;;  (setq avy-timeout-seconds nil))
 
-(use-package! swiper
-  ;; :bind
-  ;;  ("C-s" . swiper) ;; migemo とうまく連携しないので isearch 置き換えを保留. C-c s s で swiper 起動.
-  :config
-  (require 'ivy-hydra)
-  (ivy-mode 1))
+;; Vertico使用のためswiperとivyは無効化
+;; (use-package! swiper
+;;   :config
+;;   (ivy-mode 1))
 
 
   
@@ -295,6 +271,11 @@ Strongly recommend to enable childframe option in company module ((company +chil
 
 ;; projectileの検索スピードを上げる
 (setq projectile-indexing-method 'alien)
+
+;; custom-fileの設定
+(setq custom-file (expand-file-name "custom.el" doom-user-dir))
+(when (file-exists-p custom-file)
+  (load custom-file))
 #+end_src
 
 * Editor
@@ -303,11 +284,11 @@ Strongly recommend to enable childframe option in company module ((company +chil
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; 英数字と日本語の間にスペースをいれる.
-(use-package! pangu-spacing
-  :config
-  (global-pangu-spacing-mode 1)
+;;(use-package! pangu-spacing
+;;  :config
+;;  (global-pangu-spacing-mode 1)
   ;; 保存時に自動的にスペースを入れるのを抑止.あくまで入力時にしておく.
-  (setq pangu-spacing-real-insert-separtor nil))
+;;  (setq pangu-spacing-real-insert-separtor nil))
 
 ;; 記号の前後にスペースを入れる.
 (use-package! electric-operator)
@@ -692,6 +673,7 @@ refs:
   ;; copilot.elをいれたら相性が悪くなった.. 
   ;; (add-hook! 'clojure-mode-hook 'smartparens-strict-mode)
   (setq smartparens-strict-mode nil))
+
 #+end_src
 
 *** symbol-overlay
@@ -923,6 +905,7 @@ counsel-linux-appだと起動時にハングしてPC再起動になることが�
 
 #+begin_src emacs-lisp :tangle yes
 (use-package! exwm
+  :if (not (wsl-p))
   :after counsel
   :init
   (setq counsel-linux-app-format-function
@@ -1560,130 +1543,136 @@ bulletをおしゃれにかえる. ただそれと引き換えにパフォーマ
 Zettelkasten MethodのOrg-roam実装.
 
 #+begin_src emacs-lisp :tangle yes
-;; org-roam
-(setq org-roam-directory (file-truename "~/repo/keido/notes"))
-(setq org-roam-zk-dir (concat org-roam-directory "/zk"))
-(setq org-roam-db-location (file-truename "~/repo/keido/db/org-roam.db"))
+  ;; org-roam
+  (setq org-roam-directory (file-truename "~/repo/keido/notes"))
+  (setq org-roam-zk-dir (concat org-roam-directory "/zk"))
+  (setq org-roam-db-location (file-truename "~/repo/keido/db/org-roam.db"))
 
-(use-package! org-roam
-  :after org
-  :init
-  (setq org-roam-v2-ack t)
-  (map!
-        :leader
-        :prefix ("r" . "org-roam")
-        "f" #'org-roam-node-find
-        "i" #'org-roam-node-insert
-        "l" #'org-roam-buffer-toggle
-        "t" #'org-roam-tag-add
-        "T" #'org-roam-tag-remove
-        "a" #'org-roam-alias-add
-        "A" #'org-roam-alias-remove
-        "r" #'org-roam-ref-add
-        "R" #'org-roam-ref-remove
-        "o" #'org-id-get-create
-        "u" #'my/org-roam-update
-        "D" #'org-roam-dailies-goto-today
-        )
-  :custom
-  ;;ファイル名を ID にする.
-  (org-roam-capture-templates
-   '(("z" "🌱 Zettel" plain "%?"
-      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "\n#+date: %T\n#+title:🌱${title}\n#+filetags: :ZETTEL:\n")
-      :unnarrowed t)
-     ("w" "📝 Wiki" plain "%?"
-      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:📝${title}\n#+filetags: :WIKI:\n")
-      :unnarrowed t)
-     ("t" "🔖 Tag" plain "%?"
-      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:🔖${title}\n#+filetags: :TAG:\n")
-      :unnarrowed t)
-     ("h" "👨 Person" plain "%?"
-      :target (file+head 
-               "zk/%<%Y%m%d%H%M%S>.org"                 
-               "#+title:👨${title}\n#+filetags: :PERSON:\n")
-      :unnarrowed t)
-     ("f" "📂 Type" plain "%?"
-      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:📂${title}\n#+filetags: :TYPE:\n")
-      :unnarrowed t)
-     ("m" "🌳 MOC" plain "%?"
-      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:🌳${title}\n#+filetags: :MOC:\n")
-      :unnarrowed t)
-     ("i" "✅ Issue" plain "%?"
-      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                        "#+title:✅${title}\n#+filetags: :ISSUE:\n")
-      :unnarrowed t)
-     ("d" "💡 Idea" plain "%?"
-      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:💡${title}\n#+filetags: :IDEA:\n")
-      :unnarrowed t)
-     ("c" "📑 Concept" plain "%?"
-      :target (file+head 
-               "zk/%<%Y%m%d%H%M%S>.org"
-               "#+title:🎓${title}\n#+filetags: :CONCEPT:\n")
-      :unnarrowed t)
-     ("k" "🦊 Darkfox" plain "%?"
-      :target (file+head 
-               "zk/%<%Y%m%d%H%M%S>.org"
-               "#+title:🦊${title}\n#+filetags: :DARKFOX:\n")
-      :unnarrowed t)
-     ("b" "📚 Book" plain
-      "%?
+  (use-package! org-roam
+    :after org
+    :init
+    (setq org-roam-v2-ack t)
+    (map!
+          :leader
+          :prefix ("r" . "org-roam")
+          "f" #'org-roam-node-find
+          "i" #'org-roam-node-insert
+          "l" #'org-roam-buffer-toggle
+          "t" #'org-roam-tag-add
+          "T" #'org-roam-tag-remove
+          "a" #'org-roam-alias-add
+          "A" #'org-roam-alias-remove
+          "r" #'org-roam-ref-add
+          "R" #'org-roam-ref-remove
+          "o" #'org-id-get-create
+          "u" #'my/org-roam-update
+          "D" #'org-roam-dailies-goto-today
+          )
+    :custom
+    ;;ファイル名を ID にする.
+    (org-roam-capture-templates
+     '(("z" "🌱 Zettel" plain "%?"
+        :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                           "\n#+date: %T\n#+title:🌱${title}\n#+filetags: :ZETTEL:\n")
+        :unnarrowed t)
+       ("w" "📝 Wiki" plain "%?"
+        :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                           "#+title:📝${title}\n#+filetags: :WIKI:\n")
+        :unnarrowed t)
+       ("t" "🔖 Tag" plain "%?"
+        :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                           "#+title:🔖${title}\n#+filetags: :TAG:\n")
+        :unnarrowed t)
+       ("h" "👨 Person" plain "%?"
+        :target (file+head
+                 "zk/%<%Y%m%d%H%M%S>.org"
+                 "#+title:👨${title}\n#+filetags: :PERSON:\n")
+        :unnarrowed t)
+       ("f" "📂 Type" plain "%?"
+        :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                           "#+title:📂${title}\n#+filetags: :TYPE:\n")
+        :unnarrowed t)
+       ("m" "🌳 MOC" plain "%?"
+        :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                           "#+title:🌳${title}\n#+filetags: :MOC:\n")
+        :unnarrowed t)
+       ("i" "✅ Issue" plain "%?"
+        :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                          "#+title:✅${title}\n#+filetags: :ISSUE:\n")
+        :unnarrowed t)
+       ("d" "💡 Idea" plain "%?"
+        :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                           "#+title:💡${title}\n#+filetags: :IDEA:\n")
+        :unnarrowed t)
+       ("c" "📑 Concept" plain "%?"
+        :target (file+head
+                 "zk/%<%Y%m%d%H%M%S>.org"
+                 "#+title:🎓${title}\n#+filetags: :CONCEPT:\n")
+        :unnarrowed t)
+       ("k" "🦊 Darkfox" plain "%?"
+        :target (file+head
+                 "zk/%<%Y%m%d%H%M%S>.org"
+                 "#+title:🦊${title}\n#+filetags: :DARKFOX:\n")
+        :unnarrowed t)
+       ("b" "📚 Book" plain
+        "%?
 
-- title: %^{title}
-- authors: %^{author}
-- date: %^{date}
-- publisher: %^{publisher}
-- url: http://www.amazon.co.jp/dp/%^{isbn}
-"
-      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:📚${title} - ${author}(${date})\n#+filetags: :BOOK:SOURCE:\n")
-      :unnarrowed t)
-     ("s" "🎙‍ Talk" plain
-      "%?
+  - title: %^{title}
+  - authors: %^{author}
+  - date: %^{date}
+  - publisher: %^{publisher}
+  - url: http://www.amazon.co.jp/dp/%^{isbn}
+  "
+        :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                           "#+title:📚${title} - ${author}(${date})\n#+filetags: :BOOK:SOURCE:\n")
+        :unnarrowed t)
+       ("s" "🎙‍ Talk" plain
+        "%?
 
-- title: %^{title}
-- url: %^{url}
-"
-      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:🎙 ${title} - ${editor}(${date})\n#+filetags: :TALK:SOURCE:\n")
-      :unnarrowed t)
-     ("o" "💻 Online" plain
-      "%?
+  - title: %^{title}
+  - url: %^{url}
+  "
+        :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                           "#+title:🎙 ${title} - ${editor}(${date})\n#+filetags: :TALK:SOURCE:\n")
+        :unnarrowed t)
+       ("o" "💻 Online" plain
+        "%?
 
-- title: %^{title}
-- authors: %^{author}
-- url: %^{url}
-"
-      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:💻${title}\n#+filetags: :ONLINE:SOURCE:\n")
-      :unnarrowed t)))
-  (org-roam-extract-new-file-path "%<%Y%m%d%H%M%S>.org")
-  ;;        :map org-mode-map
-  ;;        ("C-M-i"    . completion-at-point)
-  :config
-  (defun my/org-roam-update ()
-    (interactive)
-    (org-id-update-id-locations)
-    (org-roam-db-sync)
-    (org-roam-update-org-id-locations))
+  - title: %^{title}
+  - authors: %^{author}
+  - url: %^{url}
+  "
+        :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                           "#+title:💻${title}\n#+filetags: :ONLINE:SOURCE:\n")
+        :unnarrowed t)))
+    (org-roam-extract-new-file-path "%<%Y%m%d%H%M%S>.org")
+    ;;        :map org-mode-map
+    ;;        ("C-M-i"    . completion-at-point)
+    :config
+    (defun my/org-roam-update ()
+      (interactive)
+      (org-id-update-id-locations)
+      (org-roam-db-sync)
+      (org-roam-update-org-id-locations))
 
-  (setq org-roam-mode-sections
-        '((org-roam-backlinks-section :unique t)))
+    (setq org-roam-mode-sections
+          '((org-roam-backlinks-section :unique t)))
 
-  (setq org-roam-db-gc-threshold most-positive-fixnum)
+    (setq org-roam-db-gc-threshold most-positive-fixnum)
 
-  ;; for speed up
-  ;; (setq org-roam-node-default-sort 'file-mtime)
- 
-  (setq +org-roam-open-buffer-on-find-file nil)
-  ;; (org-roam-db-autosync-mode)
-  (org-roam-db-autosync-enable)
-)
+    ;; for speed up
+    ;; (setq org-roam-node-default-sort 'file-mtime)
+
+    (setq +org-roam-open-buffer-on-find-file nil)
+    ;; (org-roam-db-autosync-mode)
+    (org-roam-db-autosync-enable)
+
+    ;; (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+
+    ;; for emacs 29~
+    ;; (when (>= emacs-major-version 29)
+    ;; (setq org-roam-database-connector 'sqlite-builtin))
+  )
 #+end_src
 
 #+begin_src emacs-lisp :tangle yes
@@ -1733,7 +1722,7 @@ consult-ripgrepを [[https://jblevins.org/projects/deft/][deft]] の代わりに
 (defun my/org-roam-rg-search ()
   "Search org-roam directory using consult-ripgrep. With live-preview."
   (interactive)
-  (counsel-rg nil org-roam-directory))
+  (consult-ripgrep org-roam-directory))
 (global-set-key (kbd "C-c r s") 'my/org-roam-rg-search)
 #+end_src
 
@@ -1903,13 +1892,13 @@ https://www.reddit.com/r/orgmode/comments/s8xv5j/orgroam_slows_down_as_nodes_inc
 #+end_src
 
 
-** org-toggl
 
+** org-toggl
 
 org-modeをTogglと連携させる.
 https://github.com/mbork/org-toggl
 
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle no
 (use-package! org-toggl
   :after org
   :config
@@ -2050,17 +2039,19 @@ https://github.com/eyeinsky/org-anki
 #+end_src
 
 URLの挿入はorg-link形式でできる. これは便利.
-** org-bars
+** org-bars(deprecated)
 
 今どきのアウトライナー的な線を出す.
 
 - Terminal Mode ではつかえない.
 - リストの折返しでのインデントは崩れる.
 
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle no
 (require 'org-bars)
 (add-hook! 'org-mode-hook #'org-bars-mode)
 #+end_src
+
+<2025-11-12 Wed 16:25> 表示が気持ち悪くなったので無効化.
 
 ** Org-noter(disabled)
 
@@ -2152,7 +2143,9 @@ org-mode で timestamp のみを挿入するカスタム関数. Doom Emacsのせ
 なお wl-bulter は doom emacs のデフォルトで組み込まれている.
 
 #+begin_src emacs-lisp :tangle yes
-(add-hook! 'org-mode-hook (ws-butler-mode -1))
+(add-hook! 'org-mode-hook
+  (when (fboundp 'ws-butler-mode)
+    (ws-butler-mode -1)))
 #+end_src
 
 ** org-pomodoro
@@ -2253,8 +2246,12 @@ ref: [[https://magit.vc/manual/forge/][Forge User and Developer Manual]]
 
 ;; Twitterで拾った設定だけど若干org-table表示がマシになったので採用.
 ;; (set-face-attribute 'fixed-pitch nil :font "Ricty Diminished" :height 160)
-(setq doom-font (font-spec :family "Source Han Code JP" :size 15 ))
+;; (setq doom-font (font-spec :family "Source Han Code JP" :size 15 ))
 ;; (setq doom-font (font-spec :family "Ricty Diminished" :size 16))
+(when (wsl-p) 
+  (setq doom-font (font-spec :family "HackGen" :size 18)))
+(when (not (wsl-p))
+  (setq doom-font (font-spec :family "Source Han Code JP" :size 15 )))
 ;; doom-molokaiやdoom-monokai-classicだとewwの表示がいまいち.
 (setq doom-theme 'doom-molokai)
 (doom-themes-org-config)
@@ -2355,4 +2352,112 @@ TODOほかラベルを美しく.
 ;; (general-def
 ;;  :keymaps 'override
 ;;   "C-u" 'universal-argument)
+#+end_src
+
+* AI
+
+いろいろあるので試すがつかうのは一つにしたいところ. 
+
+- https://github.com/karthink/gptel
+
+** chatgpt
+
+https://github.com/emacs-openai/chatgpt
+
+** chatgpt-shell
+
+chatgpt-shell-openai-keyはconfig.elに記載. ChatGPT以外でもいける.
+
+https://github.com/xenodium/chatgpt-shell
+
+#+begin_src emacs-lisp :tangle yes
+(use-package! chatgpt-shell
+  :commands chatgpt-shell
+  :init
+  (bind-key "C-c z b" 'chatgpt-shell)
+  :config
+  (setq chatgpt-shell-chatgpt-streaming t))
+#+end_src
+
+** Ellama
+
+https://github.com/s-kostyaev/ellama/
+
+#+begin_src emacs-lisp :tangle no
+(use-package! ellama
+    :bind ("C-c e" . ellama-transient-main-menu)
+    :init
+    ;; setup key bindings
+    ;; (setopt ellama-keymap-prefix "C-c e")
+    ;; language you want ellama to translate to
+    (setopt ellama-language "Japanese")
+    ;; could be llm-openai for example
+    (require 'llm-ollama)
+    (setopt ellama-provider
+	  (make-llm-ollama
+	       ;; this model should be pulled to use it
+	       ;; value should be the same as you print in terminal during pull
+	       :chat-model "llama3.2:latest"
+	       :embedding-model "nomic-embed-text"
+	       :default-chat-non-standard-params '(("num_ctx" . 8192))))
+    ;; (setopt ellama-summarization-provider
+    ;;           (make-llm-ollama
+    ;;            :chat-model "qwen2.5:3b"
+    ;;            :embedding-model "nomic-embed-text"
+    ;;            :default-chat-non-standard-params '(("num_ctx" . 32768))))
+    ;; (setopt ellama-coding-provider
+    ;;           (make-llm-ollama
+    ;;            :chat-model "qwen2.5-coder:3b"
+    ;;            :embedding-model "nomic-embed-text"
+    ;;            :default-chat-non-standard-params '(("num_ctx" . 32768))))
+    ;; Predefined llm providers for interactive switching.
+    ;; You shouldn't add ollama providers here - it can be selected interactively
+    ;; without it. It is just example.
+    ;; ellamaで使えるプロバイダー。ellama-provider-select で選択できる
+    (setopt ellama-providers
+	      '(("zephyr" . (make-llm-ollama
+			     :chat-model "zephyr:7b-beta-q6_K"
+			     :embedding-model "zephyr:7b-beta-q6_K"))
+		("mistral" . (make-llm-ollama
+			      :chat-model "mistral:7b-instruct-v0.2-q6_K"
+			      :embedding-model "mistral:7b-instruct-v0.2-q6_K"))
+		("mixtral" . (make-llm-ollama
+			      :chat-model "mixtral:8x7b-instruct-v0.1-q3_K_M-4k"
+			      :embedding-model "mixtral:8x7b-instruct-v0.1-q3_K_M-4k"))))
+    ;; Naming new sessions with llm
+    (setopt ellama-naming-provider
+	      (make-llm-ollama
+	       :chat-model "llama3.2:latest"
+	       :embedding-model "nomic-embed-text"
+	       :default-chat-non-standard-params '(("stop" . ("\n")))))
+    (setopt ellama-naming-scheme 'ellama-generate-name-by-llm)
+    ;; Translation llm provider, 翻訳で利用するプロバイダー
+    (setopt ellama-translation-provider
+	    (make-llm-ollama
+	     :chat-model "elyza:jp8b"
+	     :embedding-model "nomic-embed-text"
+	     :default-chat-non-standard-params
+	     '(("num_ctx" . 32768))))
+    ;; customize display buffer behaviour
+    ;; see ~(info "(elisp) Buffer Display Action Functions")~
+    (setopt ellama-chat-display-action-function #'display-buffer-full-frame)
+    (setopt ellama-instant-display-action-function #'display-buffer-at-bottom)
+    :config
+    ;; send last message in chat buffer with C-c C-c
+    (add-hook 'org-ctrl-c-ctrl-c-hook #'ellama-chat-send-last-message))
+#+end_src
+
+** Claude code IDE
+
+https://github.com/manzaltu/claude-code-ide.el
+
+#+begin_src emacs-lisp :tangle yes
+(use-package! claude-code-ide
+  :after vterm
+  :init (setq claude-code-ide-terminal-backend 'vterm)
+  :bind (("C-c z-c" . claude-code-ide-menu)
+         ("C-c C-r" . claude-code-ide-insert-at-mentioned))
+  :config
+  (claude-code-ide-window-side 'left)
+  (claude-code-ide-emacs-tools-setup))
 #+end_src

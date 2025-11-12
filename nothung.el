@@ -1,12 +1,8 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 (load-file "~/.doom.d/private/config.el")
 
-(use-package! chatgpt-shell
-  :commands chatgpt-shell
-  :init
-  (bind-key "C-c z b" 'chatgpt-shell)
-  :config
-  (setq chatgpt-shell-chatgpt-streaming t))
+;; 自作関数
+(load-file "~/.doom.d/utils.el")
 
 (use-package! eww
   :bind
@@ -18,11 +14,6 @@
   (eval-after-load 'eww '(define-key eww-mode-map "f" 'ace-link-eww))
   (ace-link-setup-default)
   (define-key org-mode-map (kbd "M-o") 'ace-link-org))
-
-(use-package! tidal
-  ;; :init
-  ;; (setq tidal-boot-script-path "~/.cabal/share/x86_64-osx-ghc-8.8.4/tidal-1.7.4/BootTidal.hs")
-  )
 
 ;; Checkers
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -53,12 +44,10 @@
 ;;  (avy-migemo-mode 1)
 ;;  (setq avy-timeout-seconds nil))
 
-(use-package! swiper
-  ;; :bind
-  ;;  ("C-s" . swiper) ;; migemo とうまく連携しないので isearch 置き換えを保留. C-c s s で swiper 起動.
-  :config
-  (require 'ivy-hydra)
-  (ivy-mode 1))
+;; Vertico使用のためswiperとivyは無効化
+;; (use-package! swiper
+;;   :config
+;;   (ivy-mode 1))
 
 
   
@@ -99,15 +88,20 @@
 ;; projectileの検索スピードを上げる
 (setq projectile-indexing-method 'alien)
 
+;; custom-fileの設定
+(setq custom-file (expand-file-name "custom.el" doom-user-dir))
+(when (file-exists-p custom-file)
+  (load custom-file))
+
 ;; Editor
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; 英数字と日本語の間にスペースをいれる.
-(use-package! pangu-spacing
-  :config
-  (global-pangu-spacing-mode 1)
+;;(use-package! pangu-spacing
+;;  :config
+;;  (global-pangu-spacing-mode 1)
   ;; 保存時に自動的にスペースを入れるのを抑止.あくまで入力時にしておく.
-  (setq pangu-spacing-real-insert-separtor nil))
+;;  (setq pangu-spacing-real-insert-separtor nil))
 
 ;; 記号の前後にスペースを入れる.
 (use-package! electric-operator)
@@ -344,6 +338,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package! exwm
+  :if (not (wsl-p))
   :after counsel
   :init
   (setq counsel-linux-app-format-function
@@ -814,130 +809,136 @@
 ;; (setq org-superstar-leading-fallback ?\s)
 (setq inhibit-compacting-font-caches t))
 
-;; org-roam
-(setq org-roam-directory (file-truename "~/repo/keido/notes"))
-(setq org-roam-zk-dir (concat org-roam-directory "/zk"))
-(setq org-roam-db-location (file-truename "~/repo/keido/db/org-roam.db"))
+  ;; org-roam
+  (setq org-roam-directory (file-truename "~/repo/keido/notes"))
+  (setq org-roam-zk-dir (concat org-roam-directory "/zk"))
+  (setq org-roam-db-location (file-truename "~/repo/keido/db/org-roam.db"))
 
-(use-package! org-roam
-  :after org
-  :init
-  (setq org-roam-v2-ack t)
-  (map!
-        :leader
-        :prefix ("r" . "org-roam")
-        "f" #'org-roam-node-find
-        "i" #'org-roam-node-insert
-        "l" #'org-roam-buffer-toggle
-        "t" #'org-roam-tag-add
-        "T" #'org-roam-tag-remove
-        "a" #'org-roam-alias-add
-        "A" #'org-roam-alias-remove
-        "r" #'org-roam-ref-add
-        "R" #'org-roam-ref-remove
-        "o" #'org-id-get-create
-        "u" #'my/org-roam-update
-        "D" #'org-roam-dailies-goto-today
-        )
-  :custom
-  ;;ファイル名を ID にする.
-  (org-roam-capture-templates
-   '(("z" "🌱 Zettel" plain "%?"
-      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "\n#+date: %T\n#+title:🌱${title}\n#+filetags: :ZETTEL:\n")
-      :unnarrowed t)
-     ("w" "📝 Wiki" plain "%?"
-      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:📝${title}\n#+filetags: :WIKI:\n")
-      :unnarrowed t)
-     ("t" "🔖 Tag" plain "%?"
-      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:🔖${title}\n#+filetags: :TAG:\n")
-      :unnarrowed t)
-     ("h" "👨 Person" plain "%?"
-      :target (file+head 
-               "zk/%<%Y%m%d%H%M%S>.org"                 
-               "#+title:👨${title}\n#+filetags: :PERSON:\n")
-      :unnarrowed t)
-     ("f" "📂 Type" plain "%?"
-      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:📂${title}\n#+filetags: :TYPE:\n")
-      :unnarrowed t)
-     ("m" "🌳 MOC" plain "%?"
-      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:🌳${title}\n#+filetags: :MOC:\n")
-      :unnarrowed t)
-     ("i" "✅ Issue" plain "%?"
-      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                        "#+title:✅${title}\n#+filetags: :ISSUE:\n")
-      :unnarrowed t)
-     ("d" "💡 Idea" plain "%?"
-      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:💡${title}\n#+filetags: :IDEA:\n")
-      :unnarrowed t)
-     ("c" "📑 Concept" plain "%?"
-      :target (file+head 
-               "zk/%<%Y%m%d%H%M%S>.org"
-               "#+title:🎓${title}\n#+filetags: :CONCEPT:\n")
-      :unnarrowed t)
-     ("k" "🦊 Darkfox" plain "%?"
-      :target (file+head 
-               "zk/%<%Y%m%d%H%M%S>.org"
-               "#+title:🦊${title}\n#+filetags: :DARKFOX:\n")
-      :unnarrowed t)
-     ("b" "📚 Book" plain
-      "%?
+  (use-package! org-roam
+    :after org
+    :init
+    (setq org-roam-v2-ack t)
+    (map!
+          :leader
+          :prefix ("r" . "org-roam")
+          "f" #'org-roam-node-find
+          "i" #'org-roam-node-insert
+          "l" #'org-roam-buffer-toggle
+          "t" #'org-roam-tag-add
+          "T" #'org-roam-tag-remove
+          "a" #'org-roam-alias-add
+          "A" #'org-roam-alias-remove
+          "r" #'org-roam-ref-add
+          "R" #'org-roam-ref-remove
+          "o" #'org-id-get-create
+          "u" #'my/org-roam-update
+          "D" #'org-roam-dailies-goto-today
+          )
+    :custom
+    ;;ファイル名を ID にする.
+    (org-roam-capture-templates
+     '(("z" "🌱 Zettel" plain "%?"
+        :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                           "\n#+date: %T\n#+title:🌱${title}\n#+filetags: :ZETTEL:\n")
+        :unnarrowed t)
+       ("w" "📝 Wiki" plain "%?"
+        :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                           "#+title:📝${title}\n#+filetags: :WIKI:\n")
+        :unnarrowed t)
+       ("t" "🔖 Tag" plain "%?"
+        :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                           "#+title:🔖${title}\n#+filetags: :TAG:\n")
+        :unnarrowed t)
+       ("h" "👨 Person" plain "%?"
+        :target (file+head
+                 "zk/%<%Y%m%d%H%M%S>.org"
+                 "#+title:👨${title}\n#+filetags: :PERSON:\n")
+        :unnarrowed t)
+       ("f" "📂 Type" plain "%?"
+        :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                           "#+title:📂${title}\n#+filetags: :TYPE:\n")
+        :unnarrowed t)
+       ("m" "🌳 MOC" plain "%?"
+        :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                           "#+title:🌳${title}\n#+filetags: :MOC:\n")
+        :unnarrowed t)
+       ("i" "✅ Issue" plain "%?"
+        :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                          "#+title:✅${title}\n#+filetags: :ISSUE:\n")
+        :unnarrowed t)
+       ("d" "💡 Idea" plain "%?"
+        :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                           "#+title:💡${title}\n#+filetags: :IDEA:\n")
+        :unnarrowed t)
+       ("c" "📑 Concept" plain "%?"
+        :target (file+head
+                 "zk/%<%Y%m%d%H%M%S>.org"
+                 "#+title:🎓${title}\n#+filetags: :CONCEPT:\n")
+        :unnarrowed t)
+       ("k" "🦊 Darkfox" plain "%?"
+        :target (file+head
+                 "zk/%<%Y%m%d%H%M%S>.org"
+                 "#+title:🦊${title}\n#+filetags: :DARKFOX:\n")
+        :unnarrowed t)
+       ("b" "📚 Book" plain
+        "%?
 
-- title: %^{title}
-- authors: %^{author}
-- date: %^{date}
-- publisher: %^{publisher}
-- url: http://www.amazon.co.jp/dp/%^{isbn}
-"
-      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:📚${title} - ${author}(${date})\n#+filetags: :BOOK:SOURCE:\n")
-      :unnarrowed t)
-     ("s" "🎙‍ Talk" plain
-      "%?
+  - title: %^{title}
+  - authors: %^{author}
+  - date: %^{date}
+  - publisher: %^{publisher}
+  - url: http://www.amazon.co.jp/dp/%^{isbn}
+  "
+        :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                           "#+title:📚${title} - ${author}(${date})\n#+filetags: :BOOK:SOURCE:\n")
+        :unnarrowed t)
+       ("s" "🎙‍ Talk" plain
+        "%?
 
-- title: %^{title}
-- url: %^{url}
-"
-      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:🎙 ${title} - ${editor}(${date})\n#+filetags: :TALK:SOURCE:\n")
-      :unnarrowed t)
-     ("o" "💻 Online" plain
-      "%?
+  - title: %^{title}
+  - url: %^{url}
+  "
+        :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                           "#+title:🎙 ${title} - ${editor}(${date})\n#+filetags: :TALK:SOURCE:\n")
+        :unnarrowed t)
+       ("o" "💻 Online" plain
+        "%?
 
-- title: %^{title}
-- authors: %^{author}
-- url: %^{url}
-"
-      :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
-                         "#+title:💻${title}\n#+filetags: :ONLINE:SOURCE:\n")
-      :unnarrowed t)))
-  (org-roam-extract-new-file-path "%<%Y%m%d%H%M%S>.org")
-  ;;        :map org-mode-map
-  ;;        ("C-M-i"    . completion-at-point)
-  :config
-  (defun my/org-roam-update ()
-    (interactive)
-    (org-id-update-id-locations)
-    (org-roam-db-sync)
-    (org-roam-update-org-id-locations))
+  - title: %^{title}
+  - authors: %^{author}
+  - url: %^{url}
+  "
+        :target (file+head "zk/%<%Y%m%d%H%M%S>.org"
+                           "#+title:💻${title}\n#+filetags: :ONLINE:SOURCE:\n")
+        :unnarrowed t)))
+    (org-roam-extract-new-file-path "%<%Y%m%d%H%M%S>.org")
+    ;;        :map org-mode-map
+    ;;        ("C-M-i"    . completion-at-point)
+    :config
+    (defun my/org-roam-update ()
+      (interactive)
+      (org-id-update-id-locations)
+      (org-roam-db-sync)
+      (org-roam-update-org-id-locations))
 
-  (setq org-roam-mode-sections
-        '((org-roam-backlinks-section :unique t)))
+    (setq org-roam-mode-sections
+          '((org-roam-backlinks-section :unique t)))
 
-  (setq org-roam-db-gc-threshold most-positive-fixnum)
+    (setq org-roam-db-gc-threshold most-positive-fixnum)
 
-  ;; for speed up
-  ;; (setq org-roam-node-default-sort 'file-mtime)
- 
-  (setq +org-roam-open-buffer-on-find-file nil)
-  ;; (org-roam-db-autosync-mode)
-  (org-roam-db-autosync-enable)
-)
+    ;; for speed up
+    ;; (setq org-roam-node-default-sort 'file-mtime)
+
+    (setq +org-roam-open-buffer-on-find-file nil)
+    ;; (org-roam-db-autosync-mode)
+    (org-roam-db-autosync-enable)
+
+    ;; (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+
+    ;; for emacs 29~
+    ;; (when (>= emacs-major-version 29)
+    ;; (setq org-roam-database-connector 'sqlite-builtin))
+  )
 
 (setq org-roam-db-node-include-function
       (lambda ()
@@ -963,7 +964,7 @@
 (defun my/org-roam-rg-search ()
   "Search org-roam directory using consult-ripgrep. With live-preview."
   (interactive)
-  (counsel-rg nil org-roam-directory))
+  (consult-ripgrep org-roam-directory))
 (global-set-key (kbd "C-c r s") 'my/org-roam-rg-search)
 
 (after! org-roam
@@ -1004,14 +1005,6 @@
 ;; hash-tables instead of lists. Have a way to quickly detect
 ;; which node is to be updated.
 
-(use-package! org-toggl
-  :after org
-  :config
-  (setq org-toggl-inherit-toggl-properties t)
-  (toggl-get-projects)
-  (setq toggl-default-project "GTD")
-  (org-toggl-integration-mode))
-
 (use-package! org-journal
   :after org
   :bind
@@ -1042,9 +1035,6 @@
   (define-key org-mode-map (kbd "C-c n A u") #'org-anki-update-all)
   (define-key org-mode-map (kbd "C-c n A d") #'org-anki-delete-entry))
 
-(require 'org-bars)
-(add-hook! 'org-mode-hook #'org-bars-mode)
-
 (setq org-table-export-default-format "orgtbl-to-csv")
 
 (after! org
@@ -1057,7 +1047,9 @@
   (map! :map org-mode-map "C-u C-c C-." #'my/insert-timestamp-inactive)
   (map! :map org-mode-map "C-c C-." #'my/insert-timestamp))
 
-(add-hook! 'org-mode-hook (ws-butler-mode -1))
+(add-hook! 'org-mode-hook
+  (when (fboundp 'ws-butler-mode)
+    (ws-butler-mode -1)))
 
 (use-package! org-web-tools
   :bind
@@ -1102,8 +1094,12 @@
 
 ;; Twitterで拾った設定だけど若干org-table表示がマシになったので採用.
 ;; (set-face-attribute 'fixed-pitch nil :font "Ricty Diminished" :height 160)
-(setq doom-font (font-spec :family "Source Han Code JP" :size 15 ))
+;; (setq doom-font (font-spec :family "Source Han Code JP" :size 15 ))
 ;; (setq doom-font (font-spec :family "Ricty Diminished" :size 16))
+(when (wsl-p) 
+  (setq doom-font (font-spec :family "HackGen" :size 18)))
+(when (not (wsl-p))
+  (setq doom-font (font-spec :family "Source Han Code JP" :size 15 )))
 ;; doom-molokaiやdoom-monokai-classicだとewwの表示がいまいち.
 (setq doom-theme 'doom-molokai)
 (doom-themes-org-config)
@@ -1172,3 +1168,19 @@
 ;; (general-def
 ;;  :keymaps 'override
 ;;   "C-u" 'universal-argument)
+
+(use-package! chatgpt-shell
+  :commands chatgpt-shell
+  :init
+  (bind-key "C-c z b" 'chatgpt-shell)
+  :config
+  (setq chatgpt-shell-chatgpt-streaming t))
+
+(use-package! claude-code-ide
+  :after vterm
+  :init (setq claude-code-ide-terminal-backend 'vterm)
+  :bind (("C-c z-c" . claude-code-ide-menu)
+         ("C-c C-r" . claude-code-ide-insert-at-mentioned))
+  :config
+  (claude-code-ide-window-side 'left)
+  (claude-code-ide-emacs-tools-setup))

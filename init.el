@@ -31,7 +31,7 @@
        (company +childframe) ; the ultimate code completion backend
        ;;helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
-       (ivy +fuzzy)        ; a search engine for love and life
+       ;;(ivy +fuzzy)        ; a search engine for love and life
        (vertico +icons)  ; the search engine of the future
        :ui
        ;; deft              ; notational velocity for Emacs
@@ -72,6 +72,7 @@
        ;;parinfer          ; turn lisp into python, sort of
        ;;rotate-text       ; cycle region at point between text candidates
        snippets          ; my elves. They type so I don't have to
+       (whitespace +trim) ; trim trailing whitespace
        word-wrap         ; soft wrapping with language-aware indent
 
        :emacs
@@ -80,6 +81,7 @@
        ;;ibuffer         ; interactive buffer management
        (undo +tree)      ; persistent, smarter undo for your inevitable mistakes
        vc                ; version-control and Emacs, sitting in a tree
+       ;; eww
 
        :term
        eshell            ; the elisp shell that works everywhere
@@ -168,15 +170,15 @@
         +pretty
         +gnuplot
         +pomodoro
-        +roam2)
+        +roam)
        ;;php               ; perl's insecure younger brother
        ;;plantuml          ; diagrams for confusing people more
        ;;purescript        ; javascript, but functional
        ;; python
        (python            ; beautiful is better than ugly
-         +conda
-         +lsp
-         +pyright)
+        +conda
+        +lsp
+        +pyright)
        ;;qt                ; the 'cutest' gui framework ever
        ;;racket            ; a DSL for DSLs
        ;;raku              ; the artist formerly known as perl6

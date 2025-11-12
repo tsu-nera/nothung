@@ -1,0 +1,39 @@
+Welcome to ChatGPT shell
+
+  Type help and press RET for details.
+
+  Like this package? Consider ✨sponsoring✨
+
+
+<shell-maker-failed-command>
+ChatGPT(chatgpt-4o-latest/General)> Debugger entered--Lisp error: (void-function claude-code-ide-window-side)
+  (claude-code-ide-window-side 'left)
+  eval((claude-code-ide-window-side 'left) nil)
+  elisp--eval-last-sexp(nil)
+  #f(compiled-function () #<bytecode 0x8b9c53c04492>)()
+  #<subr eval-last-sexp>(nil)
+  apply(#<subr eval-last-sexp> nil)
+  eval-last-sexp(nil)
+  eros-eval-last-sexp(nil)
+  funcall-interactively(eros-eval-last-sexp nil)
+  command-execute(eros-eval-last-sexp)
+  recursive-edit()
+  debug(error (void-function claude-code-ide-window-side) :backtrace-base eval-expression--debug)
+  eval-expression--debug((void-function claude-code-ide-window-side))
+  (claude-code-ide-window-side 'left)
+  eval((claude-code-ide-window-side 'left) nil)
+  elisp--eval-last-sexp(nil)
+  #f(compiled-function () #<bytecode 0x8b9c53c04492>)()
+  #<subr eval-last-sexp>(nil)
+  apply(#<subr eval-last-sexp> nil)
+  eval-last-sexp(nil)
+  eros-eval-last-sexp(nil)
+  funcall-interactively(eros-eval-last-sexp nil)
+
+<shell-maker-end-of-prompt>
+
+Your account is not active, please check your billing details on our website.
+
+
+<shell-maker-failed-command>
+ChatGPT(chatgpt-4o-latest/General)> 

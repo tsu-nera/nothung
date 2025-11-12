@@ -1,4 +1,4 @@
 ((org-mode . ((mode . auto-fill)
-             (org-hugo-base-dir . "~/repo/keido-hugo")
-             (org-hugo-section . "notes")
-             (org-hugo-export-with-toc . nil))))
+              (org-hugo-base-dir . "~/repo/keido-quartz")
+              (org-hugo-section . "")
+              (org-hugo-export-with-toc . nil))))
