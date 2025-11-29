@@ -483,6 +483,7 @@
   ;; defaultではFootnotes
   (setq org-footnote-section "Footnotes")
   (setq org-footnote-auto-adjust t)
+  (setq org-indent-indentation-per-level 1) ;; indentは浅く
 
   ;; M-RET の挙動の調整
   ;; t だと subtree の最終行に heading を挿入
@@ -767,47 +768,6 @@
   :config
   ;; C-c C-o でブラウザで開く.
   (org-babel-html-enable-open-src-block-result-temporary))
-
-(after! org
-;;; Titles and Sections
-;; hide #+TITLE:
-;; (setq org-hidden-keywords '(title))
-;; set basic title font
-;; (set-face-attribute 'org-level-8 nil :weight 'bold :inherit 'default)
-;; Low levels are unimportant => no scaling
-;; (set-face-attribute 'org-level-7 nil :inherit 'org-level-8)
-;; (set-face-attribute 'org-level-6 nil :inherit 'org-level-8)
-;; (set-face-attribute 'org-level-5 nil :inherit 'org-level-8)
-;; (set-face-attribute 'org-level-4 nil :inherit 'org-level-8)
-;; Top ones get scaled the same as in LaTeX (\large, \Large, \LARGE)
-;; (set-face-attribute 'org-level-3 nil :inherit 'org-level-8 :height 1.2) ;\large
-;; (set-face-attribute 'org-level-2 nil :inherit 'org-level-8 :height 1.44) ;\Large
-;; (set-face-attribute 'org-level-1 nil :inherit 'org-level-8 :height 1.728) ;\LARGE
-;; Only use the first 4 styles and do not cycle.
-(setq org-cycle-level-faces nil)
-
-;; orgの階層の色分けレベル.
-;; (setq org-n-level-faces 8)
-
-;; Document Title, (\huge)
-;; (set-face-attribute 'org-document-title nil
-;;                    :height 2.074
-;;                    :foreground 'unspecified
-;;                    :inherit 'org-level-8)
-
-;; (with-eval-after-load 'org-superstar
-;;  (set-face-attribute 'org-superstar-item nil :height 1.2)
-;;  (set-face-attribute 'org-superstar-header-bullet nil :height 1.2)
-;;  (set-face-attribute 'org-superstar-leading nil :height 1.3))
-;; Set different bullets, with one getting a terminal fallback.
-(setq org-superstar-headline-bullets-list '("■" "◆" "●" "▷"))
-;; (setq org-superstar-special-todo-items t)
-
-;; Stop cycling bullets to emphasize hierarchy of headlines.
-(setq org-superstar-cycle-headline-bullets nil)
-;; Hide away leading stars on terminal.
-;; (setq org-superstar-leading-fallback ?\s)
-(setq inhibit-compacting-font-caches t))
 
   ;; org-roam
   (setq org-roam-directory (file-truename "~/repo/keido/notes"))
@@ -1177,10 +1137,9 @@
   (setq chatgpt-shell-chatgpt-streaming t))
 
 (use-package! claude-code-ide
-  :after vterm
-  :init (setq claude-code-ide-terminal-backend 'vterm)
-  :bind (("C-c z-c" . claude-code-ide-menu)
+  :bind (("C-c z c" . claude-code-ide)
+         ("C-c C-7" . claude-code-ide-menu)
          ("C-c C-r" . claude-code-ide-insert-at-mentioned))
   :config
-  (claude-code-ide-window-side 'left)
+  (setq claude-code-ide-window-side 'left)
   (claude-code-ide-emacs-tools-setup))

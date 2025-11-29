@@ -1068,6 +1068,7 @@ counsel-linux-appだと起動時にハングしてPC再起動になることが�
   ;; defaultではFootnotes
   (setq org-footnote-section "Footnotes")
   (setq org-footnote-auto-adjust t)
+  (setq org-indent-indentation-per-level 1) ;; indent波浅く
 
   ;; M-RET の挙動の調整
   ;; t だと subtree の最終行に heading を挿入
@@ -1088,8 +1089,6 @@ counsel-linux-appだと起動時にハングしてPC再起動になることが�
   ;; https://www.philnewton.net/blog/electric-indent-with-org-mode/
   (add-hook! org-mode (electric-indent-local-mode -1)))
 #+end_src
-
-#+RESULTS:
 
 ** org-agenda
 
@@ -1495,7 +1494,7 @@ org-superstar-mode(+pretty option)関連.
 
 bulletをおしゃれにかえる. ただそれと引き換えにパフォーマンスはちょっと落ちるかも.
 
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle no
 (after! org
 ;;; Titles and Sections
 ;; hide #+TITLE:
@@ -1890,7 +1889,6 @@ https://www.reddit.com/r/orgmode/comments/s8xv5j/orgroam_slows_down_as_nodes_inc
 ;; hash-tables instead of lists. Have a way to quickly detect
 ;; which node is to be updated.
 #+end_src
-
 
 
 ** org-toggl
@@ -2453,11 +2451,11 @@ https://github.com/manzaltu/claude-code-ide.el
 
 #+begin_src emacs-lisp :tangle yes
 (use-package! claude-code-ide
-  :after vterm
-  :init (setq claude-code-ide-terminal-backend 'vterm)
-  :bind (("C-c z-c" . claude-code-ide-menu)
+  :bind (("C-c z c" . claude-code-ide)
+         ("C-c C-7" . claude-code-ide-menu)
          ("C-c C-r" . claude-code-ide-insert-at-mentioned))
   :config
-  (claude-code-ide-window-side 'left)
+  (setq claude-code-ide-window-side 'left)
   (claude-code-ide-emacs-tools-setup))
 #+end_src
+
