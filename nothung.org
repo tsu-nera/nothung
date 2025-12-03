@@ -514,6 +514,26 @@ Emacsの画面に1行80文字のところに線を薄く引く.
 (setq-default bidi-display-reordering nil)
 #+end_src
 
+** Copy file path with line
+
+ファイルパスと行番号をコピーする。Claude Codeでのコード参照形式（file_path:line_number）に対応。
+
+- +default/yank-buffer-path
+
+#+begin_src emacs-lisp :tangle yes
+(defun my/copy-file-path-with-line ()
+  "Copy the current buffer's file path with line number."
+  (interactive)
+  (let ((path-with-line
+         (concat (buffer-file-name) ":" (number-to-string (line-number-at-pos)))))
+    (kill-new path-with-line)
+    (message "%s" path-with-line)))
+
+(map! :leader
+      :desc "Copy file path with line"
+      "f Y" #'my/copy-file-path-with-line)
+#+end_src
+
 ** recentf
 
 けっこうrecentfでハングすることが多いので少なくする. 
@@ -1373,6 +1393,7 @@ Org-modeで書いたブログ記事をHugoにあったMarkdown形式に変換す
   ;; org-roamのexportで多様するのでC-c rのprefixをつけておく.
   ("C-c r e" . org-hugo-export-to-md)
   :config
+
   (setq org-hugo-auto-set-lastmod t)
   ;; なんか.dir-locals.elに書いても反映してくれないな. 
   (setq org-export-with-author nil)
@@ -1384,7 +1405,9 @@ Org-modeで書いたブログ記事をHugoにあったMarkdown形式に変換す
           org-hugo-get-md5
           ;; 日本語に不向きな気がする
           ;; org-hugo-get-heading-slug
-          )))
+          ))
+  ;; WebP画像の自動コピーを有効化
+  (add-to-list 'org-hugo-external-file-extensions-allowed-for-copying "webp"))
 #+end_src
 
 このox-hugoで出力されるMarkdownはどうもリスト表示でスペースが4つ入ってしまう. GitHub Favorite Markdownのようにリストでのスペース２であって欲しいものの解決方法が見つからない.

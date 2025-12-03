@@ -483,7 +483,7 @@
   ;; defaultではFootnotes
   (setq org-footnote-section "Footnotes")
   (setq org-footnote-auto-adjust t)
-  (setq org-indent-indentation-per-level 1) ;; indentは浅く
+  (setq org-indent-indentation-per-level 1) ;; indent波浅く
 
   ;; M-RET の挙動の調整
   ;; t だと subtree の最終行に heading を挿入
@@ -703,6 +703,7 @@
   ;; org-roamのexportで多様するのでC-c rのprefixをつけておく.
   ("C-c r e" . org-hugo-export-to-md)
   :config
+
   (setq org-hugo-auto-set-lastmod t)
   ;; なんか.dir-locals.elに書いても反映してくれないな. 
   (setq org-export-with-author nil)
@@ -714,7 +715,9 @@
           org-hugo-get-md5
           ;; 日本語に不向きな気がする
           ;; org-hugo-get-heading-slug
-          )))
+          ))
+  ;; WebP画像の自動コピーを有効化
+  (add-to-list 'org-hugo-external-file-extensions-allowed-for-copying "webp"))
 
 (use-package! ox-rst
   :after ox)
