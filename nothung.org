@@ -1058,7 +1058,7 @@ counsel-linux-appだと起動時にハングしてPC再起動になることが�
          )))
 
 (defun my/create-weekly-org-file (path)
-  (expand-file-name (format "%s.org" (format-time-string "%Y-w%W")) path))
+  (expand-file-name (format "%s.org" (format-time-string "%Y-w%V")) path))
 (defun my/create-daily-org-file (path)
   (expand-file-name (format "%s.org" (format-time-string "%Y-%m-%d")) path))
 
