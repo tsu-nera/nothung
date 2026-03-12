@@ -29,3 +29,23 @@ doom build   # 大きな変更後にリビルド
 
 設定を変更する場合は`nothung.org`（literate source）を編集する。`nothung.el`は直接編集しない。タングル出力はEmacs起動時に再生成される。orgファイルの構成は`init.el`のDoomモジュールカテゴリに対応している。
 
+## Emacsの状態調査
+
+`emacsclient` を使って起動中のEmacsに任意のElispを評価させ、内部状態を調査できる。
+
+```bash
+# 接続確認
+emacsclient -e "(version)"
+
+# パッケージのロード確認
+emacsclient -e "(featurep 'forge)"
+
+# 変数の値確認
+emacsclient -e "(symbol-value 'some-variable)"
+
+# auth-sourceの認証情報確認
+emacsclient -e "(auth-source-search :host \"api.github.com\")"
+```
+
+MCP（claude-code-ide.el）はLSP診断・シンボル検索などの構造化データに向いており、emacsclientは任意のElisp評価が必要な場面（変数の状態、パッケージの挙動確認など）に使う。
+
