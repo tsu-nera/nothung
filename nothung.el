@@ -88,6 +88,9 @@
 ;; projectileの検索スピードを上げる
 (setq projectile-indexing-method 'alien)
 
+;; グローバルに有効化
+(global-auto-revert-mode 1)
+
 ;; custom-fileの設定
 (setq custom-file (expand-file-name "custom.el" doom-user-dir))
 (when (file-exists-p custom-file)
@@ -208,6 +211,18 @@
 
 ;;; 右から左に読む言語に対応させないことで描画高速化
 (setq-default bidi-display-reordering nil)
+
+(defun my/copy-file-path-with-line ()
+  "Copy the current buffer's file path with line number."
+  (interactive)
+  (let ((path-with-line
+         (concat (buffer-file-name) ":" (number-to-string (line-number-at-pos)))))
+    (kill-new path-with-line)
+    (message "%s" path-with-line)))
+
+(map! :leader
+      :desc "Copy file path with line"
+      "f Y" #'my/copy-file-path-with-line)
 
 ;; recentfに保存する数. 
 (setq recentf-max-saved-items 300)
@@ -457,7 +472,7 @@
          )))
 
 (defun my/create-weekly-org-file (path)
-  (expand-file-name (format "%s.org" (format-time-string "%Y-w%W")) path))
+  (expand-file-name (format "%s.org" (format-time-string "%Y-w%V")) path))
 (defun my/create-daily-org-file (path)
   (expand-file-name (format "%s.org" (format-time-string "%Y-%m-%d")) path))
 
@@ -980,8 +995,8 @@
   ;; (setq org-journal-file-format "%Y-%m-%d.org")
   ;; (setq org-journal-date-format "%Y-%m-%d")
   ;; これはorg-journalの変数ではない.
-  (setq org-journal-file-format "%Y-w%W.org")
-  (setq org-journal-date-format "%Y-w%W")
+  (setq org-journal-file-format "%Y-w%V.org")
+  (setq org-journal-date-format "%Y-w%V")
   (setq org-journal-file-type `weekly)
   (setq org-journal-dir my/weekly-private-dir)
   ;; (setq org-journal-enable-agenda-integration t)
@@ -1031,6 +1046,7 @@
 
 ;; Term
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ (after! vterm                                                                               (add-hook 'vterm-mode-hook #'hl-line-mode))
 
 ;; Tools
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1144,5 +1160,6 @@
          ("C-c C-7" . claude-code-ide-menu)
          ("C-c C-r" . claude-code-ide-insert-at-mentioned))
   :config
+  (setq exec-path (append exec-path '("~/.local/bin")))
   (setq claude-code-ide-window-side 'left)
   (claude-code-ide-emacs-tools-setup))

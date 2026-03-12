@@ -272,6 +272,9 @@ Strongly recommend to enable childframe option in company module ((company +chil
 ;; projectileの検索スピードを上げる
 (setq projectile-indexing-method 'alien)
 
+;; グローバルに有効化
+(global-auto-revert-mode 1)
+
 ;; custom-fileの設定
 (setq custom-file (expand-file-name "custom.el" doom-user-dir))
 (when (file-exists-p custom-file)
@@ -1946,8 +1949,8 @@ https://github.com/bastibe/org-journal
   ;; (setq org-journal-file-format "%Y-%m-%d.org")
   ;; (setq org-journal-date-format "%Y-%m-%d")
   ;; これはorg-journalの変数ではない.
-  (setq org-journal-file-format "%Y-w%W.org")
-  (setq org-journal-date-format "%Y-w%W")
+  (setq org-journal-file-format "%Y-w%V.org")
+  (setq org-journal-date-format "%Y-w%V")
   (setq org-journal-file-type `weekly)
   (setq org-journal-dir my/weekly-private-dir)
   ;; (setq org-journal-enable-agenda-integration t)
@@ -2209,6 +2212,7 @@ openai-api-tokenの設定が必要. private/config.elで定義している.
 #+begin_src emacs-lisp :tangle yes
 ;; Term
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ (after! vterm                                                                               (add-hook 'vterm-mode-hook #'hl-line-mode))
 #+end_src
 
 * Tools
@@ -2478,7 +2482,19 @@ https://github.com/manzaltu/claude-code-ide.el
          ("C-c C-7" . claude-code-ide-menu)
          ("C-c C-r" . claude-code-ide-insert-at-mentioned))
   :config
+  (setq exec-path (append exec-path '("~/.local/bin")))
   (setq claude-code-ide-window-side 'left)
   (claude-code-ide-emacs-tools-setup))
+#+end_src
+
+*** vterm
+
+内部ではvtermをつかっている. read-only-modeとなっている. vterm-yankで貼り付け.
+
+C-y はEvil modeの別バインドが優先されるため、vterm バッファで明示的に vterm-yank を割り当てる。
+
+#+begin_src emacs-lisp :tangle yes
+(after! vterm
+  (define-key vterm-mode-map (kbd "C-y") #'vterm-yank))
 #+end_src
 
