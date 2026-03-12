@@ -90,6 +90,9 @@
 
 ;; グローバルに有効化
 (global-auto-revert-mode 1)
+;; WSL2ではinotifyが効かないためポーリングを使う
+(setq auto-revert-use-notify nil)
+(setq auto-revert-interval 1)
 
 ;; custom-fileの設定
 (setq custom-file (expand-file-name "custom.el" doom-user-dir))
@@ -1158,8 +1161,22 @@
 (use-package! claude-code-ide
   :bind (("C-c z c" . claude-code-ide)
          ("C-c C-7" . claude-code-ide-menu)
-         ("C-c C-r" . claude-code-ide-insert-at-mentioned))
+         ("C-c C-r" . claude-code-ide-insert-at-mentioned)
+         :map vterm-mode-map
+         ("M-RET" . claude-code-ide-insert-newline))
   :config
   (setq exec-path (append exec-path '("~/.local/bin")))
   (setq claude-code-ide-window-side 'left)
+  (setq claude-code-ide-cli-extra-flags "--dangerously-skip-permissions")
   (claude-code-ide-emacs-tools-setup))
+
+(after! vterm
+  (define-key vterm-mode-map (kbd "C-y") #'vterm-yank)
+  ;; vterm-copy-mode に入るとカーソル点滅が止まる問題の修正
+  ;; vterm がエスケープシーケンスで cursor-type を上書きするため、明示的にリセットが必要
+  (add-hook 'vterm-copy-mode-hook
+            (lambda ()
+              (when vterm-copy-mode
+                (setq-local cursor-type '(box . 1))
+                (blink-cursor-mode -1)
+                (blink-cursor-mode 1)))))
