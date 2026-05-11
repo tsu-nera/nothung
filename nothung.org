@@ -606,6 +606,17 @@ https://github.com/Wilfred/helpful
 (prefer-coding-system 'utf-8)
 (set-default 'buffer-filecoding-system 'utf-8)
 
+;; pgtk Emacs + WSLg のクリップボード文字化け対策
+;; GTK 経由だと STRING target が CP932 のまま返り化けるため、
+;; wl-paste 経由で text/plain;charset=utf-8 を取得する
+;; daemon 起動時は window-system が nil なので wsl-p で判定する
+(when (and (wsl-p) (executable-find "wl-paste"))
+  (defun my/wsl-clipboard-paste ()
+    (let ((s (shell-command-to-string
+              "wl-paste -n -t text/plain\\;charset=utf-8 2>/dev/null")))
+      (unless (string-empty-p s) s)))
+  (setq interprogram-paste-function #'my/wsl-clipboard-paste))
+
 ;; migemo
 (use-package! migemo
   :config
