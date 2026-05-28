@@ -87,7 +87,7 @@
        eshell            ; the elisp shell that works everywhere
        ;;shell             ; simple shell REPL for Emacs
        ;;term              ; basic terminal emulator for Emacs
-       vterm             ; the best terminal emulation in Emacs
+       (:unless (eq system-type 'windows-nt) vterm) ; vterm: WindowsはPOSIX端末(termios)不在でモジュールビルド不可のため除外
 
        :checkers
        syntax              ; tasing you for every semicolon you forget
@@ -110,7 +110,7 @@
        (magit +forge)             ; a git porcelain for Emacs
        ;;make              ; run make tasks from Emacs
        ;;pass              ; password manager for nerds
-       pdf               ; pdf enhancements
+       (:unless (eq system-type 'windows-nt) pdf) ; pdf: Windowsはepdfinfoビルド不可で起動停止するため除外
        ;;prodigy           ; FIXME managing external services & code builders
        ;;rgb               ; creating color strings
        ;;taskrunner        ; taskrunner for all your projects

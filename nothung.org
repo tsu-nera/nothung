@@ -261,13 +261,15 @@ Strongly recommend to enable childframe option in company module ((company +chil
 ;; (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 
 ;; This is to use pdf-tools instead of doc-viewer
-(use-package! pdf-tools
-  :config
-  (pdf-tools-install)
-  ;; This means that pdfs are fitted to width by default when you open them
-  (setq-default pdf-view-display-size 'fit-width)
-  :custom
-  (pdf-annot-activate-created-annotations t "automatically annotate highlights"))
+;; Windowsはepdfinfoがビルド不可(poppler等が無い)で起動が固まるため除外。pdfモジュールもinit.elでWindows除外済み。
+(unless (eq system-type 'windows-nt)
+  (use-package! pdf-tools
+    :config
+    (pdf-tools-install)
+    ;; This means that pdfs are fitted to width by default when you open them
+    (setq-default pdf-view-display-size 'fit-width)
+    :custom
+    (pdf-annot-activate-created-annotations t "automatically annotate highlights")))
 
 ;; projectileの検索スピードを上げる
 (setq projectile-indexing-method 'alien)
@@ -617,6 +619,16 @@ https://github.com/Wilfred/helpful
       (unless (string-empty-p s) s)))
   (setq interprogram-paste-function #'my/wsl-clipboard-paste))
 
+;; Emacs → Windows コピー用。pgtk Wayland のクリップボード書き込みが
+;; WSLg ブリッジに届かないケースがあるため、wl-copy で明示的に書き込む
+(when (and (wsl-p) (executable-find "wl-copy"))
+  (defun my/wsl-clipboard-copy (text)
+    (let ((process-connection-type nil))
+      (with-temp-buffer
+        (insert text)
+        (call-process-region (point-min) (point-max) "wl-copy"))))
+  (setq interprogram-cut-function #'my/wsl-clipboard-copy))
+
 ;; migemo
 (use-package! migemo
   :config
@@ -634,12 +646,16 @@ https://github.com/Wilfred/helpful
 aggressive-setupでのminibuffer でのfcitx自動disableはよい. 相性が悪いのか, しばしば日本語入力とminibufferでEmacsがハングするので. 
 
 #+begin_src emacs-lisp :tangle yes
-(use-package! fcitx
-  :config
-  (setq fcitx-remote-command "fcitx5-remote")
-  (fcitx-aggressive-setup)
-  ;; Linux なら t が推奨されるものの、fcitx5 には未対応なためここは nil
-  (setq fcitx-use-dbus nil))
+;; fcitxはLinuxの入力メソッド連携。WindowsはGoogle日本語入力+tr-imeを使うため除外。
+(unless (eq system-type 'windows-nt)
+  (use-package! fcitx
+    :config
+    (setq fcitx-remote-command "fcitx5-remote")
+    ;; aggressive-setup は post-self-insert-hook 内で fcitx5-remote を毎回呼ぶため
+    ;; X11 Emacs + WSLg で打鍵がもたつく。default-setup に変更
+    (fcitx-default-setup)
+    ;; Linux なら t が推奨されるものの、fcitx5 には未対応なためここは nil
+    (setq fcitx-use-dbus nil)))
 #+end_src
 
 ** artist mode
@@ -2287,10 +2303,13 @@ ref: [[https://magit.vc/manual/forge/][Forge User and Developer Manual]]
 ;; (set-face-attribute 'fixed-pitch nil :font "Ricty Diminished" :height 160)
 ;; (setq doom-font (font-spec :family "Source Han Code JP" :size 15 ))
 ;; (setq doom-font (font-spec :family "Ricty Diminished" :size 16))
-(when (wsl-p) 
+;; WSL・ネイティブWindowsはHackGen(インストール済)。Source Han Code JPはWindowsに無く、
+;; doom-init-fonts-hが失敗するとafter-init-hookが中断しテーマ(doom-init-theme-h)未適用→白画面になる
+(cond
+ ((or (wsl-p) (eq system-type 'windows-nt))
   (setq doom-font (font-spec :family "HackGen" :size 18)))
-(when (not (wsl-p))
-  (setq doom-font (font-spec :family "Source Han Code JP" :size 15 )))
+ (t
+  (setq doom-font (font-spec :family "Source Han Code JP" :size 15))))
 ;; doom-molokaiやdoom-monokai-classicだとewwの表示がいまいち.
 (setq doom-theme 'doom-molokai)
 (doom-themes-org-config)

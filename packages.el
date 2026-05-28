@@ -130,3 +130,7 @@
                                         ;(unpin! pinned-package another-pinned-package)
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
                                         ;(unpin! t)
+
+;; Windows専用: ネイティブEmacsのIME統合(変換候補をカーソル位置に表示)
+(when (eq system-type 'windows-nt)
+  (package! tr-ime))
