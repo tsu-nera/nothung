@@ -2335,9 +2335,13 @@ https://github.com/iqbalansari/emacs-emojify/blob/master/data/emoji-sets.json
 
 #+begin_src emacs-lisp :tangle yes
 (after! emojify
-;;   (setq emojify-emoji-set "openmoji-v13-0")
-  ;; (setq emojify-emoji-set "emojione-v2.2.6.22")
-)
+  ;; openmoji v13に変更(カラー・線画風)。各環境で初回セットアップが必要:
+  ;;   M-x emojify-download-emoji RET openmoji-v13-0
+  ;;   → 展開先dirが "openmoji-v13.0" になる不一致があるので emojify-emojis-dir 内で
+  ;;     "openmoji-v13-0"(ハイフン) にリネームする(emojify-image-dirがハイフン名を探すため)
+  ;; 既知の制約: emojify同梱の認識データが古く、🥳(U+1F973,2018)等の最新codepointは
+  ;;   画像があっても認識されず描画されない。最新まで出すならSegoe UI Emoji等のフォント描画が要る
+  (setq emojify-emoji-set "openmoji-v13-0"))
 #+end_src
 
 ただ，2022現在twemojiはv13なのでv2は古いな..というかでないやつもおおい.

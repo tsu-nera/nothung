@@ -1124,9 +1124,8 @@
 ;;  (setq doom-modeline-major-mode-icon t))
 
 (after! emojify
-;;   (setq emojify-emoji-set "openmoji-v13-0")
-  ;; (setq emojify-emoji-set "emojione-v2.2.6.22")
-)
+  ;; 最新絵文字(🥳等)もカバーするopenmoji v13に変更。カラー画像・線画風の絵柄
+  (setq emojify-emoji-set "openmoji-v13-0"))
 
 ;; doomだと C-c i eでemojify-insert-emoji
 (global-set-key (kbd "C-c i E") 'emoji-search)
