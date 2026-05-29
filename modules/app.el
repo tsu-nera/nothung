@@ -20,7 +20,10 @@
   :config
   (eval-after-load 'eww '(define-key eww-mode-map "f" 'ace-link-eww))
   (ace-link-setup-default)
-  (define-key org-mode-map (kbd "M-o") 'ace-link-org))
+  ;; org-mode-map は org ロード後でないと未定義。旧 org-babel-load-file 方式では
+  ;; タングル時に org が先読みされ顕在化しなかったが、素のローダーでは遅延が必要。
+  (with-eval-after-load 'org
+    (define-key org-mode-map (kbd "M-o") 'ace-link-org)))
 
 ;;;; Pocket
 ;; あとで読むサービス.
