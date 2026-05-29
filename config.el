@@ -44,7 +44,11 @@ require ではなくパス直指定で load する。"
                          nil (expand-file-name "~/nothung-load-errors.log") nil 'silent))))
 
 ;; Windows専用: tr-imeでGoogle日本語入力の未確定文字列・変換候補をカーソル位置(over-the-spot)に表示
-(when (eq system-type 'windows-nt)
+;;
+;; 注意: tr-ime はW32メッセージポンプにフックするため、GUIフレームが無い状態
+;; (ヘッドレスな emacs --daemon の初期化中など)で実行するとハングする。本設定は
+;; runemacs での通常GUI起動を前提とするが、念のため display-graphic-p でガードする。
+(when (and (eq system-type 'windows-nt) (display-graphic-p))
   (tr-ime-advanced-install 'no-confirm)
   (setq default-input-method "W32-IME")
   (w32-ime-initialize)
