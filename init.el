@@ -85,7 +85,7 @@
 
        :term
        eshell            ; the elisp shell that works everywhere
-       ;;shell             ; simple shell REPL for Emacs
+       shell             ; simple shell REPL for Emacs (Windowsでo t→bash。vterm有効環境ではvtermが優先)
        ;;term              ; basic terminal emulator for Emacs
        (:unless (eq system-type 'windows-nt) vterm) ; vterm: WindowsはPOSIX端末(termios)不在でモジュールビルド不可のため除外
 

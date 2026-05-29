@@ -1124,7 +1124,12 @@
 ;;  (setq doom-modeline-major-mode-icon t))
 
 (after! emojify
-  ;; 最新絵文字(🥳等)もカバーするopenmoji v13に変更。カラー画像・線画風の絵柄
+  ;; openmoji v13に変更(カラー・線画風)。各環境で初回セットアップが必要:
+  ;;   M-x emojify-download-emoji RET openmoji-v13-0
+  ;;   → 展開先dirが "openmoji-v13.0" になる不一致があるので emojify-emojis-dir 内で
+  ;;     "openmoji-v13-0"(ハイフン) にリネームする(emojify-image-dirがハイフン名を探すため)
+  ;; 既知の制約: emojify同梱の認識データが古く、🥳(U+1F973,2018)等の最新codepointは
+  ;;   画像があっても認識されず描画されない。最新まで出すならSegoe UI Emoji等のフォント描画が要る
   (setq emojify-emoji-set "openmoji-v13-0"))
 
 ;; doomだと C-c i eでemojify-insert-emoji
@@ -1209,3 +1214,15 @@
                 (setq-local cursor-type '(box . 1))
                 (blink-cursor-mode -1)
                 (blink-cursor-mode 1)))))
+
+(when (eq system-type 'windows-nt)
+  ;; M-x shell を MSYS2 bash にする(ログイン+対話)
+  (setq explicit-shell-file-name "C:/msys64/usr/bin/bash.exe"
+        explicit-bash.exe-args '("--login" "-i"))
+  ;; 外部mintty で fish(UCRT64環境) を起動
+  (defun my/mintty-fish ()
+    "MSYS2 mintty で fish を起動する(UCRT64環境)。"
+    (interactive)
+    (start-process "msys2-fish" nil "cmd.exe" "/c"
+                   "C:\\msys64\\msys2_shell.cmd" "-defterm" "-here" "-ucrt64" "-shell" "fish"))
+  (map! :leader :desc "fish端末(mintty)" "o f" #'my/mintty-fish))
