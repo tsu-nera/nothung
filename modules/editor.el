@@ -1,0 +1,150 @@
+;;; modules/editor.el --- Editor  (:editor)  -*- lexical-binding: t; -*-
+;;; Commentary:
+;; Doom category :editor.  Migrated from nothung.org (Editor).
+;;; Code:
+
+;; Editor
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; 英数字と日本語の間にスペースをいれる.
+;;(use-package! pangu-spacing
+;;  :config
+;;  (global-pangu-spacing-mode 1)
+  ;; 保存時に自動的にスペースを入れるのを抑止.あくまで入力時にしておく.
+;;  (setq pangu-spacing-real-insert-separtor nil))
+
+;; 記号の前後にスペースを入れる.
+(use-package! electric-operator)
+(add-hook! 'org-mode-hook #'electric-operator-mode)
+
+;;;; cua-mode
+(cua-mode t)
+(setq cua-enable-cua-keys nil) 
+
+;;;; 改行(newline)と折り返し(wrap)
+;; まず改行(newline)と折り返し(wrap)の２つの概念があることに注意. 
+;; 方針として自動改行は無効, 自動折り返しは許す. 
+;; auto-fill-modeで自動改行される. これは無効にする. 
+;; 追記: 方針変更. コードではauto-fillを許す. そして単に(auto-fill-mode -1)をところでmodeのhookによって再度有効になる気がする. 
+;; (auto-fill-mode -1)
+;; 問題はMarkdownやOrg-modeでautl-fillが発動して改行されるところ. org-modeで再度hookが走り有効になる気がするのでコレで息を止める. 
+;; ->息が止まらないので諦めた. いくら無効にしてもorg-mode-hookの延長でauto-fill-modeをonにしてしまう人がいる. そしてその犯人が誰か２時間追求しても結局わからない. Doom Emacsの設定の仕業はある. 
+(auto-fill-mode -1)
+(remove-hook 'org-mode-hook #'auto-fill-mode)
+;; (remove-hook 'org-mode-hook #'turn-on-auto-fill)
+;; (remove-hook 'text-mode-hook #'auto-fill-mode)
+;; (remove-hook 'text-mode-hook #'turn-on-auto-fill)
+;; (add-hook 'org-mode-hook #'turn-off-auto-fill)
+;; (add-hook 'text-mode-hook #'turn-off-auto-fill)
+;; (add-hook 'org-roam-mode-hook #'turn-off-auto-fill)
+;; これによって折り返しの限界を80から99999にすることにして回避する. 
+(setq-default fill-column 99999)
+(setq fill-column 99999)
+;; これにより折り返しで / や $ 記号が表示される. 以下の設定で消す. 
+;; / を削除
+(set-display-table-slot standard-display-table 'wrap ?\ )
+;; $ を削除
+(set-display-table-slot standard-display-table 0 ?\ )
+;; さらに折り返しの次のラインにインデントが挿入される. これはelectric-indent-modeの仕業. 現在org-modeのみで無効中. 
+;; 折り返しoff/onは, M-x toggle-truncate-linesで切り替えることができる. 
+
+;;;; visual-line-mode
+;; 単語単位での折り返しをするEmacs標準実装のモード. 
+;; Emacsはウィンドウの右端の近くの単語の境界で折り返すよう試みる. これは単語の途中で折り返さないことにより可読性を高めるため. 
+;; https://ayatakesi.github.io/emacs/25.1/Visual-Line-Mode.html
+;; この設定はスクリーンの幅によって判定されるためたとえば文字列80で折り返すとかではない. 
+;; 日本語と英語が入り交じるときの解釈が変なので以下を設定した. 
+(setq word-wrap-by-category t)
+;; ref: [[https://www.reddit.com/r/emacs/comments/ov2s2r/wordwrap_problem_with_chinese_or_japanese/h76ipjy/][Word-wrap problem with Chinese or Japanese characters : emacs]]
+
+;;;; visual-fill-column
+;; Doomだといらないかもだけど. 
+;; (add-hook! visual-line-mode 'visual-fill-column-mode)
+;; -> perfect-marginとの相性が悪い気がするのでいったん無効. 
+;; - ref.
+;;   -  [[http://sleepboy-zzz.blogspot.com/2015/12/emacs-visual-fill-columnel_29.html][memo: Emacs の visual-fill-column.el が便利だった]]
+
+;;;; perfect-margin
+;; いい感じにmarginをとってくれる (https://github.com/mpwang/perfect-margin)
+(use-package! perfect-margin
+  :config
+  (perfect-margin-mode t)
+  ;; disable special window
+  (setq perfect-margin-ignore-regexps '("*vterm*"))
+  (setq perfect-margin-ignore-filters nil)  ;; disable minibuffer
+)
+
+;;;; ターミナルの縦分割線をUTF-8できれいに描く
+;; ref: [[https://www.reddit.com/r/emacs/comments/3u0d0u/how_do_i_make_the_vertical_window_divider_more/][How do I make the vertical window divider more pretty? : emacs]]
+(unless (display-graphic-p)
+  ;; ターミナルの縦分割線をUTF-8できれいに描く
+  (defun my-change-window-divider ()
+    (interactive)
+    (let ((display-table (or buffer-display-table
+           standard-display-table
+           (make-display-table))))
+      (set-display-table-slot display-table 5 ?│)
+      (set-window-display-table (selected-window) display-table)))
+  (add-hook 'window-configuration-change-hook 'my-change-window-divider))
+
+;;;; whitespace
+;; 余分な空白/タブに色づけ.
+(use-package! whitespace
+  :config
+  ;; limit lie length -> display-fill-column-indicator-modeを使うためマスク. 
+  ;; (setq whitespace-line-column 80) 
+  (setq whitespace-style '(face 
+                           ;;lines-tail
+                           ))
+  ;; 全角スペースを可視化
+  (setq whitespace-space-regexp "\\(\u3000+\\)")
+  (global-whitespace-mode 1))
+
+;;;; display-fill-column-indicator-mode
+;; Emacsの画面に1行80文字のところに線を薄く引く.
+;; プログラミングの世界では昔から80 columns ruleがあり, Emacsで80文字目を表示する機能もいろいろあったものの, Emacs 27.0.90からdefault機能として提供されるようになった.
+;; (最も80(charは昔の話で, 最近のディスプレイの大きさだと100charがいいという議論もある).
+;; 今つかっているモニタで縦に３分割すると74がちょうどいいことがわかった. (先頭に行番号表示4char+1charのmarginあり). 
+(setq-default display-fill-column-indicator-column 78)
+(global-display-fill-column-indicator-mode)
+
+;;;; iedit
+;; 複数同時編集.
+;; なおDoom Emacsだと +company/completeとC-;のkeybind競合.
+(use-package! iedit
+  :bind
+  ("C-;" . iedit-mode))
+
+;;;; bm
+;; 現在行のブックマークライブラリ.
+;; [[https://github.com/joodland/bm][GitHub - joodland/bm: bm.el -- Visual Bookmarks for GNU Emacs]]
+;; しかし別用途とした現在行をハイライトしてログ解析とかでつかう. 
+(use-package! bm
+  :bind   (("<f5>" . bm-toggle))
+  :config
+  (setq temporary-bookmark-p t)
+  (setq bm-face '((t (:background "steel blue" :foreground "#272822")))))
+;;(setq bm-face '((t (:background "#525252" :foreground ""))))
+;;	   ("<C-f5>"  . bm-next)
+;;	   ("<S-f5>" . bm-previous))
+
+;;;; atomic-chrome
+;; 注意(Windows): atomic-chrome のサーバは TCP 64292/64293 を使うが、これは
+;; Dropbox が常駐で占有するポートと衝突する。`atomic-chrome-start-server' を
+;; 起動時(特にdaemon初期化中)に呼ぶと、Dropboxのトラフィックを処理し続けて
+;; スピンし、initが完了せず server-start に到達できない(=Emacsが起動不能・
+;; emacsclientが接続できない)。そのため自動起動はしない。
+;; 必要なときに M-x atomic-chrome-start-server で手動起動する。
+(use-package! atomic-chrome
+  ;; auto generated by gpt4
+  ;; :init
+  ;; (setq atomic-chrome-default-major-mode 'markdown-mode
+  ;;       atomic-chrome-buffer-open-style 'frame
+  ;;       atomic-chrome-url-major-mode-alist
+  ;;       '(("github\\.com" . gfm-mode)
+  ;;         ("redmine\\." . textile-mode)))
+  :config
+  (setq atomic-chrome-buffer-open-style 'full))
+
+(provide 'nothung-editor)
+;;; modules/editor.el ends here
