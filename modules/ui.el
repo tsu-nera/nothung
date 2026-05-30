@@ -13,12 +13,12 @@
 ;; terminal だと大丈夫な模様.そもそも Terminal はこの設定ではなくて 
 ;; Terminal Emulator の設定がきく.
 
-;; フォントは全環境で HackGen Console NF / size 18 に統一(WSL2/Windows/CachyOS
+;; フォントは全環境で HackGen Console NF / size 20 に統一(WSL2/Windows/CachyOS
 ;; いずれもインストール済み)。HackGen は ASCII・日本語(CJK)・Nerd アイコン・合字を
 ;; 1フォントで賄うため、CJK フォールバック(set-fontset-font)も候補リストからの
 ;; find-font 探索も不要。なお family を実在する1つに固定するため、daemon 初期化時
 ;; (find-font が nil を返す)でも doom-init-fonts-h が monospace に落ちることはない。
-(setq doom-font (font-spec :family "HackGen Console NF" :size 18))
+(setq doom-font (font-spec :family "HackGen Console NF" :size 20))
 ;; doom-molokaiやdoom-monokai-classicだとewwの表示がいまいち.
 (setq doom-theme 'doom-molokai)
 (doom-themes-org-config)
