@@ -30,16 +30,25 @@
         (call-process-region (point-min) (point-max) "wl-copy"))))
   (setq interprogram-cut-function #'my/wsl-clipboard-copy))
 
-;; migemo
+;; migemo: ローマ字入力で日本語を漸進検索する。外部プログラム cmigemo と辞書が必要。
+;; cmigemo 未インストールの環境(新規マシン等)で migemo-init を呼ぶと
+;; "Searching for program cmigemo" で load が中断するため、cmigemo が存在する
+;; 場合のみ有効化する(Windows は config.el で migemo-init を override 無害化)。
+;; 辞書パスはディストリにより異なるため、実在するものを採用する。
 (use-package! migemo
+  :when (executable-find "cmigemo")
   :config
   (setq migemo-command "cmigemo")
   (setq migemo-options '("-q" "--emacs" "-i" "\a"))
-  (setq migemo-dictionary "/usr/share/migemo/utf-8/migemo-dict")
+  (setq migemo-dictionary
+        (cl-find-if #'file-exists-p
+                    '("/usr/share/migemo/utf-8/migemo-dict"
+                      "/usr/share/cmigemo/utf-8/migemo-dict"
+                      "/usr/local/share/migemo/utf-8/migemo-dict")))
   (setq migemo-user-dictionary nil)
   (setq migemo-regex-dictionary nil)
   (setq migemo-coding-system 'utf-8-unix)
-  (migemo-init))
+  (when migemo-dictionary (migemo-init)))
 
 ;;;; fcitx
 ;; aggressive-setupでのminibuffer でのfcitx自動disableはよい. 相性が悪いのか, しばしば日本語入力とminibufferでEmacsがハングするので. 

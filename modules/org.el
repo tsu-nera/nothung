@@ -604,7 +604,9 @@
 ;;;;; org-roamのslowdownを回避するTip
 ;; https://www.reddit.com/r/orgmode/comments/s8xv5j/orgroam_slows_down_as_nodes_increase_solution/
 ;; 2. Memoize the function that costs the most.
-(load-file "~/.doom.d/private/memoize.el")
+;; memoize は packages.el で宣言した MELPA パッケージを使う
+;; (旧運用では private/memoize.el を vendor していたが、マシン固有の private/
+;;  配下に依存すると新規環境で起動できないためパッケージ管理へ移行した)。
 (require 'memoize)
 
 (memoize 'org-roam-node-read--completions "10 minute")

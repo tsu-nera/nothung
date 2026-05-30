@@ -24,7 +24,11 @@
 ファイル名が org/emacs 等の組み込み feature 名と衝突するため、modules は
 require ではなくパス直指定で load する。"
   ;; 秘密情報と自作関数(旧 nothung.org 冒頭ブロック相当)
-  (load-file (expand-file-name "private/config.el" doom-user-dir))
+  ;; private/config.el は API キー等のマシン固有秘密情報(gitignore 済み)。
+  ;; 新規マシンでは存在しないため、有無を確認してから読み込む(無くても起動可能)。
+  (let ((private-config (expand-file-name "private/config.el" doom-user-dir)))
+    (when (file-exists-p private-config)
+      (load-file private-config)))
   (load-file (expand-file-name "utils.el" doom-user-dir))
   ;; カテゴリ別設定
   (dolist (m nothung-modules)

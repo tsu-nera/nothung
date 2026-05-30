@@ -15,6 +15,10 @@
 (package! iedit)
 (package! sqlite3)
 
+;; org-roam の補完を memoize で高速化(modules/org.el)。旧運用では
+;; private/memoize.el を vendor していたが MELPA パッケージへ移行。
+(package! memoize)
+
 (package! fcitx)
 (package! pangu-spacing)
 (package! electric-operator)

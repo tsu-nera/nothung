@@ -18,12 +18,34 @@
 ;; (setq doom-font (font-spec :family "Source Han Code JP" :size 15 ))
 ;; (setq doom-font (font-spec :family "Ricty Diminished" :size 16))
 ;; WSL・ネイティブWindowsはHackGen(インストール済)。Source Han Code JPはWindowsに無く、
-;; doom-init-fonts-hが失敗するとafter-init-hookが中断しテーマ(doom-init-theme-h)未適用→白画面になる
+;; doom-init-fonts-hが失敗するとafter-init-hookが中断しテーマ(doom-init-theme-h)未適用→白画面になる。
+;; Linux(CachyOS等)では環境によりインストール済みフォントが異なるため、候補リストから
+;; 実際に存在する最初のフォントを選ぶ(find-fontで判定)。これによりフォント未インストールでも
+;; 白画面化せず起動できる。日本語グリフはfontconfigのフォールバック(Noto CJK等)に任せる。
+(defun nothung--first-available-font (candidates size)
+  "CANDIDATES のうち最初にインストール済みのファミリで font-spec を返す。
+どれも無ければ \"monospace\" にフォールバックする。"
+  (let ((fam (or (seq-find (lambda (f) (find-font (font-spec :family f))) candidates)
+                 "monospace")))
+    (font-spec :family fam :size size)))
 (cond
  ((or (wsl-p) (eq system-type 'windows-nt))
   (setq doom-font (font-spec :family "HackGen" :size 18)))
  (t
-  (setq doom-font (font-spec :family "Source Han Code JP" :size 15))))
+  ;; Linux(CachyOS等): 日本語と「コード用Nerd Fontのアイコン/合字」を単一フォントで
+  ;; 賄えるフォント(HackGen等)が無い環境向けに、ASCII/コードと日本語(CJK)を分担させる。
+  ;;   - ASCII/アイコン: JetBrainsMono Nerd Font (合字・Nerdアイコン入り)
+  ;;   - 日本語(漢字・かな): Noto Sans CJK JP をフォールバックに割り当て(下の set-fontset-font)
+  ;; HackGen 等が入っていればそちらを優先(WSL/Windowsと揃う)。
+  (setq doom-font (nothung--first-available-font
+                   '("HackGen" "Source Han Code JP"
+                     "JetBrainsMono Nerd Font" "JetBrainsMono NF" "Noto Sans Mono CJK JP")
+                   15))
+  ;; CJK(漢字・かな・CJK記号)を Noto Sans CJK JP に割り当てる。
+  ;; 既定フォントセット t に設定するため、今後生成される全フレーム(daemon含む)に適用される。
+  ;; 対象フォントが無くても set-fontset-font は無害(マッチしないだけ)。
+  (dolist (charset '(han kana cjk-misc))
+    (set-fontset-font t charset (font-spec :family "Noto Sans CJK JP") nil 'prepend))))
 ;; doom-molokaiやdoom-monokai-classicだとewwの表示がいまいち.
 (setq doom-theme 'doom-molokai)
 (doom-themes-org-config)
