@@ -36,11 +36,18 @@
   ;; 賄えるフォント(HackGen等)が無い環境向けに、ASCII/コードと日本語(CJK)を分担させる。
   ;;   - ASCII/アイコン: JetBrainsMono Nerd Font (合字・Nerdアイコン入り)
   ;;   - 日本語(漢字・かな): Noto Sans CJK JP をフォールバックに割り当て(下の set-fontset-font)
-  ;; HackGen 等が入っていればそちらを優先(WSL/Windowsと揃う)。
-  (setq doom-font (nothung--first-available-font
-                   '("HackGen" "Source Han Code JP"
-                     "JetBrainsMono Nerd Font" "JetBrainsMono NF" "Noto Sans Mono CJK JP")
-                   15))
+  ;; 注意: 存在判定の find-font は display の無い daemon 初期化時に常に nil を返す
+  ;; (emacs --daemon 起動だと doom-font が monospace に落ちる)。このため:
+  ;;   - display あり(直起動 emacs %F): 候補から実在する最良を選ぶ(HackGen等があれば優先)
+  ;;   - display なし(emacs --daemon): 確実に存在する既定を直接指定
+  ;;     (クライアントフレーム生成時に doom-init-fonts-h がこの font-spec を適用)
+  (setq doom-font
+        (if (display-graphic-p)
+            (nothung--first-available-font
+             '("HackGen" "Source Han Code JP"
+               "JetBrainsMono Nerd Font" "JetBrainsMono NF" "Noto Sans Mono CJK JP")
+             15)
+          (font-spec :family "JetBrainsMono Nerd Font" :size 15)))
   ;; CJK(漢字・かな・CJK記号)を Noto Sans CJK JP に割り当てる。
   ;; 既定フォントセット t に設定するため、今後生成される全フレーム(daemon含む)に適用される。
   ;; 対象フォントが無くても set-fontset-font は無害(マッチしないだけ)。
