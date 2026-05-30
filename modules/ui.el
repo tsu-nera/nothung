@@ -13,46 +13,12 @@
 ;; terminal だと大丈夫な模様.そもそも Terminal はこの設定ではなくて 
 ;; Terminal Emulator の設定がきく.
 
-;; Twitterで拾った設定だけど若干org-table表示がマシになったので採用.
-;; (set-face-attribute 'fixed-pitch nil :font "Ricty Diminished" :height 160)
-;; (setq doom-font (font-spec :family "Source Han Code JP" :size 15 ))
-;; (setq doom-font (font-spec :family "Ricty Diminished" :size 16))
-;; WSL・ネイティブWindowsはHackGen(インストール済)。Source Han Code JPはWindowsに無く、
-;; doom-init-fonts-hが失敗するとafter-init-hookが中断しテーマ(doom-init-theme-h)未適用→白画面になる。
-;; Linux(CachyOS等)では環境によりインストール済みフォントが異なるため、候補リストから
-;; 実際に存在する最初のフォントを選ぶ(find-fontで判定)。これによりフォント未インストールでも
-;; 白画面化せず起動できる。日本語グリフはfontconfigのフォールバック(Noto CJK等)に任せる。
-(defun nothung--first-available-font (candidates size)
-  "CANDIDATES のうち最初にインストール済みのファミリで font-spec を返す。
-どれも無ければ \"monospace\" にフォールバックする。"
-  (let ((fam (or (seq-find (lambda (f) (find-font (font-spec :family f))) candidates)
-                 "monospace")))
-    (font-spec :family fam :size size)))
-(cond
- ((or (wsl-p) (eq system-type 'windows-nt))
-  (setq doom-font (font-spec :family "HackGen" :size 18)))
- (t
-  ;; Linux(CachyOS等): 日本語と「コード用Nerd Fontのアイコン/合字」を単一フォントで
-  ;; 賄えるフォント(HackGen等)が無い環境向けに、ASCII/コードと日本語(CJK)を分担させる。
-  ;;   - ASCII/アイコン: JetBrainsMono Nerd Font (合字・Nerdアイコン入り)
-  ;;   - 日本語(漢字・かな): Noto Sans CJK JP をフォールバックに割り当て(下の set-fontset-font)
-  ;; 注意: 存在判定の find-font は display の無い daemon 初期化時に常に nil を返す
-  ;; (emacs --daemon 起動だと doom-font が monospace に落ちる)。このため:
-  ;;   - display あり(直起動 emacs %F): 候補から実在する最良を選ぶ(HackGen等があれば優先)
-  ;;   - display なし(emacs --daemon): 確実に存在する既定を直接指定
-  ;;     (クライアントフレーム生成時に doom-init-fonts-h がこの font-spec を適用)
-  (setq doom-font
-        (if (display-graphic-p)
-            (nothung--first-available-font
-             '("HackGen" "Source Han Code JP"
-               "JetBrainsMono Nerd Font" "JetBrainsMono NF" "Noto Sans Mono CJK JP")
-             15)
-          (font-spec :family "JetBrainsMono Nerd Font" :size 15)))
-  ;; CJK(漢字・かな・CJK記号)を Noto Sans CJK JP に割り当てる。
-  ;; 既定フォントセット t に設定するため、今後生成される全フレーム(daemon含む)に適用される。
-  ;; 対象フォントが無くても set-fontset-font は無害(マッチしないだけ)。
-  (dolist (charset '(han kana cjk-misc))
-    (set-fontset-font t charset (font-spec :family "Noto Sans CJK JP") nil 'prepend))))
+;; フォントは全環境で HackGen Console NF / size 18 に統一(WSL2/Windows/CachyOS
+;; いずれもインストール済み)。HackGen は ASCII・日本語(CJK)・Nerd アイコン・合字を
+;; 1フォントで賄うため、CJK フォールバック(set-fontset-font)も候補リストからの
+;; find-font 探索も不要。なお family を実在する1つに固定するため、daemon 初期化時
+;; (find-font が nil を返す)でも doom-init-fonts-h が monospace に落ちることはない。
+(setq doom-font (font-spec :family "HackGen Console NF" :size 18))
 ;; doom-molokaiやdoom-monokai-classicだとewwの表示がいまいち.
 (setq doom-theme 'doom-molokai)
 (doom-themes-org-config)
