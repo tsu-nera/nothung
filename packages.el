@@ -34,6 +34,7 @@
 
 (package! ox-rst)
 (package! ox-qmd)
+(package! ox-hugo)
 
 (package! org-roam-ui)
 (unpin! consult-org-roam)
