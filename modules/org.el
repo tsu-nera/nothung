@@ -529,7 +529,11 @@
 
     (setq +org-roam-open-buffer-on-find-file nil)
     ;; (org-roam-db-autosync-mode)
-    (org-roam-db-autosync-enable)
+    ;; org-roam-db-autosync-enable は起動時に DB 全同期(org-roam-db-sync)を一度走らせる。
+    ;; ノート数千件 + Windows の遅いファイルI/O(Defender スキャン含む)で、これが起動時間の
+    ;; ほぼ全て(実測 130〜160 秒)を占めていた。起動フレームをブロックしないよう、
+    ;; 初回アイドル時(5秒)まで遅延させる。Linux でも害は無い。
+    (run-with-idle-timer 5 nil #'org-roam-db-autosync-enable)
 
     ;; (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
 
