@@ -92,4 +92,14 @@ emacsclient -e "(auth-source-search :host \"api.github.com\")"
 emacs --batch --eval "(with-temp-buffer (insert-file-contents \"modules/org.el\") (check-parens))"
 ```
 
+### 設定変更の即時反映
+
+`modules/*.el` を編集したあと、起動中のEmacsへ再起動なしで反映できる。変更内容で方法を使い分ける:
+
+- **setq 等の冪等な変更** — ファイルごと再読込する。式を打ち直さずに済むのでエスケープ不要:
+  ```bash
+  emacsclient -e '(load "/home/tsu-nera/.doom.d/modules/org.el")'
+  ```
+- **`run-with-idle-timer`・`use-package!`・`add-hook` 等の副作用を含む変更** — 全loadはタイマー/フックの二重登録を招くため避け、変更した該当フォームだけを `emacsclient -e` で eval する。
+
 MCP（claude-code-ide.el）はLSP診断・シンボル検索などの構造化データに向いており、emacsclientは任意のElisp評価が必要な場面（変数の状態、パッケージの挙動確認など）に使う。

@@ -535,7 +535,12 @@
     ;; 初回アイドル時(5秒)まで遅延させる。Linux でも害は無い。
     (run-with-idle-timer 5 nil #'org-roam-db-autosync-enable)
 
-    ;; (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+    ;; ノード一覧の表示列。Doomデフォルト(${doom-hierarchy:*} ${doom-type:12}
+    ;; ${doom-tags:42})は type+tags の固定幅が広く、画面半分幅だとタイトルが
+    ;; 潰れる。type列を削り tags を 20 に縮めてタイトルへ幅を回す。
+    (setq org-roam-node-display-template
+          (concat "${doom-hierarchy:*} "
+                  (propertize "${doom-tags:20}" 'face 'org-tag)))
 
     ;; for emacs 29~
     ;; (when (>= emacs-major-version 29)
