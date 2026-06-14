@@ -15,17 +15,6 @@
 ;; ブラウザと並べて表示することが多くなったのでいったんマスク
 ;; (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 
-;; This is to use pdf-tools instead of doc-viewer
-;; Windowsはepdfinfoがビルド不可(poppler等が無い)で起動が固まるため除外。pdfモジュールもinit.elでWindows除外済み。
-(unless (eq system-type 'windows-nt)
-  (use-package! pdf-tools
-    :config
-    (pdf-tools-install)
-    ;; This means that pdfs are fitted to width by default when you open them
-    (setq-default pdf-view-display-size 'fit-width)
-    :custom
-    (pdf-annot-activate-created-annotations t "automatically annotate highlights")))
-
 ;; projectileの検索スピードを上げる
 (setq projectile-indexing-method 'alien)
 

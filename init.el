@@ -110,7 +110,7 @@
        (magit +forge)             ; a git porcelain for Emacs
        ;;make              ; run make tasks from Emacs
        ;;pass              ; password manager for nerds
-       (:unless (eq system-type 'windows-nt) pdf) ; pdf: Windowsはepdfinfoビルド不可で起動停止するため除外
+       ;;pdf               ; pdf-tools。poppler更新でepdfinfo再ビルド要求→デーモン起動を中断するため無効化(未使用)
        ;;prodigy           ; FIXME managing external services & code builders
        ;;rgb               ; creating color strings
        ;;taskrunner        ; taskrunner for all your projects
