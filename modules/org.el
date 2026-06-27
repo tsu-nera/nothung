@@ -131,11 +131,15 @@
 ;;;; TODOキーワード拡張
 ;; TODOキーワードのカスタマイズ. M-x C-c t.
 ;; ref. [[https://orgmode.org/manual/TODO-Extensions.html][TODO Extensions (The Org Manual)]]
-(setq org-todo-keywords
-      '((sequence "📊(a)" "💡(b)" "✅(c)" "👨(d)" "🔬(e)" "👩(f)" "🎨(g)" "|")
-        (sequence "📂(h)" "✨(i)" "🔌(k)" "🔗(l)" "📝(m)" "🌳(n)" "|")
-        (sequence "🪨(o)" "🧩(p)" "📜(q)" "📍(r)" "🔍(s)" "🔦(t)" "|")
-        (sequence "🔧(w)" "🌱(z)" "|")))
+;; NOTE: 裸の setq だと config ロード時に走り、その後 Doom :lang org の
+;; after! org がデフォルト(TODO/PROJ/...)で上書きしてしまう。
+;; 必ず after! org 内で設定して Doom デフォルトより後に適用する。
+(after! org
+  (setq org-todo-keywords
+        '((sequence "📊(a)" "💡(b)" "✅(c)" "👨(d)" "🔬(e)" "👩(f)" "🎨(g)" "|")
+          (sequence "📂(h)" "✨(i)" "🔌(k)" "🔗(l)" "📝(m)" "🌳(n)" "|")
+          (sequence "🪨(o)" "🧩(p)" "📜(q)" "📍(r)" "🔍(s)" "🔦(t)" "|")
+          (sequence "🔧(w)" "🌱(z)" "|"))))
 
 ;;;; org-capture
 ;; [[https://orgmode.org/manual/Capture-templates.html][Capture templates (The Org Manual)]]

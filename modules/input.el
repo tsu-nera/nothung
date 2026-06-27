@@ -9,26 +9,38 @@
 (prefer-coding-system 'utf-8)
 (set-default 'buffer-filecoding-system 'utf-8)
 
-;; pgtk Emacs + WSLg のクリップボード文字化け対策
-;; GTK 経由だと STRING target が CP932 のまま返り化けるため、
-;; wl-paste 経由で text/plain;charset=utf-8 を取得する
-;; daemon 起動時は window-system が nil なので wsl-p で判定する
-(when (and (wsl-p) (executable-find "wl-paste"))
-  (defun my/wsl-clipboard-paste ()
-    (let ((s (shell-command-to-string
-              "wl-paste -n -t text/plain\\;charset=utf-8 2>/dev/null")))
-      (unless (string-empty-p s) s)))
-  (setq interprogram-paste-function #'my/wsl-clipboard-paste))
+;; pgtk Wayland のクリップボード読み取り対策。
+;; pgtk Emacs は自分が gui-set-selection で CLIPBOARD を「所有」すると、
+;; コンポジタに問い合わせず内部キャッシュを返すため、他アプリ(Chrome 等)で
+;; コピーした内容が yank できなくなる。さらに WSLg では STRING target が
+;; CP932 のまま返り化ける。いずれも wl-paste 経由 (text/plain;charset=utf-8)
+;; で読めば回避できる。daemon 起動時は window-system が nil なので、
+;; WSL 判定または WAYLAND_DISPLAY の有無で判定する。
+(when (and (or (wsl-p) (getenv "WAYLAND_DISPLAY"))
+           (executable-find "wl-paste"))
+  ;; shell-file-name が fish 等だと ";" のエスケープが壊れるため、
+  ;; shell を介さず call-process で直接 wl-paste を呼ぶ。
+  (defun my/wl-clipboard-paste ()
+    (with-temp-buffer
+      (when (zerop (call-process "wl-paste" nil t nil
+                                 "-n" "-t" "text/plain;charset=utf-8"))
+        (let ((s (buffer-string)))
+          (unless (string-empty-p s) s)))))
+  (setq interprogram-paste-function #'my/wl-clipboard-paste))
 
-;; Emacs → Windows コピー用。pgtk Wayland のクリップボード書き込みが
-;; WSLg ブリッジに届かないケースがあるため、wl-copy で明示的に書き込む
-(when (and (wsl-p) (executable-find "wl-copy"))
-  (defun my/wsl-clipboard-copy (text)
+;; Emacs → 外部アプリのコピー。pgtk Wayland では Emacs 自身の
+;; クリップボード書き込みがコンポジタに届かないことがある(WSLg ブリッジ・
+;; niri 等の素の Wayland 双方で確認)。wl-copy で明示的に書き込む。
+;; daemon 起動時は window-system が nil なので、WSL 判定または
+;; WAYLAND_DISPLAY の有無で判定する。
+(when (and (or (wsl-p) (getenv "WAYLAND_DISPLAY"))
+           (executable-find "wl-copy"))
+  (defun my/wl-clipboard-copy (text)
     (let ((process-connection-type nil))
       (with-temp-buffer
         (insert text)
         (call-process-region (point-min) (point-max) "wl-copy"))))
-  (setq interprogram-cut-function #'my/wsl-clipboard-copy))
+  (setq interprogram-cut-function #'my/wl-clipboard-copy))
 
 ;; migemo: ローマ字入力で日本語を漸進検索する。外部プログラム cmigemo と辞書が必要。
 ;; cmigemo 未インストールの環境(新規マシン等)で migemo-init を呼ぶと
