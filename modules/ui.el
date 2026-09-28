@@ -29,6 +29,16 @@
 ;; doom-molokaiやdoom-monokai-classicだとewwの表示がいまいち.
 (setq doom-theme 'doom-molokai)
 (doom-themes-org-config)
+;; Emacs 31 で gnus-group-news-low の defface が news-low-empty を継承する形に
+;; 反転した。doom-themes は逆向き(news-low-empty → news-low)を定義しており、
+;; テーマ spec の色条件に合わないフレーム(daemon の初期端末フレーム等)では
+;; 継承が循環し、load-theme と make-frame が失敗する(emacsclient -c が開かない)。
+;; face-spec-recalc は全テーマ spec を低優先から順に重ねるため、news-low-empty
+;; 側を上書きしても doom spec 適用の時点で循環する。news-low 側に全フレームで
+;; 当たる user spec を置き、defface(→ news-low-empty)へ落ちないようにする。
+;; custom-set-faces! はテーマ有効化後に適用されるため間に合わない。
+(custom-set-faces
+ '(gnus-group-news-low ((t :inherit gnus-group-mail-1))))
 
 ;; counselとdoom-modelineが相性悪いようなので
 ;; workspace name表示のためには追加で設定.
