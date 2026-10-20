@@ -54,13 +54,22 @@
 ;; Twitterが好きなのでTwitterのオープンソース辞書のtwemojiに変更.
 ;; https://github.com/iqbalansari/emacs-emojify/blob/master/data/emoji-sets.json
 (after! emojify
-  ;; openmoji v13に変更(カラー・線画風)。各環境で初回セットアップが必要:
-  ;;   M-x emojify-download-emoji RET openmoji-v13-0
-  ;;   → 展開先dirが "openmoji-v13.0" になる不一致があるので emojify-emojis-dir 内で
-  ;;     "openmoji-v13-0"(ハイフン) にリネームする(emojify-image-dirがハイフン名を探すため)
+  ;; openmoji v13に変更(カラー・線画風)。
   ;; 既知の制約: emojify同梱の認識データが古く、🥳(U+1F973,2018)等の最新codepointは
   ;;   画像があっても認識されず描画されない。最新まで出すならSegoe UI Emoji等のフォント描画が要る
-  (setq emojify-emoji-set "openmoji-v13-0"))
+  (setq emojify-emoji-set "openmoji-v13-0")
+  ;; openmoji-v13-0 の tar は "openmoji-v13.0"(ドット) に展開されるが、emojify-image-dir は
+  ;; ハイフン名を探すため、ダウンロードしても未取得扱いになり、フレームを開くたびに
+  ;; download の yes-or-no-p で daemon ごと固まる。展開後と起動時にハイフン名へリネームする。
+  (defun nothung-emojify-fix-image-dir (&rest _)
+    (let ((dotted (expand-file-name (replace-regexp-in-string
+                                     "-\\([0-9]+\\)\\'" ".\\1" emojify-emoji-set)
+                                    emojify-emojis-dir)))
+      (when (and (file-directory-p dotted)
+                 (not (file-exists-p (emojify-image-dir))))
+        (rename-file dotted (emojify-image-dir)))))
+  (advice-add 'emojify--extract-emojis :after #'nothung-emojify-fix-image-dir)
+  (nothung-emojify-fix-image-dir))
 ;; ただ，2022現在twemojiはv13なのでv2は古いな..というかでないやつもおおい.
 ;; Emacsの機能でemoji-searchがあるのでこれも設定しておこう. 
 ;; こっちの辞書のほうが扱える文字か多い.
