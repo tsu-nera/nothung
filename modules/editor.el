@@ -57,6 +57,13 @@
 (setq word-wrap-by-category t)
 ;; ref: [[https://www.reddit.com/r/emacs/comments/ov2s2r/wordwrap_problem_with_chinese_or_japanese/h76ipjy/][Word-wrap problem with Chinese or Japanese characters : emacs]]
 
+;;;; so-long
+;; Doomのso-long判定(doom-so-long-p)は buffer-line-statistics の最長行を「バイト数」で
+;; so-long-threshold(既定10000)と比べる. 日本語はUTF-8で1文字3バイトなので,
+;; 4000字程度の段落でもorg-modeではなくso-long-modeで開かれてしまう. しきい値を上げて回避する.
+(after! so-long
+  (setq so-long-threshold 20000))
+
 ;;;; visual-fill-column
 ;; Doomだといらないかもだけど. 
 ;; (add-hook! visual-line-mode 'visual-fill-column-mode)
