@@ -47,6 +47,10 @@ require ではなくパス直指定で load する。"
     (error (write-region (format "NOTHUNG LOAD ABORTED: %S\n" e)
                          nil (expand-file-name "~/nothung-load-errors.log") nil 'silent))))
 
+;; X11(GTK)ビルドの IME を XIM ではなく GTK immodule(fcitx5-gtk, DBus)経由にする。
+;; vaio は niri 上の XWayland で X11 版を使い、fcitx5 の XIM は無効化している。pgtk では無効果。
+(setq x-gtk-use-native-input t)
+
 ;; Windows専用: tr-imeでGoogle日本語入力の未確定文字列・変換候補をカーソル位置(over-the-spot)に表示
 ;;
 ;; 注意: tr-ime はW32メッセージポンプにフックするため、GUIフレームが無い状態
